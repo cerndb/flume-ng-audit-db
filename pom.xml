@@ -29,11 +29,6 @@
   		<version>1.6.0-cdh5.5.1</version>
   	</dependency>
   	<dependency>
-  		<groupId>org.apache.flume</groupId>
-  		<artifactId>flume-ng-sdk</artifactId>
-  		<version>1.6.0-cdh5.5.1</version>
-  	</dependency>
-  	<dependency>
 		<groupId>com.oracle</groupId>
 		<artifactId>jdbc</artifactId>
 		<version>7</version>
