@@ -104,7 +104,7 @@ public class ReliableOracleAuditEventReader implements ReliableEventReader {
 					String value = resultSet.getString(i);
 					
 					if(value != null)
-						event.addField(columnNames.get(i), value);
+						event.addField(columnNames.get(i - 1), value);
 				}				
 
 				last_timestamp = resultSet.getString(20);
@@ -182,8 +182,7 @@ public class ReliableOracleAuditEventReader implements ReliableEventReader {
 		try {
 			connection.close();
 			statement.close();
-		} catch (SQLException e) {
-			throw new IOException(e);
+		} catch (Throwable e) {
 		}
 	}
 
