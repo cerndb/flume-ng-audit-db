@@ -20,18 +20,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.cern.db.audit.flume.AuditEvent;
-import ch.cern.db.audit.flume.source.deserilizer.AuditEventDeserialezer;
+import ch.cern.db.audit.flume.source.deserilizer.AuditEventDeserializer;
 
 public class ReliableOracleAuditEventReader implements ReliableEventReader {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ReliableOracleAuditEventReader.class);
 	
-	private static final String CONNECTION_URL = "jdbc:oracle:oci8:@";
+	private static final String CONNECTION_URL = "jdbc:oracle:oci:@";
 	
 	private OracleDataSource dataSource = null;
 	private Connection connection = null;
 	private ResultSet resultSet = null;
-	private Statement statement;
+	private Statement statement = null;
 	
 	private String last_timestamp = null;
 	private String last_commited_timestamp = null;
@@ -40,9 +40,9 @@ public class ReliableOracleAuditEventReader implements ReliableEventReader {
 
 	private ArrayList<String> columnNames;
 
-	private AuditEventDeserialezer deserializer;
+	private AuditEventDeserializer deserializer;
 	
-	public ReliableOracleAuditEventReader(AuditEventDeserialezer deserializer) {
+	public ReliableOracleAuditEventReader(AuditEventDeserializer deserializer) {
 		Properties prop = new Properties();
 		prop.put(OracleConnection.CONNECTION_PROPERTY_USER_NAME, "sys");
 		prop.put(OracleConnection.CONNECTION_PROPERTY_PASSWORD, "sys");

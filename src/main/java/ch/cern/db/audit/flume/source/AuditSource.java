@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.flume.Context;
 import org.apache.flume.Event;
 import org.apache.flume.EventDeliveryException;
+import org.apache.flume.FlumeException;
 import org.apache.flume.PollableSource;
 import org.apache.flume.client.avro.ReliableEventReader;
 import org.apache.flume.conf.Configurable;
@@ -13,8 +14,8 @@ import org.apache.flume.source.AbstractSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.cern.db.audit.flume.source.deserilizer.AuditEventDeserialezer;
-import ch.cern.db.audit.flume.source.deserilizer.TextAuditEventDeserialezer;
+import ch.cern.db.audit.flume.source.deserilizer.AuditEventDeserializer;
+import ch.cern.db.audit.flume.source.deserilizer.AuditEventDeserializerFactory;
 import ch.cern.db.audit.flume.source.reader.ReliableOracleAuditEventReader;
 
 public class AuditSource extends AbstractSource implements Configurable, PollableSource {
@@ -29,7 +30,22 @@ public class AuditSource extends AbstractSource implements Configurable, Pollabl
 	
 	@Override
 	public void configure(Context context) {
-		AuditEventDeserialezer deserializer = new TextAuditEventDeserialezer();;
+		
+		AuditEventDeserializer.Builder builder;
+		try {
+			builder = AuditEventDeserializerFactory.newInstance("text");
+		} catch (ClassNotFoundException e) {
+			LOG.error("Builder class not found. Exception follows.", e);
+			throw new FlumeException("AuditEventDeserializer.Builder not found.", e);
+		} catch (InstantiationException e) {
+			LOG.error("Could not instantiate Builder. Exception follows.", e);
+			throw new FlumeException("AuditEventDeserializer.Builder not constructable.", e);
+		} catch (IllegalAccessException e) {
+			LOG.error("Unable to access Builder. Exception follows.", e);
+			throw new FlumeException("Unable to access AuditEventDeserializer.Builder.", e);
+		}
+        builder.configure(context);
+        AuditEventDeserializer deserializer = builder.build();
 		
 		reader = new ReliableOracleAuditEventReader(deserializer);
 	}
