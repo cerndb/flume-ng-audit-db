@@ -1,4 +1,4 @@
-package ch.cern.db.audit.flume.source.deserilizer;
+package ch.cern.db.audit.flume.source.deserializer;
 
 import java.nio.charset.Charset;
 
@@ -8,12 +8,12 @@ import org.apache.flume.event.EventBuilder;
 
 import ch.cern.db.audit.flume.AuditEvent;
 
-public class TextAuditEventDeserialezer implements AuditEventDeserializer {
+public class TextAuditEventDeserializer implements AuditEventDeserializer {
 
 	/**
 	 * Only builder can instance me
 	 */
-	private TextAuditEventDeserialezer() {
+	private TextAuditEventDeserializer() {
 	}
 	
 	@Override
@@ -29,7 +29,7 @@ public class TextAuditEventDeserialezer implements AuditEventDeserializer {
 
 		@Override
 		public AuditEventDeserializer build() {
-			return new TextAuditEventDeserialezer();
+			return new TextAuditEventDeserializer();
 		}
 		
 	}

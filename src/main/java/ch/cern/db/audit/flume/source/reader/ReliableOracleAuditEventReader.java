@@ -20,7 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.cern.db.audit.flume.AuditEvent;
-import ch.cern.db.audit.flume.source.deserilizer.AuditEventDeserializer;
+import ch.cern.db.audit.flume.source.deserializer.AuditEventDeserializer;
 
 public class ReliableOracleAuditEventReader implements ReliableEventReader {
 

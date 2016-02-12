@@ -15,13 +15,17 @@ public class AuditEvent {
 		fields.add(new Field(name, value));
 	}
 	
+	public List<Field> getFields() {
+		return fields;
+	}
+	
 	@Override
 	public String toString() {
 		return "AuditEvent [fields=" + fields + "]";
 	}
 
-	class Field{
-		String name, value;
+	public class Field{
+		public String name, value;
 		
 		public Field(String name, String value) {
 			this.name = name;

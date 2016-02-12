@@ -14,8 +14,8 @@ import org.apache.flume.source.AbstractSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.cern.db.audit.flume.source.deserilizer.AuditEventDeserializer;
-import ch.cern.db.audit.flume.source.deserilizer.AuditEventDeserializerFactory;
+import ch.cern.db.audit.flume.source.deserializer.AuditEventDeserializer;
+import ch.cern.db.audit.flume.source.deserializer.AuditEventDeserializerBuilderFactory;
 import ch.cern.db.audit.flume.source.reader.ReliableOracleAuditEventReader;
 
 public class AuditSource extends AbstractSource implements Configurable, PollableSource {
@@ -33,7 +33,7 @@ public class AuditSource extends AbstractSource implements Configurable, Pollabl
 		
 		AuditEventDeserializer.Builder builder;
 		try {
-			builder = AuditEventDeserializerFactory.newInstance("text");
+			builder = AuditEventDeserializerBuilderFactory.newInstance("json");
 		} catch (ClassNotFoundException e) {
 			LOG.error("Builder class not found. Exception follows.", e);
 			throw new FlumeException("AuditEventDeserializer.Builder not found.", e);

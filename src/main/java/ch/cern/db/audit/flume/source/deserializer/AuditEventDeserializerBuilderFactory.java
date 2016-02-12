@@ -1,17 +1,18 @@
-package ch.cern.db.audit.flume.source.deserilizer;
+package ch.cern.db.audit.flume.source.deserializer;
 
 import java.util.Locale;
 
-import ch.cern.db.audit.flume.source.deserilizer.AuditEventDeserializer.Builder;
+import ch.cern.db.audit.flume.source.deserializer.AuditEventDeserializer.Builder;
 
 /**
  * Factory used to register instances of AuditEventDeserializer & their
  * builders, as well as to instantiate the builders.
  */
-public class AuditEventDeserializerFactory {
+public class AuditEventDeserializerBuilderFactory {
 
 	public enum AuditEventDeserializerType {
-		TEXT(ch.cern.db.audit.flume.source.deserilizer.TextAuditEventDeserialezer.Builder.class);
+		TEXT(ch.cern.db.audit.flume.source.deserializer.TextAuditEventDeserializer.Builder.class),
+		JSON(ch.cern.db.audit.flume.source.deserializer.JSONAuditEventDeserializer.Builder.class);
 
 		private final Class<? extends Builder> builderClass;
 

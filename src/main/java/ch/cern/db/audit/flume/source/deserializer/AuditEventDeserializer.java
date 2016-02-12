@@ -1,4 +1,4 @@
-package ch.cern.db.audit.flume.source.deserilizer;
+package ch.cern.db.audit.flume.source.deserializer;
 
 import org.apache.flume.Event;
 import org.apache.flume.conf.Configurable;
