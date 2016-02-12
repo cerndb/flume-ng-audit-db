@@ -6,7 +6,6 @@ import java.util.List;
 import org.apache.flume.Context;
 import org.apache.flume.Event;
 import org.apache.flume.EventDeliveryException;
-import org.apache.flume.FlumeException;
 import org.apache.flume.PollableSource;
 import org.apache.flume.client.avro.ReliableEventReader;
 import org.apache.flume.conf.Configurable;
@@ -30,20 +29,7 @@ public class AuditSource extends AbstractSource implements Configurable, Pollabl
 	
 	@Override
 	public void configure(Context context) {
-		
-		AuditEventDeserializer.Builder builder;
-		try {
-			builder = AuditEventDeserializerBuilderFactory.newInstance("json");
-		} catch (ClassNotFoundException e) {
-			LOG.error("Builder class not found. Exception follows.", e);
-			throw new FlumeException("AuditEventDeserializer.Builder not found.", e);
-		} catch (InstantiationException e) {
-			LOG.error("Could not instantiate Builder. Exception follows.", e);
-			throw new FlumeException("AuditEventDeserializer.Builder not constructable.", e);
-		} catch (IllegalAccessException e) {
-			LOG.error("Unable to access Builder. Exception follows.", e);
-			throw new FlumeException("Unable to access AuditEventDeserializer.Builder.", e);
-		}
+		AuditEventDeserializer.Builder builder = AuditEventDeserializerBuilderFactory.newInstance("json");
         builder.configure(context);
         AuditEventDeserializer deserializer = builder.build();
 		
@@ -68,9 +54,7 @@ public class AuditSource extends AbstractSource implements Configurable, Pollabl
 			status = Status.BACKOFF;
 			
 			LOG.error(e.getMessage(), e);
-
-			if (e instanceof Error)
-				throw (Error) e;
+			throw new EventDeliveryException(e);
 		}
 		
 		sleep(batchStartTime);
