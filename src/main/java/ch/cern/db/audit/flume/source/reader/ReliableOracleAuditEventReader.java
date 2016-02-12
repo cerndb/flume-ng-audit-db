@@ -1,4 +1,4 @@
-package ch.cern.flume.source.oracle;
+package ch.cern.db.audit.flume.source.reader;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -18,6 +18,9 @@ import org.apache.flume.Event;
 import org.apache.flume.client.avro.ReliableEventReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import ch.cern.db.audit.flume.AuditEvent;
+import ch.cern.db.audit.flume.source.deserilizer.AuditEventDeserialezer;
 
 public class ReliableOracleAuditEventReader implements ReliableEventReader {
 
@@ -56,8 +59,6 @@ public class ReliableOracleAuditEventReader implements ReliableEventReader {
 		columnNames = (ArrayList<String>) getColumnNames();
 		
 		this.deserializer = deserializer;
-		if(this.deserializer instanceof AvroAuditEventDeserialezer)
-			((AvroAuditEventDeserialezer) this.deserializer).setFieldNames(columnNames);
 		
 		loadLastCommitedTimestamp();
 	}

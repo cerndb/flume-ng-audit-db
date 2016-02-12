@@ -1,4 +1,4 @@
-package ch.cern.flume.source.oracle;
+package ch.cern.db.audit.flume.source;
 
 import java.io.IOException;
 import java.util.List;
@@ -12,6 +12,10 @@ import org.apache.flume.conf.Configurable;
 import org.apache.flume.source.AbstractSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import ch.cern.db.audit.flume.source.deserilizer.AuditEventDeserialezer;
+import ch.cern.db.audit.flume.source.deserilizer.TextAuditEventDeserialezer;
+import ch.cern.db.audit.flume.source.reader.ReliableOracleAuditEventReader;
 
 public class AuditSource extends AbstractSource implements Configurable, PollableSource {
 

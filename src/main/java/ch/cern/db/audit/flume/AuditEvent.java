@@ -1,4 +1,4 @@
-package ch.cern.flume.source.oracle;
+package ch.cern.db.audit.flume;
 
 import java.util.LinkedList;
 import java.util.List;
