@@ -7,21 +7,15 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 import oracle.jdbc.driver.OracleConnection;
 import oracle.jdbc.pool.OracleDataSource;
 
-import org.apache.avro.Schema;
-import org.apache.avro.SchemaBuilder;
-import org.apache.avro.SchemaBuilder.FieldAssembler;
 import org.apache.flume.Event;
 import org.apache.flume.client.avro.ReliableEventReader;
-import org.apache.flume.sink.kite.DatasetSinkConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,8 +41,6 @@ public class ReliableOracleAuditEventReader implements ReliableEventReader {
 	private ArrayList<String> columnNames;
 
 	private AuditEventDeserializer deserializer;
-
-	private Schema schema;
 	
 	public ReliableOracleAuditEventReader(AuditEventDeserializer deserializer) {
 		Properties prop = new Properties();
@@ -66,23 +58,9 @@ public class ReliableOracleAuditEventReader implements ReliableEventReader {
 		
 		columnNames = (ArrayList<String>) getColumnNames();
 		
-		schema = createSchema(columnNames);
-		LOG.debug("Sending LITERAL schema in header (" 
-				+ DatasetSinkConstants.AVRO_SCHEMA_LITERAL_HEADER + "): " + schema);
-		
 		this.deserializer = deserializer;
 		
 		loadLastCommitedTimestamp();
-	}
-	
-	private Schema createSchema(ArrayList<String> columnNames) {
-		FieldAssembler<Schema> builder = SchemaBuilder.record("audit").fields();
-		
-		for (String columnName : columnNames) {
-			builder = builder.name(columnName).type().nullable().stringType().stringDefault(null);
-		}
-		
-		return builder.endRecord();
 	}
 
 	private List<String> getColumnNames() {
@@ -131,13 +109,7 @@ public class ReliableOracleAuditEventReader implements ReliableEventReader {
 
 				last_timestamp = resultSet.getString(20);
 				
-				Event deserialized_event = deserializer.process(event);
-				
-				Map<String, String> headers = new HashMap<String, String>();
-				headers.put(DatasetSinkConstants.AVRO_SCHEMA_LITERAL_HEADER, schema.toString());
-				deserialized_event.setHeaders(headers);
-				
-				return deserialized_event;
+				return deserializer.process(event);
 			}else{
 				resultSet = null;
 				
