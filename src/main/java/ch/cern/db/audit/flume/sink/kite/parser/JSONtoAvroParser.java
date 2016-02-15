@@ -146,54 +146,14 @@ public class JSONtoAvroParser implements EntityParser<GenericRecord> {
 		
 		JsonObject parser = new JsonParser().parse(new String(event.getBody())).getAsJsonObject();
 		
-		Schema schema = schema(event);
-		GenericRecordBuilder recordBuilder = new GenericRecordBuilder(schema);
-		for (Field field:schema.getFields()) {
+		GenericRecordBuilder recordBuilder = new GenericRecordBuilder(datasetSchema);
+		for (Field field:datasetSchema.getFields()) {
 			JsonElement value = parser.get(field.name());
 			
 			recordBuilder.set(field.name(), value != null ? value.getAsString() : null);
 		}
 
 		return recordBuilder.build();
-	}
-
-	/**
-	 * Get the schema from the event headers.
-	 * 
-	 * @param event
-	 *            The Flume event
-	 * @return The schema for the event
-	 * @throws EventDeliveryException
-	 *             A recoverable error such as an error downloading the schema
-	 *             from the URL has occurred.
-	 * @throws NonRecoverableEventException
-	 *             A non-recoverable error such as an unparsable schema has
-	 *             occurred.
-	 */
-	private static Schema schema(Event event) 
-			throws EventDeliveryException, NonRecoverableEventException {
-		
-		Map<String, String> headers = event.getHeaders();
-		String schemaURL = headers.get(AVRO_SCHEMA_URL_HEADER);
-		try {
-			if (schemaURL != null) {
-				return schemasFromURL.get(schemaURL);
-			} else {
-				String schemaLiteral = headers.get(AVRO_SCHEMA_LITERAL_HEADER);
-				if (schemaLiteral == null) {
-					throw new NonRecoverableEventException(
-							"No schema in event headers. Headers must include either "
-									+ AVRO_SCHEMA_URL_HEADER + " or "
-									+ AVRO_SCHEMA_LITERAL_HEADER);
-				}
-
-				return schemasFromLiteral.get(schemaLiteral);
-			}
-		} catch (ExecutionException ex) {
-			throw new EventDeliveryException("Cannot get schema ", ex.getCause());
-		} catch (UncheckedExecutionException ex) {
-			throw new NonRecoverableEventException("Cannot parse schema ", ex.getCause());
-		}
 	}
 
 	public static class Builder implements EntityParser.Builder<GenericRecord> {
