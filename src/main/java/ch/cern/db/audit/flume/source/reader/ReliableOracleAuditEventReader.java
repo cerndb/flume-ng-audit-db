@@ -79,7 +79,7 @@ public class ReliableOracleAuditEventReader implements ReliableEventReader {
 		FieldAssembler<Schema> builder = SchemaBuilder.record("audit").fields();
 		
 		for (String columnName : columnNames) {
-			builder.name(columnName);
+			builder = builder.name(columnName).type().nullable().stringType().stringDefault(null);
 		}
 		
 		return builder.endRecord();
@@ -133,11 +133,11 @@ public class ReliableOracleAuditEventReader implements ReliableEventReader {
 				
 				Event deserialized_event = deserializer.process(event);
 				
-				Map<String, String> headers = new HashMap<>();
+				Map<String, String> headers = new HashMap<String, String>();
 				headers.put(DatasetSinkConstants.AVRO_SCHEMA_LITERAL_HEADER, schema.toString());
 				deserialized_event.setHeaders(headers);
 				
-				return deserializer.process(event);
+				return deserialized_event;
 			}else{
 				resultSet = null;
 				

@@ -9,11 +9,14 @@ import java.net.URI;
 import java.net.URL;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.avro.Schema;
+import org.apache.avro.Schema.Field;
 import org.apache.avro.generic.GenericDatumReader;
 import org.apache.avro.generic.GenericRecord;
+import org.apache.avro.generic.GenericRecordBuilder;
 import org.apache.avro.io.DatumReader;
 import org.apache.avro.io.DecoderFactory;
 import org.apache.avro.io.JsonDecoder;
@@ -31,6 +34,9 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.util.concurrent.UncheckedExecutionException;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 /**
  * An {@link EntityParser} that parses Avro serialized bytes from an event.
@@ -137,18 +143,18 @@ public class JSONtoAvroParser implements EntityParser<GenericRecord> {
 	@Override
 	public GenericRecord parse(Event event, GenericRecord reuse)
 			throws EventDeliveryException, NonRecoverableEventException {
-
-		try {
-			decoder = DecoderFactory.get().jsonDecoder(schema(event), new String(event.getBody()));
+		
+		JsonObject parser = new JsonParser().parse(new String(event.getBody())).getAsJsonObject();
+		
+		Schema schema = schema(event);
+		GenericRecordBuilder recordBuilder = new GenericRecordBuilder(schema);
+		for (Field field:schema.getFields()) {
+			JsonElement value = parser.get(field.name());
 			
-			DatumReader<GenericRecord> reader = readers.getUnchecked(schema(event));
-			
-			return reader.read(reuse, decoder);
-		} catch (IOException ex) {
-			throw new NonRecoverableEventException("Cannot deserialize event", ex);
-		} catch (RuntimeException ex) {
-			throw new NonRecoverableEventException("Cannot deserialize event", ex);
+			recordBuilder.set(field.name(), value != null ? value.getAsString() : null);
 		}
+
+		return recordBuilder.build();
 	}
 
 	/**
@@ -193,8 +199,7 @@ public class JSONtoAvroParser implements EntityParser<GenericRecord> {
 	public static class Builder implements EntityParser.Builder<GenericRecord> {
 
 		@Override
-		public EntityParser<GenericRecord> build(Schema datasetSchema,
-				Context config) {
+		public EntityParser<GenericRecord> build(Schema datasetSchema, Context config) {
 			return new JSONtoAvroParser(datasetSchema);
 		}
 
