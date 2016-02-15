@@ -29,6 +29,19 @@
   		<version>1.6.0-cdh5.5.1</version>
   	</dependency>
   	<dependency>
+  		<groupId>org.apache.flume.flume-ng-sinks</groupId>
+		<artifactId>flume-dataset-sink</artifactId>
+  		<version>1.6.0-cdh5.5.1</version>
+	</dependency>
+	<dependency>
+      <!-- build will fail if this is not hadoop-common 2.*
+      because kite uses hflush.
+      -->
+      <groupId>org.apache.hadoop</groupId>
+      <artifactId>hadoop-common</artifactId>
+      <version>2.6.0-cdh5.5.1</version>
+    </dependency>
+  	<dependency>
 		<groupId>com.oracle</groupId>
 		<artifactId>jdbc</artifactId>
 		<version>7</version>
