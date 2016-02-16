@@ -122,7 +122,7 @@ public class ReliableOracleAuditEventReader implements ReliableEventReader {
 				last_commited_timestamp_file.createNewFile();
 				
 				LOG.info("File for storing last commited timestamp have been created: " +
-						TIMESTAMP_FILE_PATH);
+						last_commited_timestamp_file.getAbsolutePath());
 			}
 		} catch (IOException e) {
 			throw new FlumeException(e);
