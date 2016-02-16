@@ -7,6 +7,8 @@ import org.apache.flume.Event;
 import org.apache.flume.conf.ComponentConfiguration;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
+import org.elasticsearch.common.xcontent.XContentParser;
+import org.elasticsearch.common.xcontent.XContentType;
 
 import com.frontier45.flume.sink.elasticsearch2.ElasticSearchEventSerializer;
 
@@ -22,7 +24,9 @@ public class JSONtoElasticSearchEventSerializer implements ElasticSearchEventSer
 
 	@Override
 	public XContentBuilder getContentBuilder(Event event) throws IOException {
-		return XContentFactory.jsonBuilder().value(new String(event.getBody()));
+		XContentParser parser = XContentFactory.xContent(XContentType.JSON).createParser(event.getBody());
+		parser.close();
+		return XContentFactory.jsonBuilder().copyCurrentStructure(parser);
 	}
 
 }
