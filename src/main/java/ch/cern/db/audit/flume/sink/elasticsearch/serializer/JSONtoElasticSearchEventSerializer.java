@@ -5,11 +5,12 @@ import java.io.IOException;
 import org.apache.flume.Context;
 import org.apache.flume.Event;
 import org.apache.flume.conf.ComponentConfiguration;
-import org.apache.flume.sink.elasticsearch.ElasticSearchEventSerializer;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
 
-public class JSONtoElasticSearchEventSerializer implements	ElasticSearchEventSerializer {
+import com.frontier45.flume.sink.elasticsearch2.ElasticSearchEventSerializer;
+
+public class JSONtoElasticSearchEventSerializer implements ElasticSearchEventSerializer {
 
 	@Override
 	public void configure(Context context) {

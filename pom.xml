@@ -35,9 +35,11 @@
 			<version>1.6.0-cdh5.5.1</version>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.flume.flume-ng-sinks</groupId>
-			<artifactId>flume-ng-elasticsearch-sink</artifactId>
-			<version>1.6.0-cdh5.5.1</version>
+			<groupId>ElasticsearchSink2</groupId>
+			<artifactId>elasticsearch-sink2</artifactId>
+			<version>1.0</version>
+			<scope>system</scope>
+			<systemPath>${basedir}/lib/elasticsearch-sink2-assembly-1.0.jar</systemPath>
 		</dependency>
 		<dependency>
 			<!-- build will fail if this is not hadoop-common 2.* because kite uses 
