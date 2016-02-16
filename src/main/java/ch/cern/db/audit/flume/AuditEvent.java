@@ -23,20 +23,5 @@ public class AuditEvent {
 	public String toString() {
 		return "AuditEvent [fields=" + fields + "]";
 	}
-
-	public class Field{
-		public String name, value;
-		
-		public Field(String name, String value) {
-			this.name = name;
-			this.value = value;
-		}
-
-		@Override
-		public String toString() {
-			return "Field [name=" + name + ", value=" + value + "]";
-		}
-		
-	}
 	
 }
