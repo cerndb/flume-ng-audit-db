@@ -27,7 +27,6 @@ import ch.cern.db.audit.flume.AuditEvent;
 import ch.cern.db.audit.flume.source.deserializer.AuditEventDeserializer;
 import ch.cern.db.audit.flume.source.deserializer.AuditEventDeserializerBuilderFactory;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 
 public class ReliableOracleAuditEventReader implements ReliableEventReader {
@@ -61,7 +60,6 @@ public class ReliableOracleAuditEventReader implements ReliableEventReader {
 	
 	private AuditEventDeserializer deserializer;
 	
-	@VisibleForTesting
 	protected ReliableOracleAuditEventReader(){
 		committing_file = new File(COMMITTING_FILE_PATH);
 		loadLastCommittedValue();
@@ -96,6 +94,7 @@ public class ReliableOracleAuditEventReader implements ReliableEventReader {
 		AuditEventDeserializer.Builder builder = AuditEventDeserializerBuilderFactory.newInstance(des_config);
         builder.configure(context);
 		this.deserializer = builder.build();
+		LOG.info("Using deserializer: " + this.deserializer.getClass().getName());
 		
 		committing_file = new File(COMMITTING_FILE_PATH);
 		

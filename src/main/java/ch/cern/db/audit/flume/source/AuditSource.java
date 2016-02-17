@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.flume.Context;
 import org.apache.flume.Event;
 import org.apache.flume.EventDeliveryException;
+import org.apache.flume.FlumeException;
 import org.apache.flume.PollableSource;
 import org.apache.flume.conf.Configurable;
 import org.apache.flume.source.AbstractSource;
@@ -20,9 +21,13 @@ public class AuditSource extends AbstractSource implements Configurable, Pollabl
 
 	private static final Logger LOG = LoggerFactory.getLogger(AuditSource.class);
 
-	private static final int BATCH_SIZE = 100;
+	private static final int BATCH_SIZE_DEFAULT = 100;
+	private static final String BATCH_SIZE_PARAM = "batch.size";
+	private int batch_size = BATCH_SIZE_DEFAULT;
 
-	private static final long MINIMUM_BATCH_TIME = 10000;
+	private static final long MINIMUM_BATCH_TIME_DEFAULT = 10000;
+	private static final String MINIMUM_BATCH_TIME_PARAM = "batch.minimum_time";
+	private long minimum_batch_time = MINIMUM_BATCH_TIME_DEFAULT;
 
 	private static final String READER_DEFAULT = ReliableEventReaderBuilderFactory.Types.ORACLE.toString();
 	private static final String READER_PARAM = "reader";
@@ -31,10 +36,22 @@ public class AuditSource extends AbstractSource implements Configurable, Pollabl
 	
 	@Override
 	public void configure(Context context) {
+		try{
+			batch_size = context.getInteger(BATCH_SIZE_PARAM);
+		}catch(Exception e){
+			throw new FlumeException("Configured value for " + BATCH_SIZE_PARAM + " is not a number", e);
+		}
+		try{
+			minimum_batch_time = context.getLong(MINIMUM_BATCH_TIME_PARAM);
+		}catch(Exception e){
+			throw new FlumeException("Configured value for " + MINIMUM_BATCH_TIME_PARAM + " is not a number", e);
+		}
+		
 		String reader_config = context.getString(READER_PARAM, READER_DEFAULT);
 		Builder builder = ReliableEventReaderBuilderFactory.newInstance(reader_config);
         builder.configure(context);
 		reader = builder.build();
+		LOG.info("Using reader: " + reader.getClass().getName());
 	}
 	
 	@Override
@@ -44,7 +61,7 @@ public class AuditSource extends AbstractSource implements Configurable, Pollabl
 		long batchStartTime = System.currentTimeMillis();
 		
 		try{
-			List<Event> events = reader.readEvents(BATCH_SIZE);
+			List<Event> events = reader.readEvents(batch_size);
 			
 			getChannelProcessor().processEventBatch(events);
 			
@@ -66,9 +83,9 @@ public class AuditSource extends AbstractSource implements Configurable, Pollabl
 	private void sleep(long batchStartTime) {
 		long elapsedTime = System.currentTimeMillis() - batchStartTime;
 		
-		if(elapsedTime <= MINIMUM_BATCH_TIME){
+		if(elapsedTime <= minimum_batch_time){
 			try {
-				Thread.sleep(MINIMUM_BATCH_TIME - elapsedTime);
+				Thread.sleep(minimum_batch_time - elapsedTime);
 			} catch (InterruptedException e) {}
 		}
 	}
