@@ -27,6 +27,7 @@ import ch.cern.db.audit.flume.AuditEvent;
 import ch.cern.db.audit.flume.source.deserializer.AuditEventDeserializer;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Preconditions;
 
 public class ReliableOracleAuditEventReader implements ReliableEventReader {
 
@@ -34,16 +35,20 @@ public class ReliableOracleAuditEventReader implements ReliableEventReader {
 	
 	private static final String CONNECTION_URL = "jdbc:oracle:oci:@";
 
-	public static final String TIMESTAMP_FILE_PATH = "last_commited_timestamp.backup";
+	public static final String COMMITTING_FILE_PATH = "committed_value.backup";
 	
 	private OracleDataSource dataSource = null;
 	private Connection connection = null;
 	private ResultSet resultSet = null;
 	private Statement statement = null;
+	private String tableName = null;
+	private String columnToCommit = null;
+	private String configuredQuery = null;
 	
-	protected String last_timestamp = null;
-	protected String last_commited_timestamp = null;
-	private File last_commited_timestamp_file = null;
+	protected String last_value = null;
+	protected String committed_value = null;
+	private File committing_file = null;
+	private Integer numberOfColumnToCommit = null;
 	
 	private int columnCount;
 
@@ -54,10 +59,20 @@ public class ReliableOracleAuditEventReader implements ReliableEventReader {
 	
 	@VisibleForTesting
 	protected ReliableOracleAuditEventReader(){
-		loadLastCommitedTimestamp();
+		committing_file = new File(COMMITTING_FILE_PATH);
+		loadLastCommittedValue();
 	}
 	
 	public ReliableOracleAuditEventReader(AuditEventDeserializer deserializer) {
+		tableName = "UNIFIED_AUDIT_TRAIL";
+		columnToCommit = "EVENT_TIMESTAMP";
+		configuredQuery = null;
+		
+		if(configuredQuery == null){
+			Preconditions.checkNotNull(tableName, "Table name needs to be configured");
+			Preconditions.checkNotNull(columnToCommit, "Column to commit needs to be configured");
+		}
+		
 		Properties prop = new Properties();
 		prop.put(OracleConnection.CONNECTION_PROPERTY_USER_NAME, "sys");
 		prop.put(OracleConnection.CONNECTION_PROPERTY_PASSWORD, "sys");
@@ -75,7 +90,9 @@ public class ReliableOracleAuditEventReader implements ReliableEventReader {
 		
 		this.deserializer = deserializer;
 		
-		loadLastCommitedTimestamp();
+		committing_file = new File(COMMITTING_FILE_PATH);
+		
+		loadLastCommittedValue();
 	}
 
 	protected void getColumnMetadata() {
@@ -83,7 +100,9 @@ public class ReliableOracleAuditEventReader implements ReliableEventReader {
 			connect();
 			
 			Statement statement = connection.createStatement();
-			String query = "SELECT * FROM UNIFIED_AUDIT_TRAIL WHERE ROWNUM < 1";
+			String query = "SELECT * "
+					+ "FROM " + tableName
+					+ " WHERE ROWNUM < 1";
 			ResultSet resultSet = statement.executeQuery(query);
 			ResultSetMetaData metadata = resultSet.getMetaData();
 			columnCount = metadata.getColumnCount();
@@ -93,6 +112,15 @@ public class ReliableOracleAuditEventReader implements ReliableEventReader {
 			for (int i = 1; i <= columnCount; i++){
 				columnNames.add(metadata.getColumnName(i));
 				columnTypes.add(metadata.getColumnType(i));
+				
+				if(metadata.getColumnName(i).equals(columnToCommit)){
+					numberOfColumnToCommit = i;
+				}
+			}
+			
+			if(numberOfColumnToCommit == null){
+				throw new FlumeException("Name of column to commit was " + columnCount +
+						" but in table " + tableName + " there is no column with this name");
 			}
 		} catch (SQLException e) {
 			LOG.error(e.getMessage(), e);
@@ -101,29 +129,27 @@ public class ReliableOracleAuditEventReader implements ReliableEventReader {
 		}
 	}
 
-	private void loadLastCommitedTimestamp() {
+	private void loadLastCommittedValue() {
 		try {
-			last_commited_timestamp_file = new File(TIMESTAMP_FILE_PATH);
-			
-			if(last_commited_timestamp_file.exists()){
-				FileReader in = new FileReader(last_commited_timestamp_file);
+			if(committing_file.exists()){
+				FileReader in = new FileReader(committing_file);
 				char [] in_chars = new char[60];
 			    in.read(in_chars);
 				in.close();
-				String timestamp_from_file = new String(in_chars).trim();
+				String value_from_file = new String(in_chars).trim();
 				
-				if(timestamp_from_file.length() > 1){
-					last_commited_timestamp = timestamp_from_file;
+				if(value_from_file.length() > 1){
+					committed_value = value_from_file;
 					
-					LOG.info("Last timestamp loaded from file: " + last_commited_timestamp);
+					LOG.info("Last value loaded from file: " + committed_value);
 				}else{
-					LOG.info("File for loading last timestamp is empty");
+					LOG.info("File for loading last value is empty");
 				}
 			}else{
-				last_commited_timestamp_file.createNewFile();
+				committing_file.createNewFile();
 				
-				LOG.info("File for storing last commited timestamp have been created: " +
-						last_commited_timestamp_file.getAbsolutePath());
+				LOG.info("File for storing last commited value have been created: " +
+						committing_file.getAbsolutePath());
 			}
 		} catch (IOException e) {
 			throw new FlumeException(e);
@@ -169,8 +195,7 @@ public class ReliableOracleAuditEventReader implements ReliableEventReader {
 					}
 				}				
 
-				//TODO timestamp column must be passed from config
-				last_timestamp = resultSet.getString(20);
+				last_value = resultSet.getString(numberOfColumnToCommit);
 				
 				return deserializer.process(event);
 			}else{
@@ -190,14 +215,56 @@ public class ReliableOracleAuditEventReader implements ReliableEventReader {
 		connect();
 		
 		statement = connection.createStatement();
-		String query = "SELECT * " +
-				"FROM UNIFIED_AUDIT_TRAIL " +
-				(last_commited_timestamp == null ? "" : "WHERE EVENT_TIMESTAMP > TIMESTAMP \'" + last_commited_timestamp + "\'") +
-				"ORDER BY EVENT_TIMESTAMP";
+		
+		String query = createQuery(configuredQuery,
+				tableName,
+				columnToCommit,
+				columnTypes.get(numberOfColumnToCommit - 1),
+				committed_value);
 		
 		resultSet = statement.executeQuery(query);
 		
 		LOG.info("Executing query: " + query);
+	}
+
+	protected String createQuery(String configuredQuery, 
+			String tableName, 
+			String columnToCommit, 
+			Integer typeCommitColumn, 
+			String committedValue) {
+		
+		if(configuredQuery != null)
+			return configuredQuery;
+		
+		String query = "SELECT * FROM " + tableName;
+		
+		if(committedValue != null){
+			query = query.concat(" WHERE " + columnToCommit + " > ");
+		
+			switch (typeCommitColumn) {
+			case java.sql.Types.BOOLEAN:
+			case java.sql.Types.SMALLINT:
+			case java.sql.Types.TINYINT:
+			case java.sql.Types.INTEGER:
+			case java.sql.Types.BIGINT:
+			case java.sql.Types.NUMERIC:
+			case java.sql.Types.DOUBLE:
+			case java.sql.Types.FLOAT:
+				query = query.concat(committedValue);
+				break;
+			case java.sql.Types.TIMESTAMP:
+			case -102: //TIMESTAMP(6) WITH LOCAL TIME ZONE
+				query = query.concat("TIMESTAMP \'" + committedValue + "\'");
+				break;
+			default:
+				query = query.concat("\'" + committedValue + "\'");
+				break;
+			}
+		}
+		
+		query = query.concat(" ORDER BY " + columnToCommit);
+		
+		return query;
 	}
 
 	private void connect() throws SQLException{
@@ -232,16 +299,16 @@ public class ReliableOracleAuditEventReader implements ReliableEventReader {
 
 	@Override
 	public void commit() throws IOException {
-		if(last_timestamp == null)
+		if(last_value == null)
 			return;
 		
-		last_commited_timestamp = last_timestamp;
+		committed_value = last_value;
 		
-		FileWriter out = new FileWriter(last_commited_timestamp_file, false);
-		out.write(last_commited_timestamp);
+		FileWriter out = new FileWriter(committing_file, false);
+		out.write(committed_value);
 		out.close();
 		
-		last_timestamp = null;
+		last_value = null;
 	}
 
 	@Override
