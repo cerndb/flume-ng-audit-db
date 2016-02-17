@@ -140,30 +140,36 @@ public class ReliableOracleAuditEventReader implements ReliableEventReader {
 				AuditEvent event = new AuditEvent();
 				
 				for (int i = 1; i <= columnCount; i++) {										
-					if(!resultSet.wasNull()){
-						String name = columnNames.get(i - 1);
-						
-						switch (columnTypes.get(i - 1)) {
-						case java.sql.Types.SMALLINT:
-						case java.sql.Types.TINYINT:
-						case java.sql.Types.INTEGER:
-						case java.sql.Types.BIGINT:
-							event.addField(name, resultSet.getInt(i));
-							break;
-						case java.sql.Types.BOOLEAN:
-							event.addField(name, resultSet.getBoolean(i));
-							break;
-						case java.sql.Types.DOUBLE:
-						case java.sql.Types.FLOAT:
-							event.addField(name, resultSet.getDouble(i));
-							break;
-						default:
-							event.addField(name, resultSet.getString(i));
-							break;
-						}
+					String name = columnNames.get(i - 1);
+					
+					switch (columnTypes.get(i - 1)) {
+					case java.sql.Types.SMALLINT:
+					case java.sql.Types.TINYINT:
+					case java.sql.Types.INTEGER:
+					case java.sql.Types.BIGINT:
+						event.addField(name, resultSet.getInt(i));
+						break;
+					case java.sql.Types.BOOLEAN:
+						event.addField(name, resultSet.getBoolean(i));
+						break;
+					case java.sql.Types.NUMERIC:
+					case java.sql.Types.DOUBLE:
+					case java.sql.Types.FLOAT:
+						event.addField(name, resultSet.getDouble(i));
+						break;
+					case java.sql.Types.TIMESTAMP:
+					case -102: //TIMESTAMP(6) WITH LOCAL TIME ZONE
+						String ts = resultSet.getTimestamp(i).toString();
+						ts = ts.substring(0, 23).replace(" ", "T");
+						event.addField(name, ts);
+						break;
+					default:
+						event.addField(name, resultSet.getString(i));
+						break;
 					}
 				}				
 
+				//TODO timestamp column must be passed from config
 				last_timestamp = resultSet.getString(20);
 				
 				return deserializer.process(event);
