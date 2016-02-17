@@ -23,10 +23,10 @@ import org.apache.flume.client.avro.ReliableEventReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.annotations.VisibleForTesting;
-
 import ch.cern.db.audit.flume.AuditEvent;
 import ch.cern.db.audit.flume.source.deserializer.AuditEventDeserializer;
+
+import com.google.common.annotations.VisibleForTesting;
 
 public class ReliableOracleAuditEventReader implements ReliableEventReader {
 
@@ -48,7 +48,8 @@ public class ReliableOracleAuditEventReader implements ReliableEventReader {
 	private int columnCount;
 
 	private ArrayList<String> columnNames;
-
+	private ArrayList<Integer> columnTypes;
+	
 	private AuditEventDeserializer deserializer;
 	
 	@VisibleForTesting
@@ -70,14 +71,14 @@ public class ReliableOracleAuditEventReader implements ReliableEventReader {
 			LOG.error(e.getMessage(), e);
 		}
 		
-		columnNames = (ArrayList<String>) getColumnNames();
+		getColumnMetadata();
 		
 		this.deserializer = deserializer;
 		
 		loadLastCommitedTimestamp();
 	}
 
-	protected List<String> getColumnNames() {
+	protected void getColumnMetadata() {
 		try {
 			connect();
 			
@@ -87,12 +88,12 @@ public class ReliableOracleAuditEventReader implements ReliableEventReader {
 			ResultSetMetaData metadata = resultSet.getMetaData();
 			columnCount = metadata.getColumnCount();
 			
-			List<String> columnNames = new ArrayList<String>();			
+			columnNames = new ArrayList<String>();	
+			columnTypes = new ArrayList<Integer>();	
 			for (int i = 1; i <= columnCount; i++){
 				columnNames.add(metadata.getColumnName(i));
+				columnTypes.add(metadata.getColumnType(i));
 			}
-
-			return columnNames;
 		} catch (SQLException e) {
 			LOG.error(e.getMessage(), e);
 			
@@ -138,11 +139,29 @@ public class ReliableOracleAuditEventReader implements ReliableEventReader {
 			if(resultSet != null && !resultSet.isClosed() && resultSet.next()){
 				AuditEvent event = new AuditEvent();
 				
-				for (int i = 1; i <= columnCount; i++) {					
-					String value = resultSet.getString(i);
-					
-					if(value != null)
-						event.addField(columnNames.get(i - 1), value);
+				for (int i = 1; i <= columnCount; i++) {										
+					if(!resultSet.wasNull()){
+						String name = columnNames.get(i - 1);
+						
+						switch (columnTypes.get(i - 1)) {
+						case java.sql.Types.SMALLINT:
+						case java.sql.Types.TINYINT:
+						case java.sql.Types.INTEGER:
+						case java.sql.Types.BIGINT:
+							event.addField(name, resultSet.getInt(i));
+							break;
+						case java.sql.Types.BOOLEAN:
+							event.addField(name, resultSet.getBoolean(i));
+							break;
+						case java.sql.Types.DOUBLE:
+						case java.sql.Types.FLOAT:
+							event.addField(name, resultSet.getDouble(i));
+							break;
+						default:
+							event.addField(name, resultSet.getString(i));
+							break;
+						}
+					}
 				}				
 
 				last_timestamp = resultSet.getString(20);
