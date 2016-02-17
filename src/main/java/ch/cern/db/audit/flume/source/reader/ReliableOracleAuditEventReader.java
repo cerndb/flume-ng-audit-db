@@ -17,14 +17,15 @@ import java.util.Properties;
 import oracle.jdbc.driver.OracleConnection;
 import oracle.jdbc.pool.OracleDataSource;
 
+import org.apache.flume.Context;
 import org.apache.flume.Event;
 import org.apache.flume.FlumeException;
-import org.apache.flume.client.avro.ReliableEventReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.cern.db.audit.flume.AuditEvent;
 import ch.cern.db.audit.flume.source.deserializer.AuditEventDeserializer;
+import ch.cern.db.audit.flume.source.deserializer.AuditEventDeserializerBuilderFactory;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
@@ -36,6 +37,9 @@ public class ReliableOracleAuditEventReader implements ReliableEventReader {
 	private static final String CONNECTION_URL = "jdbc:oracle:oci:@";
 
 	public static final String COMMITTING_FILE_PATH = "committed_value.backup";
+
+	private static final String DESERIALIZER_PARAM = "deserializer";
+	private static final String DESERIALIZER_DEFAULT = AuditEventDeserializerBuilderFactory.Types.JSON.toString();
 	
 	private OracleDataSource dataSource = null;
 	private Connection connection = null;
@@ -63,7 +67,7 @@ public class ReliableOracleAuditEventReader implements ReliableEventReader {
 		loadLastCommittedValue();
 	}
 	
-	public ReliableOracleAuditEventReader(AuditEventDeserializer deserializer) {
+	public ReliableOracleAuditEventReader(Context context) {
 		tableName = "UNIFIED_AUDIT_TRAIL";
 		columnToCommit = "EVENT_TIMESTAMP";
 		configuredQuery = null;
@@ -88,7 +92,10 @@ public class ReliableOracleAuditEventReader implements ReliableEventReader {
 		
 		getColumnMetadata();
 		
-		this.deserializer = deserializer;
+		String des_config = context.getString(DESERIALIZER_PARAM, DESERIALIZER_DEFAULT);
+		AuditEventDeserializer.Builder builder = AuditEventDeserializerBuilderFactory.newInstance(des_config);
+        builder.configure(context);
+		this.deserializer = builder.build();
 		
 		committing_file = new File(COMMITTING_FILE_PATH);
 		
@@ -320,4 +327,19 @@ public class ReliableOracleAuditEventReader implements ReliableEventReader {
 		}
 	}
 
+	public static class Builder implements ReliableEventReader.Builder {
+
+		private Context context;
+		
+		@Override
+		public void configure(Context context) {
+			this.context = context;
+		}
+
+		@Override
+		public ReliableOracleAuditEventReader build() {
+			return new ReliableOracleAuditEventReader(context);
+		}
+		
+	}
 }

@@ -7,15 +7,14 @@ import org.apache.flume.Context;
 import org.apache.flume.Event;
 import org.apache.flume.EventDeliveryException;
 import org.apache.flume.PollableSource;
-import org.apache.flume.client.avro.ReliableEventReader;
 import org.apache.flume.conf.Configurable;
 import org.apache.flume.source.AbstractSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.cern.db.audit.flume.source.deserializer.AuditEventDeserializer;
-import ch.cern.db.audit.flume.source.deserializer.AuditEventDeserializerBuilderFactory;
-import ch.cern.db.audit.flume.source.reader.ReliableOracleAuditEventReader;
+import ch.cern.db.audit.flume.source.reader.ReliableEventReader;
+import ch.cern.db.audit.flume.source.reader.ReliableEventReader.Builder;
+import ch.cern.db.audit.flume.source.reader.ReliableEventReaderBuilderFactory;
 
 public class AuditSource extends AbstractSource implements Configurable, PollableSource {
 
@@ -25,15 +24,17 @@ public class AuditSource extends AbstractSource implements Configurable, Pollabl
 
 	private static final long MINIMUM_BATCH_TIME = 10000;
 
+	private static final String READER_DEFAULT = ReliableEventReaderBuilderFactory.Types.ORACLE.toString();
+	private static final String READER_PARAM = "reader";
+
 	private ReliableEventReader reader;
 	
 	@Override
 	public void configure(Context context) {
-		AuditEventDeserializer.Builder builder = AuditEventDeserializerBuilderFactory.newInstance("json");
+		String reader_config = context.getString(READER_PARAM, READER_DEFAULT);
+		Builder builder = ReliableEventReaderBuilderFactory.newInstance(reader_config);
         builder.configure(context);
-        AuditEventDeserializer deserializer = builder.build();
-		
-		reader = new ReliableOracleAuditEventReader(deserializer);
+		reader = builder.build();
 	}
 	
 	@Override
