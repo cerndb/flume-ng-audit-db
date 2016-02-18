@@ -37,12 +37,16 @@ public class AuditSource extends AbstractSource implements Configurable, Pollabl
 	@Override
 	public void configure(Context context) {
 		try{
-			batch_size = context.getInteger(BATCH_SIZE_PARAM);
+			String value = context.getString(BATCH_SIZE_PARAM);
+			if(value != null)
+				batch_size = Integer.parseInt(value);
 		}catch(Exception e){
 			throw new FlumeException("Configured value for " + BATCH_SIZE_PARAM + " is not a number", e);
 		}
 		try{
-			minimum_batch_time = context.getLong(MINIMUM_BATCH_TIME_PARAM);
+			String value = context.getString(MINIMUM_BATCH_TIME_PARAM);
+			if(value != null)
+				minimum_batch_time = Integer.parseInt(value);
 		}catch(Exception e){
 			throw new FlumeException("Configured value for " + MINIMUM_BATCH_TIME_PARAM + " is not a number", e);
 		}
