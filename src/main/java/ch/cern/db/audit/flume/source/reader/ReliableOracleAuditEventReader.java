@@ -76,12 +76,10 @@ public class ReliableOracleAuditEventReader implements ReliableEventReader {
 		columnToCommit = context.getString(COLUMN_TO_COMMIT_PARAM);
 		configuredQuery = context.getString(QUERY_PARAM);
 		
+		Preconditions.checkNotNull(columnToCommit, "Column to commit needs to be configured with " + COLUMN_TO_COMMIT_PARAM);
+		
 		if(configuredQuery == null){
 			Preconditions.checkNotNull(tableName, "Table name needs to be configured with " + TABLE_NAME_PARAM);
-			Preconditions.checkNotNull(columnToCommit, "Column to commit needs to be configured with " + COLUMN_TO_COMMIT_PARAM);
-		}else{
-			//TODO check format of query
-			//it must include special string for replacing committed value/ able to get rid of when clause
 		}
 		
 		String conf_type_column = context.getString(TYPE_COLUMN_TO_COMMIT_PARAM);
@@ -224,9 +222,28 @@ public class ReliableOracleAuditEventReader implements ReliableEventReader {
 	protected String createQuery(String committed_value) {
 		
 		if(configuredQuery != null){
-			//TODO return query with committedValue
+			char left = '[';
+			char right = ']';
+			String toReplace = "{$committed_value}";
 			
-			return configuredQuery;
+			int left_index = configuredQuery.indexOf(left);
+			int right_index = configuredQuery.indexOf(right);
+			int committed_value_index = configuredQuery.indexOf(toReplace);
+			if(committed_value_index < right_index && committed_value_index > left_index){
+				//right syntax for replacing 
+				//SELECT * FROM table_name [WHERE column_name > '{$committed_vale}'] ORDER BY column_name
+				
+				if(committed_value == null){
+					return configuredQuery.substring(0, left_index)
+							.concat(configuredQuery.substring(right_index+1, configuredQuery.length()));
+				}else{
+					return configuredQuery.replace(left, ' ')
+							.replace(right, ' ')
+							.replace(toReplace, committed_value);
+				}
+			}else{
+				return configuredQuery;
+			}
 		}
 		
 		String query = "SELECT * FROM " + tableName;

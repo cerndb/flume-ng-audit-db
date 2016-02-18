@@ -111,10 +111,30 @@ public class ReliableOracleAuditEventReaderTests {
 		
 		Context context = new Context();
 		context.put(ReliableOracleAuditEventReader.QUERY_PARAM, "new query");
+		context.put(ReliableOracleAuditEventReader.COLUMN_TO_COMMIT_PARAM, "column");
 		ReliableOracleAuditEventReader reader = new ReliableOracleAuditEventReader(context);
 		
 		String result = reader.createQuery(null);
 		Assert.assertEquals(result, "new query");
+		
+		context = new Context();
+		context.put(ReliableOracleAuditEventReader.QUERY_PARAM, 
+				"SELECT * FROM table_name [WHERE column_name > '{$committed_value}'] ORDER BY column_name");
+		context.put(ReliableOracleAuditEventReader.COLUMN_TO_COMMIT_PARAM, "column");
+		reader = new ReliableOracleAuditEventReader(context);
+		
+		result = reader.createQuery(null);
+		Assert.assertEquals(result, "SELECT * FROM table_name  ORDER BY column_name");
+		
+		
+		context = new Context();
+		context.put(ReliableOracleAuditEventReader.QUERY_PARAM, 
+				"SELECT * FROM table_name [WHERE column_name > '{$committed_value}'] ORDER BY column_name");
+		context.put(ReliableOracleAuditEventReader.COLUMN_TO_COMMIT_PARAM, "column");
+		reader = new ReliableOracleAuditEventReader(context);
+		
+		result = reader.createQuery("12345");
+		Assert.assertEquals(result, "SELECT * FROM table_name  WHERE column_name > '12345'  ORDER BY column_name");
 		
 		
 		context = new Context();
