@@ -60,6 +60,12 @@ public class ReliableOracleAuditEventReader implements ReliableEventReader {
 
 	public static final String QUERY_PARAM = "reader.query";
 	private String configuredQuery = null;
+	
+	public static final String USERNAME_PARAM = "reader.username";
+	public static final String USERNAME_DEFAULT = "sys";
+	
+	public static final String PASSWORD_PARAM = "reader.password";
+	public static final String PASSWORD_DEFAULT = "sys";
 
 	public static final String LOGIN_AS_SYSDBA_PARAM = "reader.loginAsSysdba";
 	public static final Boolean LOGIN_AS_SYSDBA_DEFAULT = false;
@@ -93,8 +99,10 @@ public class ReliableOracleAuditEventReader implements ReliableEventReader {
 		}
 		
 		Properties prop = new Properties();
-		prop.put(OracleConnection.CONNECTION_PROPERTY_USER_NAME, "sys");
-		prop.put(OracleConnection.CONNECTION_PROPERTY_PASSWORD, "sys");
+		prop.put(OracleConnection.CONNECTION_PROPERTY_USER_NAME, 
+				context.getString(USERNAME_PARAM, USERNAME_DEFAULT));
+		prop.put(OracleConnection.CONNECTION_PROPERTY_PASSWORD, 
+				context.getString(PASSWORD_PARAM, PASSWORD_DEFAULT));
 		
 		if(context.getBoolean(LOGIN_AS_SYSDBA_PARAM, LOGIN_AS_SYSDBA_DEFAULT)){
 			prop.put(OracleConnection.CONNECTION_PROPERTY_INTERNAL_LOGON, "sysdba");
