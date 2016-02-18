@@ -9,7 +9,6 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
@@ -33,8 +32,8 @@ public class ReliableOracleAuditEventReader implements ReliableEventReader {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ReliableOracleAuditEventReader.class);
 	
-	private static final String CONNECTION_URL_DEFAULT = "jdbc:oracle:oci:@";
-	private static final String CONNECTION_URL_PARAM = "reader.connection_url";
+	public static final String CONNECTION_URL_DEFAULT = "jdbc:oracle:oci:@";
+	public static final String CONNECTION_URL_PARAM = "reader.connection_url";
 	private String connection_url = CONNECTION_URL_DEFAULT;
 
 	public static final String COMMITTING_FILE_PATH_DEFAULT = "committed_value.backup";
@@ -42,24 +41,27 @@ public class ReliableOracleAuditEventReader implements ReliableEventReader {
 	private String committing_file_path = COMMITTING_FILE_PATH_DEFAULT;
 	private File committing_file = null;
 
-	private static final String DESERIALIZER_DEFAULT = AuditEventDeserializerBuilderFactory.Types.JSON.toString();
-	private static final String DESERIALIZER_PARAM = "deserializer";
+	public static final String DESERIALIZER_DEFAULT = AuditEventDeserializerBuilderFactory.Types.JSON.toString();
+	public static final String DESERIALIZER_PARAM = "deserializer";
 	private AuditEventDeserializer deserializer;
 	
-	private static final String TABLE_NAME_PARAM = "reader.table";
+	public static final String TABLE_NAME_PARAM = "reader.table";
 	private String tableName = null;
 	
-	private static final String COLUMN_TO_COMMIT_PARAM = "reader.table.column_to_commit";
+	public static final String COLUMN_TO_COMMIT_PARAM = "reader.table.columnToCommit";
 	private String columnToCommit = null;
-	private Integer numberOfColumnToCommit = null;
 	protected String committed_value = null;
+	
+	enum ColumnType {STRING, TIMESTAMP, NUMERIC}
+	public static final String TYPE_COLUMN_TO_COMMIT_PARAM = "reader.table.columnToCommit.type";
+	public static final ColumnType TYPE_COLUMN_TO_COMMIT_DEFUALT = ColumnType.TIMESTAMP;
+	private ColumnType type_column_to_commit = TYPE_COLUMN_TO_COMMIT_DEFUALT;
 
-	private static final String QUERY_PARAM = "reader.query";
+	public static final String QUERY_PARAM = "reader.query";
 	private String configuredQuery = null;
 
-	private static final String LOGIN_AS_SYSDBA_PARAM = "reader.login_as_sysdba";
-	private static final Boolean LOGIN_AS_SYSDBA_DEFAULT = false;
-	private boolean login_as_sysdba = LOGIN_AS_SYSDBA_DEFAULT;
+	public static final String LOGIN_AS_SYSDBA_PARAM = "reader.loginAsSysdba";
+	public static final Boolean LOGIN_AS_SYSDBA_DEFAULT = false;
 	
 	private OracleDataSource dataSource = null;
 	private Connection connection = null;
@@ -67,15 +69,6 @@ public class ReliableOracleAuditEventReader implements ReliableEventReader {
 	private Statement statement = null;
 	
 	protected String last_value = null;
-	
-	private int columnCount;
-	private ArrayList<String> columnNames;
-	private ArrayList<Integer> columnTypes;
-	
-	protected ReliableOracleAuditEventReader(){
-		committing_file = new File(committing_file_path);
-		loadLastCommittedValue();
-	}
 	
 	public ReliableOracleAuditEventReader(Context context) {
 		tableName = context.getString(TABLE_NAME_PARAM);
@@ -90,11 +83,21 @@ public class ReliableOracleAuditEventReader implements ReliableEventReader {
 			//it must include special string for replacing committed value/ able to get rid of when clause
 		}
 		
-		login_as_sysdba = context.getBoolean(LOGIN_AS_SYSDBA_PARAM, LOGIN_AS_SYSDBA_DEFAULT);
+		String conf_type_column = context.getString(TYPE_COLUMN_TO_COMMIT_PARAM);
+		if(conf_type_column != null){
+			try{
+				type_column_to_commit = ColumnType.valueOf(conf_type_column.toUpperCase());
+			}catch(Exception e){
+				throw new FlumeException("Configuration value for " + TYPE_COLUMN_TO_COMMIT_PARAM
+						+ " is not valid, it must be one of: " + ColumnType.values());
+			}
+		}
+		
 		Properties prop = new Properties();
-		if(login_as_sysdba){
-			prop.put(OracleConnection.CONNECTION_PROPERTY_USER_NAME, "sys");
-			prop.put(OracleConnection.CONNECTION_PROPERTY_PASSWORD, "sys");
+		prop.put(OracleConnection.CONNECTION_PROPERTY_USER_NAME, "sys");
+		prop.put(OracleConnection.CONNECTION_PROPERTY_PASSWORD, "sys");
+		
+		if(context.getBoolean(LOGIN_AS_SYSDBA_PARAM, LOGIN_AS_SYSDBA_DEFAULT)){
 			prop.put(OracleConnection.CONNECTION_PROPERTY_INTERNAL_LOGON, "sysdba");
 		}
 		
@@ -107,8 +110,6 @@ public class ReliableOracleAuditEventReader implements ReliableEventReader {
 			throw new FlumeException(e.getMessage(), e);
 		}
 		
-		getColumnMetadata();
-		
 		String des_config = context.getString(DESERIALIZER_PARAM, DESERIALIZER_DEFAULT);
 		AuditEventDeserializer.Builder builder = AuditEventDeserializerBuilderFactory.newInstance(des_config);
         builder.configure(context);
@@ -118,40 +119,6 @@ public class ReliableOracleAuditEventReader implements ReliableEventReader {
 		committing_file = new File(committing_file_path);
 		
 		loadLastCommittedValue();
-	}
-
-	protected void getColumnMetadata() {
-		try {
-			connect();
-			
-			Statement statement = connection.createStatement();
-			String query = "SELECT * "
-					+ "FROM " + tableName
-					+ " WHERE ROWNUM < 1";
-			ResultSet resultSet = statement.executeQuery(query);
-			ResultSetMetaData metadata = resultSet.getMetaData();
-			columnCount = metadata.getColumnCount();
-			
-			columnNames = new ArrayList<String>();	
-			columnTypes = new ArrayList<Integer>();	
-			for (int i = 1; i <= columnCount; i++){
-				columnNames.add(metadata.getColumnName(i));
-				columnTypes.add(metadata.getColumnType(i));
-				
-				if(metadata.getColumnName(i).equals(columnToCommit)){
-					numberOfColumnToCommit = i;
-				}
-			}
-			
-			if(numberOfColumnToCommit == null){
-				throw new FlumeException("Name of column to commit was " + columnCount +
-						" but in table " + tableName + " there is no column with this name");
-			}
-		} catch (SQLException e) {
-			LOG.error(e.getMessage(), e);
-			
-			throw new FlumeException(e);
-		}
 	}
 
 	private void loadLastCommittedValue() {
@@ -188,12 +155,15 @@ public class ReliableOracleAuditEventReader implements ReliableEventReader {
 				runQuery();
 			
 			if(resultSet != null && !resultSet.isClosed() && resultSet.next()){
+				ResultSetMetaData metadata = resultSet.getMetaData();
+				int columnCount = metadata.getColumnCount();
+				
 				AuditEvent event = new AuditEvent();
 				
 				for (int i = 1; i <= columnCount; i++) {										
-					String name = columnNames.get(i - 1);
+					String name = metadata.getColumnName(i);
 					
-					switch (columnTypes.get(i - 1)) {
+					switch (metadata.getColumnType(i)) {
 					case java.sql.Types.SMALLINT:
 					case java.sql.Types.TINYINT:
 					case java.sql.Types.INTEGER:
@@ -218,9 +188,11 @@ public class ReliableOracleAuditEventReader implements ReliableEventReader {
 						event.addField(name, resultSet.getString(i));
 						break;
 					}
+					
+					if(name.equals(columnToCommit)){
+						last_value = resultSet.getString(i);
+					}
 				}				
-
-				last_value = resultSet.getString(numberOfColumnToCommit);
 				
 				return deserializer.process(event);
 			}else{
@@ -244,7 +216,7 @@ public class ReliableOracleAuditEventReader implements ReliableEventReader {
 		String query = createQuery(configuredQuery,
 				tableName,
 				columnToCommit,
-				columnTypes.get(numberOfColumnToCommit - 1),
+				type_column_to_commit,
 				committed_value);
 		
 		resultSet = statement.executeQuery(query);
@@ -255,7 +227,7 @@ public class ReliableOracleAuditEventReader implements ReliableEventReader {
 	protected String createQuery(String configuredQuery, 
 			String tableName, 
 			String columnToCommit, 
-			Integer typeCommitColumn, 
+			ColumnType typeCommitColumn, 
 			String committedValue) {
 		
 		if(configuredQuery != null){
@@ -270,21 +242,13 @@ public class ReliableOracleAuditEventReader implements ReliableEventReader {
 			query = query.concat(" WHERE " + columnToCommit + " > ");
 		
 			switch (typeCommitColumn) {
-			case java.sql.Types.BOOLEAN:
-			case java.sql.Types.SMALLINT:
-			case java.sql.Types.TINYINT:
-			case java.sql.Types.INTEGER:
-			case java.sql.Types.BIGINT:
-			case java.sql.Types.NUMERIC:
-			case java.sql.Types.DOUBLE:
-			case java.sql.Types.FLOAT:
+			case NUMERIC:
 				query = query.concat(committedValue);
 				break;
-			case java.sql.Types.TIMESTAMP:
-			case -102: //TIMESTAMP(6) WITH LOCAL TIME ZONE
+			case TIMESTAMP:
 				query = query.concat("TIMESTAMP \'" + committedValue + "\'");
 				break;
-			default:
+			default: //String
 				query = query.concat("\'" + committedValue + "\'");
 				break;
 			}
