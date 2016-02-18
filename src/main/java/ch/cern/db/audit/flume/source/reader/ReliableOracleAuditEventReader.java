@@ -9,6 +9,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
@@ -89,7 +90,7 @@ public class ReliableOracleAuditEventReader implements ReliableEventReader {
 				type_column_to_commit = ColumnType.valueOf(conf_type_column.toUpperCase());
 			}catch(Exception e){
 				throw new FlumeException("Configuration value for " + TYPE_COLUMN_TO_COMMIT_PARAM
-						+ " is not valid, it must be one of: " + ColumnType.values());
+						+ " is not valid, it must be one of: " + Arrays.asList(ColumnType.values()));
 			}
 		}
 		
@@ -213,22 +214,14 @@ public class ReliableOracleAuditEventReader implements ReliableEventReader {
 		
 		statement = connection.createStatement();
 		
-		String query = createQuery(configuredQuery,
-				tableName,
-				columnToCommit,
-				type_column_to_commit,
-				committed_value);
+		String query = createQuery(committed_value);
 		
 		resultSet = statement.executeQuery(query);
 		
 		LOG.info("Executing query: " + query);
 	}
 
-	protected String createQuery(String configuredQuery, 
-			String tableName, 
-			String columnToCommit, 
-			ColumnType typeCommitColumn, 
-			String committedValue) {
+	protected String createQuery(String committed_value) {
 		
 		if(configuredQuery != null){
 			//TODO return query with committedValue
@@ -238,18 +231,18 @@ public class ReliableOracleAuditEventReader implements ReliableEventReader {
 		
 		String query = "SELECT * FROM " + tableName;
 		
-		if(committedValue != null){
+		if(committed_value != null){
 			query = query.concat(" WHERE " + columnToCommit + " > ");
 		
-			switch (typeCommitColumn) {
+			switch (type_column_to_commit) {
 			case NUMERIC:
-				query = query.concat(committedValue);
+				query = query.concat(committed_value);
 				break;
 			case TIMESTAMP:
-				query = query.concat("TIMESTAMP \'" + committedValue + "\'");
+				query = query.concat("TIMESTAMP \'" + committed_value + "\'");
 				break;
 			default: //String
-				query = query.concat("\'" + committedValue + "\'");
+				query = query.concat("\'" + committed_value + "\'");
 				break;
 			}
 		}

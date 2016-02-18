@@ -6,11 +6,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import org.apache.flume.Context;
+import org.apache.flume.FlumeException;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
-
-import ch.cern.db.audit.flume.source.reader.ReliableOracleAuditEventReader.ColumnType;
 
 public class ReliableOracleAuditEventReaderTests {
 
@@ -107,38 +106,94 @@ public class ReliableOracleAuditEventReaderTests {
 	}
 	
 	@Test
+	@SuppressWarnings("resource")
 	public void queryCreation(){
 		
 		Context context = new Context();
-		context.put(ReliableOracleAuditEventReader.TABLE_NAME_PARAM, "table");
-		context.put(ReliableOracleAuditEventReader.COLUMN_TO_COMMIT_PARAM, "column");
-		@SuppressWarnings("resource")
+		context.put(ReliableOracleAuditEventReader.QUERY_PARAM, "new query");
 		ReliableOracleAuditEventReader reader = new ReliableOracleAuditEventReader(context);
 		
-		String result = reader.createQuery("new query", null, null, null, null);
+		String result = reader.createQuery(null);
 		Assert.assertEquals(result, "new query");
 		
-		result = reader.createQuery("new query", "a", "b", ColumnType.NUMERIC, "c");
+		
+		context = new Context();
+		context.put(ReliableOracleAuditEventReader.TABLE_NAME_PARAM, "table");
+		context.put(ReliableOracleAuditEventReader.COLUMN_TO_COMMIT_PARAM, "column");
+		context.put(ReliableOracleAuditEventReader.QUERY_PARAM, "new query");
+		reader = new ReliableOracleAuditEventReader(context);
+		
+		result = reader.createQuery("value");
 		Assert.assertEquals(result, "new query");
 		
-		result = reader.createQuery(null, "table_name", "column_name", ColumnType.NUMERIC, null);
-		Assert.assertEquals(result, "SELECT * FROM table_name "
-				+ "ORDER BY column_name");
 		
-		result = reader.createQuery(null, "table_name", "column_name", ColumnType.TIMESTAMP, "2016-02-09 09:34:51.244");
-		Assert.assertEquals(result, "SELECT * FROM table_name "
-				+ "WHERE column_name > TIMESTAMP '2016-02-09 09:34:51.244' "
-				+ "ORDER BY column_name");
+		context = new Context();
+		context.put(ReliableOracleAuditEventReader.TABLE_NAME_PARAM, "table_name1");
+		context.put(ReliableOracleAuditEventReader.COLUMN_TO_COMMIT_PARAM, "column_name1");
+		reader = new ReliableOracleAuditEventReader(context);
 		
-		result = reader.createQuery(null, "table_name", "column_name", ColumnType.NUMERIC, "244");
-		Assert.assertEquals(result, "SELECT * FROM table_name "
-				+ "WHERE column_name > 244 "
-				+ "ORDER BY column_name");
+		result = reader.createQuery(null);
+		Assert.assertEquals(result, "SELECT * FROM table_name1 ORDER BY column_name1");
 		
-		result = reader.createQuery(null, "table_name", "column_name", ColumnType.STRING, "string");
-		Assert.assertEquals(result, "SELECT * FROM table_name "
-				+ "WHERE column_name > \'string\' "
-				+ "ORDER BY column_name");
+		
+		context = new Context();
+		context.put(ReliableOracleAuditEventReader.TABLE_NAME_PARAM, "table_name2");
+		context.put(ReliableOracleAuditEventReader.COLUMN_TO_COMMIT_PARAM, "column_name2");
+		reader = new ReliableOracleAuditEventReader(context);
+		
+		result = reader.createQuery("2016-02-09 09:34:51.244");
+		Assert.assertEquals(result, "SELECT * FROM table_name2 "
+				+ "WHERE column_name2 > TIMESTAMP '2016-02-09 09:34:51.244' "
+				+ "ORDER BY column_name2");
+		
+		
+		context = new Context();
+		context.put(ReliableOracleAuditEventReader.TABLE_NAME_PARAM, "table_name2");
+		context.put(ReliableOracleAuditEventReader.COLUMN_TO_COMMIT_PARAM, "column_name2");
+		context.put(ReliableOracleAuditEventReader.TYPE_COLUMN_TO_COMMIT_PARAM, "timestamp");
+		reader = new ReliableOracleAuditEventReader(context);
+		
+		result = reader.createQuery("2016-02-09 09:34:51.244");
+		Assert.assertEquals(result, "SELECT * FROM table_name2 "
+				+ "WHERE column_name2 > TIMESTAMP '2016-02-09 09:34:51.244' "
+				+ "ORDER BY column_name2");
+		
+		
+		context = new Context();
+		context.put(ReliableOracleAuditEventReader.TABLE_NAME_PARAM, "table_name3");
+		context.put(ReliableOracleAuditEventReader.COLUMN_TO_COMMIT_PARAM, "column_name3");
+		context.put(ReliableOracleAuditEventReader.TYPE_COLUMN_TO_COMMIT_PARAM, "numeric");
+		reader = new ReliableOracleAuditEventReader(context);
+		
+		result = reader.createQuery("244");
+		Assert.assertEquals(result, "SELECT * FROM table_name3 "
+				+ "WHERE column_name3 > 244 "
+				+ "ORDER BY column_name3");
+		
+		
+		context = new Context();
+		context.put(ReliableOracleAuditEventReader.TABLE_NAME_PARAM, "table_name4");
+		context.put(ReliableOracleAuditEventReader.COLUMN_TO_COMMIT_PARAM, "column_name4");
+		context.put(ReliableOracleAuditEventReader.TYPE_COLUMN_TO_COMMIT_PARAM, "string");
+		reader = new ReliableOracleAuditEventReader(context);
+		
+		result = reader.createQuery("string4");
+		Assert.assertEquals(result, "SELECT * FROM table_name4 "
+				+ "WHERE column_name4 > \'string4\' "
+				+ "ORDER BY column_name4");
+		
+		
+		context = new Context();
+		context.put(ReliableOracleAuditEventReader.TABLE_NAME_PARAM, "table_name4");
+		context.put(ReliableOracleAuditEventReader.COLUMN_TO_COMMIT_PARAM, "column_name4");
+		context.put(ReliableOracleAuditEventReader.TYPE_COLUMN_TO_COMMIT_PARAM, "does_not_exist");
+		
+		try{
+			reader = new ReliableOracleAuditEventReader(context);
+			Assert.fail();
+		}catch(FlumeException e){
+			System.out.println(e.getMessage());
+		}
 	}
 
 	@After
