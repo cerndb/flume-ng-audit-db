@@ -27,7 +27,7 @@ public class ReliableOracleAuditEventReaderTests {
 		}
 		
 		try {
-			FileReader in = new FileReader(ReliableOracleAuditEventReader.COMMITTING_FILE_PATH);
+			FileReader in = new FileReader(ReliableOracleAuditEventReader.COMMITTING_FILE_PATH_PARAM);
 			char [] in_chars = new char[50];
 		    in.read(in_chars);
 			in.close();
@@ -47,7 +47,7 @@ public class ReliableOracleAuditEventReaderTests {
 		String timestamp = "2016-02-09 09:34:51.244507 Europe/Zurich";
 		
 		try {
-			FileWriter out = new FileWriter(ReliableOracleAuditEventReader.COMMITTING_FILE_PATH, false);
+			FileWriter out = new FileWriter(ReliableOracleAuditEventReader.COMMITTING_FILE_PATH_PARAM, false);
 			out.write(timestamp);
 			out.close();
 		} catch (IOException e) {
@@ -81,7 +81,7 @@ public class ReliableOracleAuditEventReaderTests {
 		}
 		
 		try {
-			FileReader in = new FileReader(ReliableOracleAuditEventReader.COMMITTING_FILE_PATH);
+			FileReader in = new FileReader(ReliableOracleAuditEventReader.COMMITTING_FILE_PATH_PARAM);
 			char [] in_chars = new char[50];
 		    in.read(in_chars);
 			in.close();
@@ -128,6 +128,6 @@ public class ReliableOracleAuditEventReaderTests {
 
 	@After
 	public void cleanUp(){
-		new File(ReliableOracleAuditEventReader.COMMITTING_FILE_PATH).delete();
+		new File(ReliableOracleAuditEventReader.COMMITTING_FILE_PATH_PARAM).delete();
 	}
 }

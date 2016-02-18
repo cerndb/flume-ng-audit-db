@@ -33,59 +33,78 @@ public class ReliableOracleAuditEventReader implements ReliableEventReader {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ReliableOracleAuditEventReader.class);
 	
-	private static final String CONNECTION_URL = "jdbc:oracle:oci:@";
+	private static final String CONNECTION_URL_DEFAULT = "jdbc:oracle:oci:@";
+	private static final String CONNECTION_URL_PARAM = "reader.connection_url";
+	private String connection_url = CONNECTION_URL_DEFAULT;
 
-	public static final String COMMITTING_FILE_PATH = "committed_value.backup";
+	public static final String COMMITTING_FILE_PATH_DEFAULT = "committed_value.backup";
+	public static final String COMMITTING_FILE_PATH_PARAM = "reader.committing_file";
+	private String committing_file_path = COMMITTING_FILE_PATH_DEFAULT;
+	private File committing_file = null;
 
-	private static final String DESERIALIZER_PARAM = "deserializer";
 	private static final String DESERIALIZER_DEFAULT = AuditEventDeserializerBuilderFactory.Types.JSON.toString();
+	private static final String DESERIALIZER_PARAM = "deserializer";
+	private AuditEventDeserializer deserializer;
+	
+	private static final String TABLE_NAME_PARAM = "reader.table";
+	private String tableName = null;
+	
+	private static final String COLUMN_TO_COMMIT_PARAM = "reader.table.column_to_commit";
+	private String columnToCommit = null;
+	private Integer numberOfColumnToCommit = null;
+	protected String committed_value = null;
+
+	private static final String QUERY_PARAM = "reader.query";
+	private String configuredQuery = null;
+
+	private static final String LOGIN_AS_SYSDBA_PARAM = "reader.login_as_sysdba";
+	private static final Boolean LOGIN_AS_SYSDBA_DEFAULT = false;
+	private boolean login_as_sysdba = LOGIN_AS_SYSDBA_DEFAULT;
 	
 	private OracleDataSource dataSource = null;
 	private Connection connection = null;
 	private ResultSet resultSet = null;
 	private Statement statement = null;
-	private String tableName = null;
-	private String columnToCommit = null;
-	private String configuredQuery = null;
 	
 	protected String last_value = null;
-	protected String committed_value = null;
-	private File committing_file = null;
-	private Integer numberOfColumnToCommit = null;
 	
 	private int columnCount;
-
 	private ArrayList<String> columnNames;
 	private ArrayList<Integer> columnTypes;
 	
-	private AuditEventDeserializer deserializer;
-	
 	protected ReliableOracleAuditEventReader(){
-		committing_file = new File(COMMITTING_FILE_PATH);
+		committing_file = new File(committing_file_path);
 		loadLastCommittedValue();
 	}
 	
 	public ReliableOracleAuditEventReader(Context context) {
-		tableName = "UNIFIED_AUDIT_TRAIL";
-		columnToCommit = "EVENT_TIMESTAMP";
-		configuredQuery = null;
+		tableName = context.getString(TABLE_NAME_PARAM);
+		columnToCommit = context.getString(COLUMN_TO_COMMIT_PARAM);
+		configuredQuery = context.getString(QUERY_PARAM);
 		
 		if(configuredQuery == null){
-			Preconditions.checkNotNull(tableName, "Table name needs to be configured");
-			Preconditions.checkNotNull(columnToCommit, "Column to commit needs to be configured");
+			Preconditions.checkNotNull(tableName, "Table name needs to be configured with " + TABLE_NAME_PARAM);
+			Preconditions.checkNotNull(columnToCommit, "Column to commit needs to be configured with " + COLUMN_TO_COMMIT_PARAM);
+		}else{
+			//TODO check format of query
+			//it must include special string for replacing committed value/ able to get rid of when clause
 		}
 		
+		login_as_sysdba = context.getBoolean(LOGIN_AS_SYSDBA_PARAM, LOGIN_AS_SYSDBA_DEFAULT);
 		Properties prop = new Properties();
-		prop.put(OracleConnection.CONNECTION_PROPERTY_USER_NAME, "sys");
-		prop.put(OracleConnection.CONNECTION_PROPERTY_PASSWORD, "sys");
-		prop.put(OracleConnection.CONNECTION_PROPERTY_INTERNAL_LOGON, "sysdba");
+		if(login_as_sysdba){
+			prop.put(OracleConnection.CONNECTION_PROPERTY_USER_NAME, "sys");
+			prop.put(OracleConnection.CONNECTION_PROPERTY_PASSWORD, "sys");
+			prop.put(OracleConnection.CONNECTION_PROPERTY_INTERNAL_LOGON, "sysdba");
+		}
 		
+		connection_url = context.getString(CONNECTION_URL_PARAM, CONNECTION_URL_DEFAULT);
 		try {
 			dataSource = new OracleDataSource();
 			dataSource.setConnectionProperties(prop);
-			dataSource.setURL(CONNECTION_URL);
+			dataSource.setURL(connection_url);
 		} catch (SQLException e) {
-			LOG.error(e.getMessage(), e);
+			throw new FlumeException(e.getMessage(), e);
 		}
 		
 		getColumnMetadata();
@@ -96,7 +115,7 @@ public class ReliableOracleAuditEventReader implements ReliableEventReader {
 		this.deserializer = builder.build();
 		LOG.info("Using deserializer: " + this.deserializer.getClass().getName());
 		
-		committing_file = new File(COMMITTING_FILE_PATH);
+		committing_file = new File(committing_file_path);
 		
 		loadLastCommittedValue();
 	}
@@ -239,8 +258,11 @@ public class ReliableOracleAuditEventReader implements ReliableEventReader {
 			Integer typeCommitColumn, 
 			String committedValue) {
 		
-		if(configuredQuery != null)
+		if(configuredQuery != null){
+			//TODO return query with committedValue
+			
 			return configuredQuery;
+		}
 		
 		String query = "SELECT * FROM " + tableName;
 		
