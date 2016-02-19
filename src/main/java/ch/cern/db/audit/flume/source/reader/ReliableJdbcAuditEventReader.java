@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -12,10 +13,6 @@ import java.sql.Statement;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Properties;
-
-import oracle.jdbc.driver.OracleConnection;
-import oracle.jdbc.pool.OracleDataSource;
 
 import org.apache.flume.Context;
 import org.apache.flume.Event;
@@ -29,22 +26,25 @@ import ch.cern.db.audit.flume.source.deserializer.AuditEventDeserializerBuilderF
 
 import com.google.common.base.Preconditions;
 
-public class ReliableOracleAuditEventReader implements ReliableEventReader {
+public class ReliableJdbcAuditEventReader implements ReliableEventReader {
 
-	private static final Logger LOG = LoggerFactory.getLogger(ReliableOracleAuditEventReader.class);
+	private static final Logger LOG = LoggerFactory.getLogger(ReliableJdbcAuditEventReader.class);
+	
+	public static final String CONNECTION_DRIVER_DEFAULT = "oracle.jdbc.driver.OracleDriver";
+	public static final String CONNECTION_DRIVER_PARAM = "reader.connectionDriver";
+	private String connection_driver = CONNECTION_DRIVER_DEFAULT;
 	
 	public static final String CONNECTION_URL_DEFAULT = "jdbc:oracle:oci:@";
-	public static final String CONNECTION_URL_PARAM = "reader.connection_url";
+	public static final String CONNECTION_URL_PARAM = "reader.connectionUrl";
 	private String connection_url = CONNECTION_URL_DEFAULT;
-
-	public static final String COMMITTING_FILE_PATH_DEFAULT = "committed_value.backup";
-	public static final String COMMITTING_FILE_PATH_PARAM = "reader.committing_file";
-	private String committing_file_path = COMMITTING_FILE_PATH_DEFAULT;
-	private File committing_file = null;
-
-	public static final String DESERIALIZER_DEFAULT = AuditEventDeserializerBuilderFactory.Types.JSON.toString();
-	public static final String DESERIALIZER_PARAM = "deserializer";
-	private AuditEventDeserializer deserializer;
+	
+	public static final String USERNAME_PARAM = "reader.username";
+	public static final String USERNAME_DEFAULT = "sys as sysdba";
+	private String connection_user = USERNAME_DEFAULT;;
+	
+	public static final String PASSWORD_PARAM = "reader.password";
+	public static final String PASSWORD_DEFAULT = "sys";
+	private String connection_password = PASSWORD_DEFAULT;
 	
 	public static final String TABLE_NAME_PARAM = "reader.table";
 	private String tableName = null;
@@ -61,23 +61,22 @@ public class ReliableOracleAuditEventReader implements ReliableEventReader {
 	public static final String QUERY_PARAM = "reader.query";
 	private String configuredQuery = null;
 	
-	public static final String USERNAME_PARAM = "reader.username";
-	public static final String USERNAME_DEFAULT = "sys";
-	
-	public static final String PASSWORD_PARAM = "reader.password";
-	public static final String PASSWORD_DEFAULT = "sys";
+	public static final String COMMITTING_FILE_PATH_DEFAULT = "committed_value.backup";
+	public static final String COMMITTING_FILE_PATH_PARAM = "reader.committing_file";
+	private String committing_file_path = COMMITTING_FILE_PATH_DEFAULT;
+	private File committing_file = null;
 
-	public static final String LOGIN_AS_SYSDBA_PARAM = "reader.loginAsSysdba";
-	public static final Boolean LOGIN_AS_SYSDBA_DEFAULT = false;
+	public static final String DESERIALIZER_DEFAULT = AuditEventDeserializerBuilderFactory.Types.JSON.toString();
+	public static final String DESERIALIZER_PARAM = "deserializer";
+	private AuditEventDeserializer deserializer;
 	
-	private OracleDataSource dataSource = null;
 	private Connection connection = null;
 	private ResultSet resultSet = null;
 	private Statement statement = null;
 	
 	protected String last_value = null;
 	
-	public ReliableOracleAuditEventReader(Context context) {
+	public ReliableJdbcAuditEventReader(Context context) {
 		tableName = context.getString(TABLE_NAME_PARAM);
 		columnToCommit = context.getString(COLUMN_TO_COMMIT_PARAM);
 		configuredQuery = context.getString(QUERY_PARAM);
@@ -98,24 +97,17 @@ public class ReliableOracleAuditEventReader implements ReliableEventReader {
 			}
 		}
 		
-		Properties prop = new Properties();
-		prop.put(OracleConnection.CONNECTION_PROPERTY_USER_NAME, 
-				context.getString(USERNAME_PARAM, USERNAME_DEFAULT));
-		prop.put(OracleConnection.CONNECTION_PROPERTY_PASSWORD, 
-				context.getString(PASSWORD_PARAM, PASSWORD_DEFAULT));
-		
-		if(context.getBoolean(LOGIN_AS_SYSDBA_PARAM, LOGIN_AS_SYSDBA_DEFAULT)){
-			prop.put(OracleConnection.CONNECTION_PROPERTY_INTERNAL_LOGON, "sysdba");
-		}
-		
-		connection_url = context.getString(CONNECTION_URL_PARAM, CONNECTION_URL_DEFAULT);
+		connection_driver = context.getString(CONNECTION_DRIVER_PARAM, CONNECTION_DRIVER_DEFAULT);
 		try {
-			dataSource = new OracleDataSource();
-			dataSource.setConnectionProperties(prop);
-			dataSource.setURL(connection_url);
-		} catch (SQLException e) {
-			throw new FlumeException(e.getMessage(), e);
+			Class.forName(connection_driver);
+		} catch (ClassNotFoundException e) {
+			throw new FlumeException("Configured class for JDBC driver ("
+					+ connection_driver + ") has not been found in the classpath");
 		}
+		
+		connection_user = context.getString(USERNAME_PARAM, USERNAME_DEFAULT);
+		connection_password = context.getString(PASSWORD_PARAM, PASSWORD_DEFAULT);
+		connection_url = context.getString(CONNECTION_URL_PARAM, CONNECTION_URL_DEFAULT);
 		
 		String des_config = context.getString(DESERIALIZER_PARAM, DESERIALIZER_DEFAULT);
 		AuditEventDeserializer.Builder builder = AuditEventDeserializerBuilderFactory.newInstance(des_config);
@@ -279,9 +271,12 @@ public class ReliableOracleAuditEventReader implements ReliableEventReader {
 
 	private void connect() throws SQLException{
 		try {
-			if(connection == null || connection.isClosed())
-				connection = dataSource.getConnection();
-			
+			if(connection == null || connection.isClosed()){
+				connection = DriverManager.getConnection(
+						connection_url, 
+						connection_user, 
+						connection_password);
+			}
 		} catch (SQLException e) {
 			LOG.error(e.getMessage(), e);
 			throw e;
@@ -340,8 +335,8 @@ public class ReliableOracleAuditEventReader implements ReliableEventReader {
 		}
 
 		@Override
-		public ReliableOracleAuditEventReader build() {
-			return new ReliableOracleAuditEventReader(context);
+		public ReliableJdbcAuditEventReader build() {
+			return new ReliableJdbcAuditEventReader(context);
 		}
 		
 	}

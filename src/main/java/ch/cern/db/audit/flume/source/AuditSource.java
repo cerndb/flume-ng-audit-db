@@ -29,7 +29,7 @@ public class AuditSource extends AbstractSource implements Configurable, Pollabl
 	private static final String MINIMUM_BATCH_TIME_PARAM = "batch.minimum_time";
 	private long minimum_batch_time = MINIMUM_BATCH_TIME_DEFAULT;
 
-	private static final String READER_DEFAULT = ReliableEventReaderBuilderFactory.Types.ORACLE.toString();
+	private static final String READER_DEFAULT = ReliableEventReaderBuilderFactory.Types.JDBC.toString();
 	private static final String READER_PARAM = "reader";
 
 	private ReliableEventReader reader;

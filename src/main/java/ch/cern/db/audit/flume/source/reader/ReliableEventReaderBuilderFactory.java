@@ -18,7 +18,7 @@ public class ReliableEventReaderBuilderFactory {
 	private static final Logger LOG = LoggerFactory.getLogger(ReliableEventReaderBuilderFactory.class);
 
 	public enum Types {
-		ORACLE(ch.cern.db.audit.flume.source.reader.ReliableOracleAuditEventReader.Builder.class);
+		JDBC(ch.cern.db.audit.flume.source.reader.ReliableJdbcAuditEventReader.Builder.class);
 
 		private final Class<? extends Builder> builderClass;
 
