@@ -126,19 +126,28 @@ public class ReliableJdbcAuditEventReaderTests {
 			Assert.assertEquals("{\"ID\":3,\"RETURN_CODE\":48,\"NAME\":\"name3\"}", 
 					new String(events.get(2).getBody()));
 			
-//			statement = connection.createStatement();
-//			statement.execute("INSERT INTO audit_data_table VALUES 0, 48, 'name0';");
-//			statement.execute("INSERT INTO audit_data_table VALUES 4, 48, 'name4';");
-//			statement.execute("INSERT INTO audit_data_table VALUES 5, 48, 'name5';");
-//			statement.close();
-//			event = reader.readEvent();
-//			Assert.assertNotNull(event);
-//			Assert.assertEquals("{\"ID\":4,\"RETURN_CODE\":48,\"NAME\":\"name4\"}", new String(event.getBody()));
-//			event = reader.readEvent();
-//			Assert.assertNotNull(event);
-//			Assert.assertEquals("{\"ID\":5,\"RETURN_CODE\":48,\"NAME\":\"name5\"}", new String(event.getBody()));
-//			event = reader.readEvent();
-//			Assert.assertNull(event);
+			reader.commit();
+			events = reader.readEvents(10);
+			Assert.assertEquals(0, events.size());
+			
+			statement = connection.createStatement();
+			statement.execute("INSERT INTO audit_data_table VALUES 4, 48, 'name4';");
+			statement.execute("INSERT INTO audit_data_table VALUES 5, 48, 'name5';");
+			statement.close();
+			events = reader.readEvents(1);
+			Assert.assertNotNull(events);
+			Assert.assertEquals(1, events.size());
+			Assert.assertEquals("{\"ID\":4,\"RETURN_CODE\":48,\"NAME\":\"name4\"}", 
+					new String(events.get(0).getBody()));
+			reader.commit();
+			events = reader.readEvents(1);
+			Assert.assertNotNull(events);
+			Assert.assertEquals(1, events.size());
+			Assert.assertEquals("{\"ID\":5,\"RETURN_CODE\":48,\"NAME\":\"name5\"}", 
+					new String(events.get(0).getBody()));
+			events = reader.readEvents(1);
+			Assert.assertNotNull(events);
+			Assert.assertEquals(0, events.size());
 			
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -232,7 +241,7 @@ public class ReliableJdbcAuditEventReaderTests {
 			
 			String timestamp_from_file = new String(in_chars).trim();
 			
-			Assert.assertEquals(timestamp, reader.last_value);
+			Assert.assertEquals(timestamp, reader.committed_value);
 			Assert.assertEquals(timestamp, timestamp_from_file);
 		} catch (IOException e) {
 			Assert.fail(e.getMessage());
@@ -257,7 +266,7 @@ public class ReliableJdbcAuditEventReaderTests {
 		context.put(ReliableJdbcAuditEventReader.COLUMN_TO_COMMIT_PARAM, "column");
 		ReliableJdbcAuditEventReader reader = new ReliableJdbcAuditEventReader(context);
 		
-		Assert.assertEquals(timestamp, reader.last_value);
+		Assert.assertEquals(timestamp, reader.committed_value);
 	}
 	
 	@Test
@@ -290,7 +299,7 @@ public class ReliableJdbcAuditEventReaderTests {
 			
 			String timestamp_from_file = new String(in_chars).trim();
 			
-			Assert.assertEquals(timestamp, reader.last_value);
+			Assert.assertEquals(timestamp, reader.committed_value);
 			Assert.assertEquals(timestamp, timestamp_from_file);
 		} catch (IOException e) {
 			Assert.fail(e.getMessage());
