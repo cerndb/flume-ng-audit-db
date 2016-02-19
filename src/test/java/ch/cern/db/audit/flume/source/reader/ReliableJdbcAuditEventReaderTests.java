@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 
 import org.apache.flume.Context;
 import org.apache.flume.Event;
@@ -68,23 +69,76 @@ public class ReliableJdbcAuditEventReaderTests {
 			statement.close();
 			event = reader.readEvent();
 			Assert.assertNotNull(event);
+			Assert.assertEquals("{\"ID\":1,\"RETURN_CODE\":48,\"NAME\":\"name1\"}", new String(event.getBody()));
+			event = reader.readEvent();
+			Assert.assertNotNull(event);
+			Assert.assertEquals("{\"ID\":2,\"RETURN_CODE\":48,\"NAME\":\"name2\"}", new String(event.getBody()));
+			event = reader.readEvent();
+			Assert.assertNotNull(event);
 			Assert.assertEquals("{\"ID\":3,\"RETURN_CODE\":48,\"NAME\":\"name3\"}", new String(event.getBody()));
 			event = reader.readEvent();
 			Assert.assertNull(event);
 			
+		} catch (IOException e) {
+			e.printStackTrace();
+			Assert.fail();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			Assert.fail();
+		}
+	}
+	
+	@Test
+	public void eventsFromDatabaseInBatchFasion(){
+		
+		Context context = new Context();
+		context.put(ReliableJdbcAuditEventReader.CONNECTION_DRIVER_PARAM, "org.hsqldb.jdbc.JDBCDriver");
+		context.put(ReliableJdbcAuditEventReader.CONNECTION_URL_PARAM, connection_url);
+		context.put(ReliableJdbcAuditEventReader.USERNAME_PARAM, "SA");
+		context.put(ReliableJdbcAuditEventReader.PASSWORD_PARAM, "");
+		context.put(ReliableJdbcAuditEventReader.TABLE_NAME_PARAM, " audit_data_table");
+		context.put(ReliableJdbcAuditEventReader.COLUMN_TO_COMMIT_PARAM, "ID");
+		context.put(ReliableJdbcAuditEventReader.TYPE_COLUMN_TO_COMMIT_PARAM, "numeric");
+		ReliableJdbcAuditEventReader reader = new ReliableJdbcAuditEventReader(context);
+		
+		try {
+			List<Event> events = reader.readEvents(10);
+			Assert.assertEquals(0, events.size());
+			
+			Statement statement = connection.createStatement();
+			statement.execute("INSERT INTO audit_data_table VALUES 2, 48, 'name2';");
+			events = reader.readEvents(10);
+			Assert.assertNotNull(events);
+			Assert.assertEquals(1, events.size());
+			Assert.assertEquals("{\"ID\":2,\"RETURN_CODE\":48,\"NAME\":\"name2\"}", new String(events.get(0).getBody()));
+			
 			statement = connection.createStatement();
-			statement.execute("INSERT INTO audit_data_table VALUES 0, 48, 'name0';");
-			statement.execute("INSERT INTO audit_data_table VALUES 4, 48, 'name4';");
-			statement.execute("INSERT INTO audit_data_table VALUES 5, 48, 'name5';");
+			statement.execute("INSERT INTO audit_data_table VALUES 1, 48, 'name1';");
+			statement.execute("INSERT INTO audit_data_table VALUES 3, 48, 'name3';");
 			statement.close();
-			event = reader.readEvent();
-			Assert.assertNotNull(event);
-			Assert.assertEquals("{\"ID\":4,\"RETURN_CODE\":48,\"NAME\":\"name4\"}", new String(event.getBody()));
-			event = reader.readEvent();
-			Assert.assertNotNull(event);
-			Assert.assertEquals("{\"ID\":5,\"RETURN_CODE\":48,\"NAME\":\"name5\"}", new String(event.getBody()));
-			event = reader.readEvent();
-			Assert.assertNull(event);
+			events = reader.readEvents(10);
+			Assert.assertNotNull(events);
+			Assert.assertEquals(3, events.size());
+			Assert.assertEquals("{\"ID\":1,\"RETURN_CODE\":48,\"NAME\":\"name1\"}", 
+					new String(events.get(0).getBody()));
+			Assert.assertEquals("{\"ID\":2,\"RETURN_CODE\":48,\"NAME\":\"name2\"}", 
+					new String(events.get(1).getBody()));
+			Assert.assertEquals("{\"ID\":3,\"RETURN_CODE\":48,\"NAME\":\"name3\"}", 
+					new String(events.get(2).getBody()));
+			
+//			statement = connection.createStatement();
+//			statement.execute("INSERT INTO audit_data_table VALUES 0, 48, 'name0';");
+//			statement.execute("INSERT INTO audit_data_table VALUES 4, 48, 'name4';");
+//			statement.execute("INSERT INTO audit_data_table VALUES 5, 48, 'name5';");
+//			statement.close();
+//			event = reader.readEvent();
+//			Assert.assertNotNull(event);
+//			Assert.assertEquals("{\"ID\":4,\"RETURN_CODE\":48,\"NAME\":\"name4\"}", new String(event.getBody()));
+//			event = reader.readEvent();
+//			Assert.assertNotNull(event);
+//			Assert.assertEquals("{\"ID\":5,\"RETURN_CODE\":48,\"NAME\":\"name5\"}", new String(event.getBody()));
+//			event = reader.readEvent();
+//			Assert.assertNull(event);
 			
 		} catch (IOException e) {
 			e.printStackTrace();
