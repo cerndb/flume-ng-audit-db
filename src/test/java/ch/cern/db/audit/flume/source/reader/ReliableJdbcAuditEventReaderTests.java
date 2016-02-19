@@ -34,8 +34,7 @@ public class ReliableJdbcAuditEventReaderTests {
 			statement.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}
-		
+		}	
 	}
 	
 	@Test
@@ -48,6 +47,7 @@ public class ReliableJdbcAuditEventReaderTests {
 		context.put(ReliableJdbcAuditEventReader.PASSWORD_PARAM, "");
 		context.put(ReliableJdbcAuditEventReader.TABLE_NAME_PARAM, " audit_data_table");
 		context.put(ReliableJdbcAuditEventReader.COLUMN_TO_COMMIT_PARAM, "ID");
+		context.put(ReliableJdbcAuditEventReader.TYPE_COLUMN_TO_COMMIT_PARAM, "numeric");
 		ReliableJdbcAuditEventReader reader = new ReliableJdbcAuditEventReader(context);
 		
 		try {
@@ -68,18 +68,90 @@ public class ReliableJdbcAuditEventReaderTests {
 			statement.close();
 			event = reader.readEvent();
 			Assert.assertNotNull(event);
-			Assert.assertEquals("{\"ID\":1,\"RETURN_CODE\":48,\"NAME\":\"name1\"}", new String(event.getBody()));
+			Assert.assertEquals("{\"ID\":3,\"RETURN_CODE\":48,\"NAME\":\"name3\"}", new String(event.getBody()));
+			event = reader.readEvent();
+			Assert.assertNull(event);
+			
+			statement = connection.createStatement();
+			statement.execute("INSERT INTO audit_data_table VALUES 0, 48, 'name0';");
+			statement.execute("INSERT INTO audit_data_table VALUES 4, 48, 'name4';");
+			statement.execute("INSERT INTO audit_data_table VALUES 5, 48, 'name5';");
+			statement.close();
 			event = reader.readEvent();
 			Assert.assertNotNull(event);
-			Assert.assertEquals("{\"ID\":3,\"RETURN_CODE\":48,\"NAME\":\"name3\"}", new String(event.getBody()));
+			Assert.assertEquals("{\"ID\":4,\"RETURN_CODE\":48,\"NAME\":\"name4\"}", new String(event.getBody()));
+			event = reader.readEvent();
+			Assert.assertNotNull(event);
+			Assert.assertEquals("{\"ID\":5,\"RETURN_CODE\":48,\"NAME\":\"name5\"}", new String(event.getBody()));
 			event = reader.readEvent();
 			Assert.assertNull(event);
 			
 		} catch (IOException e) {
 			e.printStackTrace();
+			Assert.fail();
 		} catch (SQLException e) {
 			e.printStackTrace();
+			Assert.fail();
 		}
+	}
+	
+	@Test
+	public void readFromDatabaseAndCommit(){
+		
+		Context context = new Context();
+		context.put(ReliableJdbcAuditEventReader.CONNECTION_DRIVER_PARAM, "org.hsqldb.jdbc.JDBCDriver");
+		context.put(ReliableJdbcAuditEventReader.CONNECTION_URL_PARAM, connection_url);
+		context.put(ReliableJdbcAuditEventReader.USERNAME_PARAM, "SA");
+		context.put(ReliableJdbcAuditEventReader.PASSWORD_PARAM, "");
+		context.put(ReliableJdbcAuditEventReader.TABLE_NAME_PARAM, " audit_data_table");
+		context.put(ReliableJdbcAuditEventReader.COLUMN_TO_COMMIT_PARAM, "ID");
+		context.put(ReliableJdbcAuditEventReader.TYPE_COLUMN_TO_COMMIT_PARAM, "numeric");
+		ReliableJdbcAuditEventReader reader = new ReliableJdbcAuditEventReader(context);
+		
+		try {
+			//Remove commit file
+			new File(ReliableJdbcAuditEventReader.COMMITTING_FILE_PATH_DEFAULT).delete();
+			
+			Event event = reader.readEvent();
+			Assert.assertNull(event);
+			
+			Statement statement = connection.createStatement();
+			statement.execute("INSERT INTO audit_data_table VALUES 1, 48, 'name1';");
+			statement.execute("INSERT INTO audit_data_table VALUES 2, 48, 'name2';");
+			event = reader.readEvent();
+			Assert.assertNotNull(event);
+			Assert.assertEquals("{\"ID\":1,\"RETURN_CODE\":48,\"NAME\":\"name1\"}", new String(event.getBody()));
+			
+			reader.close();
+			reader = new ReliableJdbcAuditEventReader(context);
+			
+			event = reader.readEvent();
+			Assert.assertNotNull(event);
+			Assert.assertEquals("{\"ID\":1,\"RETURN_CODE\":48,\"NAME\":\"name1\"}", new String(event.getBody()));
+			reader.commit();
+			event = reader.readEvent();
+			Assert.assertNotNull(event);
+			Assert.assertEquals("{\"ID\":2,\"RETURN_CODE\":48,\"NAME\":\"name2\"}", new String(event.getBody()));
+			event = reader.readEvent();
+			Assert.assertNull(event);
+			
+			reader.close();
+			reader = new ReliableJdbcAuditEventReader(context);
+			
+			event = reader.readEvent();
+			Assert.assertNotNull(event);
+			Assert.assertEquals("{\"ID\":2,\"RETURN_CODE\":48,\"NAME\":\"name2\"}", new String(event.getBody()));
+			event = reader.readEvent();
+			Assert.assertNull(event);
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+			Assert.fail();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			Assert.fail();
+		}
+		
 	}
 
 	@Test
@@ -106,7 +178,7 @@ public class ReliableJdbcAuditEventReaderTests {
 			
 			String timestamp_from_file = new String(in_chars).trim();
 			
-			Assert.assertEquals(timestamp, reader.committed_value);
+			Assert.assertEquals(timestamp, reader.last_value);
 			Assert.assertEquals(timestamp, timestamp_from_file);
 		} catch (IOException e) {
 			Assert.fail(e.getMessage());
@@ -131,7 +203,7 @@ public class ReliableJdbcAuditEventReaderTests {
 		context.put(ReliableJdbcAuditEventReader.COLUMN_TO_COMMIT_PARAM, "column");
 		ReliableJdbcAuditEventReader reader = new ReliableJdbcAuditEventReader(context);
 		
-		Assert.assertEquals(timestamp, reader.committed_value);
+		Assert.assertEquals(timestamp, reader.last_value);
 	}
 	
 	@Test
@@ -142,11 +214,11 @@ public class ReliableJdbcAuditEventReaderTests {
 		context.put(ReliableJdbcAuditEventReader.TABLE_NAME_PARAM, "table");
 		context.put(ReliableJdbcAuditEventReader.COLUMN_TO_COMMIT_PARAM, "column");
 		ReliableJdbcAuditEventReader reader = new ReliableJdbcAuditEventReader(context);
-		Assert.assertNull(reader.committed_value);
+		Assert.assertNull(reader.last_value);
 		
 		//It will read an empty file
 		reader = new ReliableJdbcAuditEventReader(context);
-		Assert.assertNull(reader.committed_value);
+		Assert.assertNull(reader.last_value);
 		
 		String timestamp = "2016-02-09 09:34:51.244507 Europe/Zurich";
 		reader.last_value = timestamp;
@@ -164,7 +236,7 @@ public class ReliableJdbcAuditEventReaderTests {
 			
 			String timestamp_from_file = new String(in_chars).trim();
 			
-			Assert.assertEquals(timestamp, reader.committed_value);
+			Assert.assertEquals(timestamp, reader.last_value);
 			Assert.assertEquals(timestamp, timestamp_from_file);
 		} catch (IOException e) {
 			Assert.fail(e.getMessage());

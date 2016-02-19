@@ -51,7 +51,6 @@ public class ReliableJdbcAuditEventReader implements ReliableEventReader {
 	
 	public static final String COLUMN_TO_COMMIT_PARAM = "reader.table.columnToCommit";
 	private String columnToCommit = null;
-	protected String committed_value = null;
 	
 	enum ColumnType {STRING, TIMESTAMP, NUMERIC}
 	public static final String TYPE_COLUMN_TO_COMMIT_PARAM = "reader.table.columnToCommit.type";
@@ -129,10 +128,10 @@ public class ReliableJdbcAuditEventReader implements ReliableEventReader {
 				in.close();
 				String value_from_file = new String(in_chars).trim();
 				
-				if(value_from_file.length() > 1){
-					committed_value = value_from_file;
+				if(value_from_file.length() > 0){
+					last_value = value_from_file;
 					
-					LOG.info("Last value loaded from file: " + committed_value);
+					LOG.info("Last value loaded from file: " + last_value);
 				}else{
 					LOG.info("File for loading last value is empty");
 				}
@@ -212,7 +211,7 @@ public class ReliableJdbcAuditEventReader implements ReliableEventReader {
 		
 		statement = connection.createStatement();
 		
-		String query = createQuery(committed_value);
+		String query = createQuery(last_value);
 		
 		resultSet = statement.executeQuery(query);
 		
@@ -307,13 +306,9 @@ public class ReliableJdbcAuditEventReader implements ReliableEventReader {
 		if(last_value == null)
 			return;
 		
-		committed_value = last_value;
-		
 		FileWriter out = new FileWriter(committing_file, false);
-		out.write(committed_value);
+		out.write(last_value);
 		out.close();
-		
-		last_value = null;
 	}
 
 	@Override
