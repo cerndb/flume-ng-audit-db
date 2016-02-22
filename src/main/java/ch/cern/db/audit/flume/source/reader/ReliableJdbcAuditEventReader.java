@@ -62,7 +62,7 @@ public class ReliableJdbcAuditEventReader implements ReliableEventReader {
 	private String configuredQuery = null;
 	
 	public static final String COMMITTING_FILE_PATH_DEFAULT = "committed_value.backup";
-	public static final String COMMITTING_FILE_PATH_PARAM = "reader.committing_file";
+	public static final String COMMITTING_FILE_PATH_PARAM = "reader.committingFile";
 	private String committing_file_path = COMMITTING_FILE_PATH_DEFAULT;
 	private File committing_file = null;
 
