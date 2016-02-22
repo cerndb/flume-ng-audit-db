@@ -32,7 +32,7 @@ In order to use AuditSource as source in your Flume agent, you need to specify t
 <agent_name>.sources.<source_name>.type = ch.cern.db.audit.flume.source.AuditSource 
 ```
 
-You do not need to specify a reader if you are going to use ReliableJdbcAuditEventReader since this one is the default. If you want to use other other reader use the following parameter.
+You do not need to specify a reader if you are going to use ReliableJdbcAuditEventReader since this one is the default. If you want to use other reader use the following parameter.
 
 ```
 <agent_name>.sources.<source_name>.reader = jdbc
