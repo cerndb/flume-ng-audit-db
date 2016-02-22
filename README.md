@@ -64,9 +64,9 @@ reader.query = NULL
 reader.committing_file = committed_value.backup
 ```
 
-Most configuration parameters do not required any further explanation. Default values are written, parameters with NULL has not default value. However, some of then need to be explained.
+Default values are written, parameters with NULL has not default value. Most configuration parameters do not require any further explanation. However, some of then need to be explained.
 
-Since it is a reliable reader, it requires one column of the table to be use for committing its value. Column to use for this purpose is configured with ".columnToCommit" parameter. You would need to specify the type of this column in order to build the query properly.
+Since it is a reliable reader, it requires one column of the table to be used for committing its value. Column to use for this purpose is configured with ".columnToCommit" parameter. You would need to specify the type of this column in order to build the query properly.
 
 ".table" or ".query" parameter must be configured. ".columnToCommit" is always required.
 
@@ -80,12 +80,12 @@ Some tips:
 * ORDER BY clause is strongly recommended to use since last value from "column to commit" will be used in further queries to get only last rows.
 * If no value has been committed, part of the query between [] is removed.
 * If there is no [], same query will be always executed.
-* {$committed_vale} must be between [], it will be replace by last committed value.
+* {$committed_value} must be between [], it will be replace by last committed value.
 
 Custom query example:
 
 ```
-reader.query = SELECT * FROM UNIFIED_AUDIT_TRAIL [WHERE EVENT_TIMESTAMP > TIMESTAMP '{$committed_vale}'] ORDER BY EVENT_TIMESTAMP
+reader.query = SELECT * FROM UNIFIED_AUDIT_TRAIL [WHERE EVENT_TIMESTAMP > TIMESTAMP '{$committed_value}'] ORDER BY EVENT_TIMESTAMP
 ```
 
 ### JSONAuditEventDeserializer, TextAuditEventDeserializer, JSONtoAvroParser and JSONtoElasticSearchEventSerializer

@@ -231,7 +231,7 @@ public class ReliableJdbcAuditEventReader implements ReliableEventReader {
 			int committed_value_index = configuredQuery.indexOf(toReplace);
 			if(committed_value_index < right_index && committed_value_index > left_index){
 				//right syntax for replacing 
-				//SELECT * FROM table_name [WHERE column_name > '{$committed_vale}'] ORDER BY column_name
+				//SELECT * FROM table_name [WHERE column_name > '{$committed_value}'] ORDER BY column_name
 				
 				if(committed_value == null){
 					return configuredQuery.substring(0, left_index)
