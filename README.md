@@ -13,11 +13,11 @@ likely in Hadoop eco-system.
 Several implementations have been made for adapting Flume, both in the source and sink side.
 
 * AuditSource: a custom source which is able to collect audit data from database instances. This source needs a reader and a deserializer, some are already implemented:
-  * Readers, create AuditEvents from audit data:
-    * ReliableJdbcAuditEventReader (default): reads audit events from tables. It uses JDBC driver for connecting to database, so many types of databases are compatible. It provides a reliable way to read audit data from tables in order to avoid data loss.
-  * Deserializer, convert AuditEvents into Flume Events:
-    * JSONAuditEventDeserializer (default): generates events which body is a JSON with all fields contained in AuditEvent.
-    * TextAuditEventDeserializer: generates events which body is a string with all fields contained in AuditEvent.
+    * Readers, create AuditEvents from audit data:
+        * ReliableJdbcAuditEventReader (default): reads audit events from tables. It uses JDBC driver for connecting to database, so many types of databases are compatible. It provides a reliable way to read audit data from tables in order to avoid data loss.
+    * Deserializer, convert AuditEvents into Flume Events:
+        * JSONAuditEventDeserializer (default): generates events which body is a JSON with all fields contained in AuditEvent.
+        * TextAuditEventDeserializer: generates events which body is a string with all fields contained in AuditEvent.
 * For some sinks, you may need to implement a custom parser for parsing Flume Events to Avro records:
-  * JSONtoAvroParser: for Kite sink, this parser converts Flume Events which body is JSON into Avro records.
-  * JSONtoElasticSearchEventSerializer: for Elasticsearch sink, this parser converts Flume Events which body is JSON into Elasticsearch XContentBuilder.
+    * JSONtoAvroParser: for Kite sink, this parser converts Flume Events which body is JSON into Avro records.
+    * JSONtoElasticSearchEventSerializer: for Elasticsearch sink, this parser converts Flume Events which body is JSON into Elasticsearch XContentBuilder.
