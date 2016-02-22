@@ -21,3 +21,43 @@ Several implementations have been made for adapting Flume, both in the source an
 * For some sinks, you may need to implement a custom parser for parsing Flume Events to Avro records:
     * JSONtoAvroParser: for Kite sink, this parser converts Flume Events which body is JSON into Avro records.
     * JSONtoElasticSearchEventSerializer: for Elasticsearch sink, this parser converts Flume Events which body is JSON into Elasticsearch XContentBuilder.
+    
+## Configuration
+
+### AuditSource
+
+In order to use AuditSource as source in your Flume agent, you need to specify the type of agent source as:
+
+```
+<agent_name>.sources.<source_name>.type = ch.cern.db.audit.flume.source.AuditSource 
+```
+
+You do not need to specify a reader if you are going to use ReliableJdbcAuditEventReader since this one is the default. If you want to use other other reader use the following parameter.
+
+```
+<agent_name>.sources.<source_name>.reader = jdbc
+```
+
+If you want to develop a custom Reader, make sure that it implements ReliableEventReader and create a nested Builder class. To use your custom reader, you need to configure .reader parameter with the FQCN.
+
+Deserializer needs also to be configured. Use below parameter with json or text value.
+
+```
+<agent_name>.sources.<source_name>.deserializer = [json|text] 
+```
+
+If you want to develop a custom deserializer, make sure that it implements AuditEventDeserializer and create a nested Builder class. To use your custom deserializer, you need to configure .deserializer parameter with the FQCN.
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
