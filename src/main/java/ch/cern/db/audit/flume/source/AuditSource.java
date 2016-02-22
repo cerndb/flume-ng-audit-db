@@ -26,7 +26,7 @@ public class AuditSource extends AbstractSource implements Configurable, Pollabl
 	private int batch_size = BATCH_SIZE_DEFAULT;
 
 	private static final long MINIMUM_BATCH_TIME_DEFAULT = 10000;
-	private static final String MINIMUM_BATCH_TIME_PARAM = "batch.minimum_time";
+	private static final String MINIMUM_BATCH_TIME_PARAM = "batch.minimumTime";
 	private long minimum_batch_time = MINIMUM_BATCH_TIME_DEFAULT;
 
 	private static final String READER_DEFAULT = ReliableEventReaderBuilderFactory.Types.JDBC.toString();

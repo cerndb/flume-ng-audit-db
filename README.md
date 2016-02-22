@@ -48,6 +48,16 @@ Deserializer needs also to be configured. Use below parameter with json or text 
 
 If you want to develop a custom deserializer, make sure that it implements AuditEventDeserializer and create a nested Builder class. To use your custom deserializer, you need to configure .deserializer parameter with the FQCN.
 
+Set number of events to be processed in every batch:
+```
+<agent_name>.sources.<source_name>.batch.size = 100
+```
+
+Minimun time in milliseconds a batch must last:
+```
+<agent_name>.sources.<source_name>.batch.minimumTime = 10000
+```
+
 ### ReliableJdbcAuditEventReader
 
 Find below all available configuration parameters:
