@@ -1,6 +1,8 @@
 package ch.cern.db.audit.flume.source;
 
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -46,7 +48,7 @@ public class AuditSourceTests{
 	}
 	
 	@Test
-	public void basic() throws SQLException, InterruptedException, EventDeliveryException{
+	public void basic() throws SQLException, InterruptedException, EventDeliveryException, IOException{
 		
 		Statement statement = connection.createStatement();
 		statement.execute("INSERT INTO audit_data_table VALUES 1, 48, 'name1';");
@@ -86,11 +88,24 @@ public class AuditSourceTests{
 	    
 	    Event event = channel.take();
 	    Assert.assertEquals("{\"ID\":1,\"RETURN_CODE\":48,\"NAME\":\"name1\"}", new String(event.getBody()));
+	    event = channel.take();
+	    Assert.assertEquals("{\"ID\":3,\"RETURN_CODE\":48,\"NAME\":\"name3\"}", new String(event.getBody()));
+	    event = channel.take();
+	    Assert.assertNull(event);
 	    
 	    channel.getTransaction().commit();
 	    channel.getTransaction().close();;
 	    
 	    runner.stop();
+	    
+	    //Check content of committing file 
+	    FileReader in = new FileReader(ReliableJdbcAuditEventReader.COMMITTING_FILE_PATH_DEFAULT);
+		char [] in_chars = new char[50];
+	    in.read(in_chars);
+		in.close();
+		String committed_value_from_file = new String(in_chars).trim();
+		Assert.assertEquals("3", committed_value_from_file);
+		
 	}
 
 	@After
