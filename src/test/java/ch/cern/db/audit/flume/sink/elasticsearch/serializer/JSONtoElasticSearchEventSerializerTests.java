@@ -12,28 +12,15 @@ import org.junit.Test;
 public class JSONtoElasticSearchEventSerializerTests{
 
 	@Test
-	public void serialize(){
-		
+	public void serialize() throws IOException{
 		String json = "{\"menu\":{\"id\":\"file\",\"value\":\"File\",\"popup\""
 				+ ":{\"menuitem\":[{\"value\":\"New\",\"onclick\":\"CreateNewDoc()\"}]}}}";
 		Event event = EventBuilder.withBody(json.getBytes());
 		
 		JSONtoElasticSearchEventSerializer serializer = new JSONtoElasticSearchEventSerializer();
 		
-		XContentBuilder content = null;
-		try {
-			content = serializer.getContentBuilder(event);
-		} catch (IOException e) {
-			e.printStackTrace();
-			Assert.fail();
-		}
-		
-		try {
-			Assert.assertEquals(json, content.string());
-		} catch (IOException e) {
-			Assert.fail();
-		}
-
+		XContentBuilder content = serializer.getContentBuilder(event);
+		Assert.assertEquals(json, content.string());
 	}
 	
 }
