@@ -1,0 +1,302 @@
+ {
+  "type" : "record",
+  "name" : "audit",
+  "fields" : [ {
+    "name" : "AUDIT_TYPE",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "SESSIONID",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "PROXY_SESSIONID",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "OS_USERNAME",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "USERHOST",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "TERMINAL",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "INSTANCE_ID",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "DBID",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "AUTHENTICATION_TYPE",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "DBUSERNAME",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "DBPROXY_USERNAME",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "EXTERNAL_USERID",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "GLOBAL_USERID",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "CLIENT_PROGRAM_NAME",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "DBLINK_INFO",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "XS_USER_NAME",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "XS_SESSIONID",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "ENTRY_ID",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "STATEMENT_ID",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "EVENT_TIMESTAMP",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "ACTION_NAME",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "RETURN_CODE",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "OS_PROCESS",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "TRANSACTION_ID",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "SCN",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "EXECUTION_ID",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "OBJECT_SCHEMA",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "OBJECT_NAME",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "SQL_TEXT",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "SQL_BINDS",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "APPLICATION_CONTEXTS",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "CLIENT_IDENTIFIER",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "NEW_SCHEMA",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "NEW_NAME",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "OBJECT_EDITION",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "SYSTEM_PRIVILEGE_USED",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "SYSTEM_PRIVILEGE",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "AUDIT_OPTION",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "OBJECT_PRIVILEGES",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "ROLE",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "TARGET_USER",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "EXCLUDED_USER",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "EXCLUDED_SCHEMA",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "EXCLUDED_OBJECT",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "CURRENT_USER",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "ADDITIONAL_INFO",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "UNIFIED_AUDIT_POLICIES",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "FGA_POLICY_NAME",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "XS_INACTIVITY_TIMEOUT",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "XS_ENTITY_TYPE",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "XS_TARGET_PRINCIPAL_NAME",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "XS_PROXY_USER_NAME",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "XS_DATASEC_POLICY_NAME",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "XS_SCHEMA_NAME",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "XS_CALLBACK_EVENT_TYPE",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "XS_PACKAGE_NAME",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "XS_PROCEDURE_NAME",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "XS_ENABLED_ROLE",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "XS_COOKIE",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "XS_NS_NAME",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "XS_NS_ATTRIBUTE",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "XS_NS_ATTRIBUTE_OLD_VAL",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "XS_NS_ATTRIBUTE_NEW_VAL",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "DV_ACTION_CODE",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "DV_ACTION_NAME",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "DV_EXTENDED_ACTION_CODE",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "DV_GRANTEE",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "DV_RETURN_CODE",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "DV_ACTION_OBJECT_NAME",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "DV_RULE_SET_NAME",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "DV_COMMENT",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "DV_FACTOR_CONTEXT",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "DV_OBJECT_STATUS",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "OLS_POLICY_NAME",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "OLS_GRANTEE",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "OLS_MAX_READ_LABEL",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "OLS_MAX_WRITE_LABEL",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "OLS_MIN_WRITE_LABEL",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "OLS_PRIVILEGES_GRANTED",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "OLS_PROGRAM_UNIT_NAME",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "OLS_PRIVILEGES_USED",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "OLS_STRING_LABEL",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "OLS_LABEL_COMPONENT_TYPE",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "OLS_LABEL_COMPONENT_NAME",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "OLS_PARENT_GROUP_NAME",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "OLS_OLD_VALUE",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "OLS_NEW_VALUE",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "RMAN_SESSION_RECID",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "RMAN_SESSION_STAMP",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "RMAN_OPERATION",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "RMAN_OBJECT_TYPE",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "RMAN_DEVICE_TYPE",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "DP_TEXT_PARAMETERS1",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "DP_BOOLEAN_PARAMETERS1",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "DIRECT_PATH_NUM_COLUMNS_LOADED",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "RLS_INFO",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "KSACL_USER_NAME",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "KSACL_SERVICE_NAME",
+    "type" : [ "string", "null" ]
+  }, {
+    "name" : "KSACL_SOURCE_LOCATION",
+    "type" : [ "string", "null" ]
+  } ]
+}              
