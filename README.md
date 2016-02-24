@@ -46,7 +46,7 @@ Below command should be used for running this utility. This script is contained 
  -help                     Print help
 ```
 
-Note that JDBC driver must be included in Java classpath, you may need to edit the script.
+This script add to classpath all JAR files contained in lib folder, there should be placed the JDBC driver.
 
 ## Configuration
 

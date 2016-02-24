@@ -1,1 +1,1 @@
-java -cp ../target/flume-ng-customizations-0.0.1-SNAPSHOT.jar:../lib/ojdbc7.jar ch.cern.db.audit.flume.sink.kite.util.GenerateSchemaFromTableTests $@
+java -cp ../target/*:../lib/* ch.cern.db.audit.flume.sink.kite.util.GenerateSchemaFromTable $@
