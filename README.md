@@ -48,6 +48,13 @@ Below command should be used for running this utility. This script is contained 
 
 This script add to classpath all JAR files contained in lib folder, there should be placed the JDBC driver.
 
+You can redirect the output of previous command to a local file and then, use this file for creating a Kite datasest. 
+
+```
+sh infer-avro-schema-from-database.sh -c jdbc:oracle:thin:@itrac13108.cern.ch:10121:IMT -u <user> -p <password> -t ADMIN_EMP > schema.avsc
+kite-dataset create ADMIN_EMP_DATASET -s schema.avsc
+```
+
 ## Configuration
 
 ### AuditSource
