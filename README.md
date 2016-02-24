@@ -14,14 +14,40 @@ Several implementations have been made for adapting Flume, both in the source an
 
 * AuditSource: a custom source which is able to collect audit data from database instances. This source needs a reader and a deserializer, some are already implemented:
     * Readers, create AuditEvents from audit data:
-        * ReliableJdbcAuditEventReader (default): reads audit events from tables. It uses JDBC driver for connecting to database, so many types of databases are compatible. It provides a reliable way to read audit data from tables in order to avoid data loss.
+        * ReliableJdbcAuditEventReader (default): reads audit events from tables. It uses JDBC driver for connecting to database, so many types of databases are compatible. It provides a reliable way to read audit data from tables in order to avoid data loss and replicated events.
     * Deserializer, convert AuditEvents into Flume Events:
         * JSONAuditEventDeserializer (default): generates events which body is a JSON with all fields contained in AuditEvent.
         * TextAuditEventDeserializer: generates events which body is a string with all fields contained in AuditEvent.
-* For some sinks, you may need to implement a custom parser for parsing Flume Events to Avro records:
+* For some sinks, you may need to implement a custom parser for Flume Events:
     * JSONtoAvroParser: for Kite sink, this parser converts Flume Events which body is JSON into Avro records.
     * JSONtoElasticSearchEventSerializer: for Elasticsearch sink, this parser converts Flume Events which body is JSON into Elasticsearch XContentBuilder.
-    
+
+## Schema creation utility for Kite sink and JDBC source 
+
+When using Kite as sink, previously you need to create a dataset. In order to create a Kite dataset, you should use the following command:
+
+```
+kite-dataset create <dataset_name> -s schema.avsc
+```
+
+This command receives an argument which points out to a file (schema.avsc) containing the new dataset schema. You can infer the schema from a database table with an utility provided. An use case when this utility can be useful is when using ReliableJdbcAuditEventReader in the source.
+
+Below command should be used for running this utility. This script is contained into scripts directory.
+
+```
+./infer-avro-schema-from-database.sh -c <Connection URL> -t <TABLE_NAME> -u <USERNSME> -p <PASSWORD> [-dc <driver_FQCN>] [-catalog <CATALOG_NAME>] [-schema <SCHEMA_NAME>] [-help]
+ -c <CONNECTION_URL>       URL for connecting to database
+ -t <TABLE_NAME>           Table from which schema is inferred
+ -u <USERNSME>             User to authenticate against database
+ -p <PASSWORD>             User's password
+ -dc <DRIVER_FQCN>         Fully qualified class name of JDBC driver (default: oracle.jdbc.driver.OracleDriver)
+ -catalog <CATALOG_NAME>   Table catalog
+ -schema <SCHEMA_NAME>     Table schema
+ -help                     Print help
+```
+
+Note that JDBC driver must be included in Java classpath, you may need to edit the script.
+
 ## Configuration
 
 ### AuditSource
@@ -101,7 +127,6 @@ reader.query = SELECT * FROM UNIFIED_AUDIT_TRAIL [WHERE EVENT_TIMESTAMP > TIMEST
 ### JSONAuditEventDeserializer, TextAuditEventDeserializer, JSONtoAvroParser and JSONtoElasticSearchEventSerializer
 
 They do not have any configuration parameters.
-
 
 
 
