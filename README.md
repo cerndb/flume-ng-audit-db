@@ -124,6 +124,18 @@ Custom query example:
 reader.query = SELECT * FROM UNIFIED_AUDIT_TRAIL [WHERE EVENT_TIMESTAMP > TIMESTAMP '{$committed_value}'] ORDER BY EVENT_TIMESTAMP
 ```
 
+Query to be executed when a value has not been committed yet:
+
+```
+SELECT * FROM UNIFIED_AUDIT_TRAIL ORDER BY EVENT_TIMESTAMP
+```
+
+As soon as a value has been committed, query will be like:
+
+```
+SELECT * FROM UNIFIED_AUDIT_TRAIL WHERE EVENT_TIMESTAMP > TIMESTAMP '2013-11-08 12:11:31.123123 Europe/Zurich' ORDER BY EVENT_TIMESTAMP
+```
+
 ### JSONAuditEventDeserializer, TextAuditEventDeserializer, JSONtoAvroParser and JSONtoElasticSearchEventSerializer
 
 They do not have any configuration parameters.
