@@ -6,7 +6,7 @@ import org.junit.Test;
 
 import ch.cern.db.flume.JSONEvent;
 
-public class JSONEventToCSVInterceptorTests {
+public class JSONEventToCSVInterceptorTest {
 
 	@Test
 	public void parse(){

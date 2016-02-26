@@ -20,7 +20,7 @@ import org.junit.Test;
 
 import ch.cern.db.flume.source.reader.ReliableJdbcEventReader;
 
-public class ReliableJdbcEventReaderTests {
+public class ReliableJdbcEventReaderTest {
 	
 	String connection_url = "jdbc:hsqldb:mem:aname";
 	Connection connection = null;

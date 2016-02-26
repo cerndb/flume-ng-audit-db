@@ -16,7 +16,7 @@ import org.junit.Test;
 import ch.cern.db.flume.sink.kite.parser.JSONtoAvroParser;
 import ch.cern.db.flume.sink.kite.parser.JSONtoAvroParser.Builder;
 
-public class JSONtoAvroParserTests {
+public class JSONtoAvroParserTest {
 
 	@Test
 	public void fildsInJSONbutNotInSchema() throws EventDeliveryException, NonRecoverableEventException{

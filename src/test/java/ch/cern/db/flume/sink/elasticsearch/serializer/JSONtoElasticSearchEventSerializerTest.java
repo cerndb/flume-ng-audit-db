@@ -11,7 +11,7 @@ import org.junit.Test;
 import ch.cern.db.flume.sink.elasticsearch.serializer.JSONtoElasticSearchEventSerializer;
 
 
-public class JSONtoElasticSearchEventSerializerTests{
+public class JSONtoElasticSearchEventSerializerTest{
 
 	@Test
 	public void serialize() throws IOException{

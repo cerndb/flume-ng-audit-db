@@ -29,7 +29,7 @@ import org.junit.Test;
 import ch.cern.db.flume.source.JDBCSource;
 import ch.cern.db.flume.source.reader.ReliableJdbcEventReader;
 
-public class JDBCSourceTests{
+public class JDBCSourceTest{
 
 	String connection_url = "jdbc:hsqldb:mem:aname";
 	Connection connection = null;
