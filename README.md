@@ -12,7 +12,7 @@ likely in Hadoop eco-system.
 
 Several implementations have been made for adapting Flume, both in the source and sink side.
 
-* JDBCSource: a custom source which is able to collect data from database tables. It makes use of a ReliableJdbcEventReader which uses a JDBC driver for connecting to a database, so many types of databases are compatible. It provides a reliable way to read audit data from tables in order to avoid data loss and replicated events. This source produces JSONEvents (implements Flume Event interface), this events are deserialized as a JSON string.
+* JDBCSource: a custom source which is able to collect data from database tables. It makes use of a ReliableJdbcEventReader which uses a JDBC driver for connecting to a database, so many types of databases are compatible. It provides a reliable way to read data from tables in order to avoid data loss and replicated events. This source produces JSONEvents (implements Flume Event interface), this events are deserialized as a JSON string.
 * For some sinks, you may need to implement a custom parser for Flume Events:
     * JSONtoAvroParser: for Kite sink, this parser converts Flume Events which body is JSON into Avro records.
     * JSONtoElasticSearchEventSerializer: for Elasticsearch sink, this parser converts Flume Events which body is JSON into Elasticsearch XContentBuilder.

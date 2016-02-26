@@ -32,7 +32,7 @@ public class JSONEventToCSVInterceptor implements Interceptor {
 	@Override
 	public Event intercept(Event event) {
 		if(!(event instanceof JSONEvent))
-			return null;
+			return event;
 		
 		StringBuilder csv = new StringBuilder();
 		
