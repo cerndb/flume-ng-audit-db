@@ -57,7 +57,7 @@ kite-dataset create ADMIN_EMP_DATASET -s schema.avsc
 In order to use AuditSource as source in your Flume agent, you need to specify the type of agent source as:
 
 ```
-<agent_name>.sources.<source_name>.type = ch.cern.db.audit.flume.source.AuditSource 
+<agent_name>.sources.<source_name>.type = ch.cern.db.flume.source.JDBCSource 
 ```
 
 Set number of events to be processed in every batch:
@@ -122,7 +122,7 @@ As soon as a value has been committed, query will be like:
 SELECT * FROM UNIFIED_AUDIT_TRAIL WHERE EVENT_TIMESTAMP > TIMESTAMP '2013-11-08 12:11:31.123123 Europe/Zurich' ORDER BY EVENT_TIMESTAMP
 ```
 
-### JSONAuditEventDeserializer, TextAuditEventDeserializer, JSONtoAvroParser and JSONtoElasticSearchEventSerializer
+### JSONtoAvroParser and JSONtoElasticSearchEventSerializer
 
 They do not have any configuration parameters.
 
