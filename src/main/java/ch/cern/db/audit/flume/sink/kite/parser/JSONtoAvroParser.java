@@ -66,12 +66,43 @@ public class JSONtoAvroParser implements EntityParser<GenericRecord> {
 		
 		GenericRecordBuilder recordBuilder = new GenericRecordBuilder(datasetSchema);
 		for (Field field:datasetSchema.getFields()) {
-			JsonElement value = parser.get(field.name());
-			
-			recordBuilder.set(field.name(), value != null ? value.getAsString() : null);
+			JsonElement element = parser.get(field.name());
+
+			recordBuilder.set(field.name(), getElementAsType(field.schema(), element));
 		}
 
 		return recordBuilder.build();
+	}
+	
+	private Object getElementAsType(Schema schema, JsonElement element) {
+		if(element == null)
+			return null;
+		
+		switch(schema.getType()){
+		case BOOLEAN:
+			return element.getAsBoolean();
+		case DOUBLE:
+			return element.getAsDouble();
+		case FLOAT:
+			return element.getAsFloat();
+		case INT:
+			return element.getAsInt();
+		case LONG:
+			return element.getAsLong();
+		case NULL:
+			return null;
+		case UNION:
+			return getElementAsType(schema.getTypes().get(0), element);
+//		case FIXED:
+//		case ARRAY:
+//		case BYTES:
+//		case ENUM:
+//		case MAP:
+//		case RECORD:
+//		case STRING:
+		default:
+			return element.getAsString();
+		}
 	}
 
 	public static class Builder implements EntityParser.Builder<GenericRecord> {
