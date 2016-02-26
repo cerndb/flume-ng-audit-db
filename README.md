@@ -120,7 +120,7 @@ SELECT * FROM table_name [WHERE column_name > '{$committed_vale}'] ORDER BY colu
 ```
 
 Some tips:
-* ORDER BY clause is strongly recommended to use since last value from "column to commit" will be used in further queries to get only last rows.
+* ORDER BY clause is strongly recommended to be used since last value from "column to commit" will be used in further queries to get only last rows.
 * If no value has been committed, part of the query between [] is removed.
 * If there is no [], same query will be always executed.
 * {$committed_value} must be between [], it will be replace by last committed value.
