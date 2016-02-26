@@ -23,9 +23,8 @@ public class GenerateSchemaFromTableTests {
 			connection = DriverManager.getConnection(connection_url, "sa", "");
 			
 			Statement statement = connection.createStatement();
-			statement.execute("CREATE SCHEMA TEST;");
-			statement.execute("DROP TABLE IF EXISTS TEST.audit_data_table;");
-			statement.execute("CREATE TABLE TEST.audit_data_table (id INTEGER, return_code BIGINT, name VARCHAR(20));");
+			statement.execute("DROP TABLE IF EXISTS audit_data_table;");
+			statement.execute("CREATE TABLE audit_data_table (id INTEGER, return_code BIGINT, name VARCHAR(20));");
 			statement.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -41,8 +40,7 @@ public class GenerateSchemaFromTableTests {
 				"-t", "AUDIT_DATA_TABLE",
 				"-u", "sa",
 				"-p", "",
-				"-schema", "null",
-				"-catalog", "null"
+				"-schema", "PUBLIC" //Can be removed
 				});
 		
 		Schema schema = generator.getSchema();
@@ -52,6 +50,21 @@ public class GenerateSchemaFromTableTests {
 				+ "{\"name\":\"RETURN_CODE\",\"type\":[\"int\",\"null\"]},"
 				+ "{\"name\":\"NAME\",\"type\":[\"string\",\"null\"]}]}", 
 				schema.toString(false));
+	}
+	
+	@Test(expected=SQLException.class)
+	public void noTableFound() throws SQLException{
+		
+		GenerateSchemaFromTable generator = new GenerateSchemaFromTable();
+		generator.configure(new String[]{
+				"-c", connection_url,
+				"-t", "AUDIT_DATA_TABLE_no_exists",
+				"-u", "sa",
+				"-p", ""
+				});
+		
+		generator.getSchema();
+		Assert.fail();
 	}
 	
 	@After

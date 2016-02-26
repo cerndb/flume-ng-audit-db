@@ -30,12 +30,12 @@ When using Kite as sink, previously you need to create a dataset. In order to cr
 kite-dataset create <dataset_name> -s schema.avsc
 ```
 
-This command receives an argument which points out to a file (schema.avsc) containing the new dataset schema. You can infer the schema from a database table with an utility provided. An use case when this utility can be useful is when using ReliableJdbcAuditEventReader in the source.
+This command receives an argument which points out a file (schema.avsc) containing the new dataset schema. You can infer the schema from a database table with an utility provided. An use case when this utility can be useful is when using ReliableJdbcAuditEventReader in the source.
 
 Below command should be used for running this utility. This script is contained into scripts directory.
 
 ```
-./infer-avro-schema-from-database.sh -c <Connection URL> -t <TABLE_NAME> -u <USERNSME> -p <PASSWORD> [-dc <driver_FQCN>] [-catalog <CATALOG_NAME>] [-schema <SCHEMA_NAME>] [-help]
+./infer-avro-schema-from-database.sh -c <Connection URL> -t <TABLE_NAME> -u <USERNSME> -p <PASSWORD> [-dc <DRIVER_FQCN>] [-catalog <CATALOG_NAME>] [-schema <SCHEMA_NAME>] [-help]
  -c <CONNECTION_URL>       URL for connecting to database
  -t <TABLE_NAME>           Table from which schema is inferred
  -u <USERNSME>             User to authenticate against database
