@@ -24,7 +24,7 @@ import ch.cern.db.flume.JSONEvent;
 
 import com.google.common.base.Preconditions;
 
-public class ReliableJdbcEventReader implements ReliableEventReader {
+public class ReliableJdbcEventReader{
 
 	private static final Logger LOG = LoggerFactory.getLogger(ReliableJdbcEventReader.class);
 	
@@ -135,7 +135,6 @@ public class ReliableJdbcEventReader implements ReliableEventReader {
 		}
 	}
 
-	@Override
 	public Event readEvent() throws IOException {
 		try {
 			if(resultSet == null)
@@ -271,7 +270,6 @@ public class ReliableJdbcEventReader implements ReliableEventReader {
 		}
 	}
 	
-	@Override
 	public List<Event> readEvents(int numberOfEventToRead) throws IOException {
 		LinkedList<Event> events = new LinkedList<Event>();
 		
@@ -290,7 +288,6 @@ public class ReliableJdbcEventReader implements ReliableEventReader {
 		return events;
 	}
 
-	@Override
 	public void commit() throws IOException {
 		if(last_value == null)
 			return;
@@ -304,7 +301,6 @@ public class ReliableJdbcEventReader implements ReliableEventReader {
 		last_value = null;
 	}
 
-	@Override
 	public void close() throws IOException {
 		try {
 			connection.close();
@@ -313,19 +309,4 @@ public class ReliableJdbcEventReader implements ReliableEventReader {
 		}
 	}
 
-	public static class Builder implements ReliableEventReader.Builder {
-
-		private Context context;
-		
-		@Override
-		public void configure(Context context) {
-			this.context = context;
-		}
-
-		@Override
-		public ReliableJdbcEventReader build() {
-			return new ReliableJdbcEventReader(context);
-		}
-		
-	}
 }

@@ -21,7 +21,7 @@ import org.junit.Test;
 import ch.cern.db.flume.source.reader.ReliableJdbcEventReader;
 
 @SuppressWarnings("resource")
-public class ReliableJdbcAuditEventReaderTests {
+public class ReliableJdbcEventReaderTests {
 	
 	String connection_url = "jdbc:hsqldb:mem:aname";
 	Connection connection = null;

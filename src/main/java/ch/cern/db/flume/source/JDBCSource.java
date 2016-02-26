@@ -13,9 +13,7 @@ import org.apache.flume.source.AbstractSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.cern.db.flume.source.reader.ReliableEventReader;
-import ch.cern.db.flume.source.reader.ReliableEventReaderBuilderFactory;
-import ch.cern.db.flume.source.reader.ReliableEventReader.Builder;
+import ch.cern.db.flume.source.reader.ReliableJdbcEventReader;
 
 public class JDBCSource extends AbstractSource implements Configurable, PollableSource {
 
@@ -29,10 +27,7 @@ public class JDBCSource extends AbstractSource implements Configurable, Pollable
 	private static final String MINIMUM_BATCH_TIME_PARAM = "batch.minimumTime";
 	private long minimum_batch_time = MINIMUM_BATCH_TIME_DEFAULT;
 
-	private static final String READER_DEFAULT = ReliableEventReaderBuilderFactory.Types.JDBC.toString();
-	private static final String READER_PARAM = "reader";
-
-	private ReliableEventReader reader;
+	private ReliableJdbcEventReader reader;
 	
 	@Override
 	public void configure(Context context) {
@@ -51,11 +46,7 @@ public class JDBCSource extends AbstractSource implements Configurable, Pollable
 			throw new FlumeException("Configured value for " + MINIMUM_BATCH_TIME_PARAM + " is not a number", e);
 		}
 		
-		String reader_config = context.getString(READER_PARAM, READER_DEFAULT);
-		Builder builder = ReliableEventReaderBuilderFactory.newInstance(reader_config);
-        builder.configure(context);
-		reader = builder.build();
-		LOG.info("Using reader: " + reader.getClass().getName());
+		reader = new ReliableJdbcEventReader(context);
 	}
 	
 	@Override
