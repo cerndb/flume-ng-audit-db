@@ -17,9 +17,9 @@ import ch.cern.db.flume.source.reader.ReliableEventReader;
 import ch.cern.db.flume.source.reader.ReliableEventReaderBuilderFactory;
 import ch.cern.db.flume.source.reader.ReliableEventReader.Builder;
 
-public class AuditSource extends AbstractSource implements Configurable, PollableSource {
+public class JDBCSource extends AbstractSource implements Configurable, PollableSource {
 
-	private static final Logger LOG = LoggerFactory.getLogger(AuditSource.class);
+	private static final Logger LOG = LoggerFactory.getLogger(JDBCSource.class);
 
 	private static final int BATCH_SIZE_DEFAULT = 100;
 	private static final String BATCH_SIZE_PARAM = "batch.size";

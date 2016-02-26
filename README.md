@@ -12,12 +12,7 @@ likely in Hadoop eco-system.
 
 Several implementations have been made for adapting Flume, both in the source and sink side.
 
-* AuditSource: a custom source which is able to collect audit data from database instances. This source needs a reader and a deserializer, some are already implemented:
-    * Readers, create AuditEvents from audit data:
-        * ReliableJdbcAuditEventReader (default): reads audit events from tables. It uses JDBC driver for connecting to database, so many types of databases are compatible. It provides a reliable way to read audit data from tables in order to avoid data loss and replicated events.
-    * Deserializer, convert AuditEvents into Flume Events:
-        * JSONAuditEventDeserializer (default): generates events which body is a JSON with all fields contained in AuditEvent.
-        * TextAuditEventDeserializer: generates events which body is a string with all fields contained in AuditEvent.
+* JDBCSource: a custom source which is able to collect data from database tables. It makes use of a ReliableJdbcEventReader which uses a JDBC driver for connecting to a database, so many types of databases are compatible. It provides a reliable way to read audit data from tables in order to avoid data loss and replicated events. This source produces JSONEvents (implements Flume Event interface), this events are deserialized as a JSON string.
 * For some sinks, you may need to implement a custom parser for Flume Events:
     * JSONtoAvroParser: for Kite sink, this parser converts Flume Events which body is JSON into Avro records.
     * JSONtoElasticSearchEventSerializer: for Elasticsearch sink, this parser converts Flume Events which body is JSON into Elasticsearch XContentBuilder.
@@ -65,22 +60,6 @@ In order to use AuditSource as source in your Flume agent, you need to specify t
 <agent_name>.sources.<source_name>.type = ch.cern.db.audit.flume.source.AuditSource 
 ```
 
-You do not need to specify a reader if you are going to use ReliableJdbcAuditEventReader since this one is the default. If you want to use other reader use the following parameter.
-
-```
-<agent_name>.sources.<source_name>.reader = jdbc
-```
-
-If you want to develop a custom Reader, make sure that it implements ReliableEventReader and create a nested Builder class. To use your custom reader, you need to configure .reader parameter with the FQCN.
-
-Deserializer needs also to be configured. Use below parameter with json or text value.
-
-```
-<agent_name>.sources.<source_name>.deserializer = [json|text] 
-```
-
-If you want to develop a custom deserializer, make sure that it implements AuditEventDeserializer and create a nested Builder class. To use your custom deserializer, you need to configure .deserializer parameter with the FQCN.
-
 Set number of events to be processed in every batch:
 ```
 <agent_name>.sources.<source_name>.batch.size = 100
@@ -96,15 +75,15 @@ Minimun time in milliseconds a batch must last:
 Find below all available configuration parameters:
 
 ```
-reader.committingFile = committed_value.backup
-reader.connectionDriver = oracle.jdbc.driver.OracleDriver
-reader.connectionUrl = jdbc:oracle:oci:@
-reader.username = sys as sysdba
-reader.password = sys
-reader.table = NULL
-reader.table.columnToCommit = NULL
-reader.table.columnToCommit.type = [TIMESTAMP (default)|NUMERIC|STRING]
-reader.query = NULL
+<agent_name>.sources.<source_name>.reader.committingFile = committed_value.backup
+<agent_name>.sources.<source_name>.reader.connectionDriver = oracle.jdbc.driver.OracleDriver
+<agent_name>.sources.<source_name>.reader.connectionUrl = jdbc:oracle:oci:@
+<agent_name>.sources.<source_name>.reader.username = sys as sysdba
+<agent_name>.sources.<source_name>.reader.password = sys
+<agent_name>.sources.<source_name>.reader.table = NULL
+<agent_name>.sources.<source_name>.reader.table.columnToCommit = NULL
+<agent_name>.sources.<source_name>.reader.table.columnToCommit.type = [TIMESTAMP (default)|NUMERIC|STRING]
+<agent_name>.sources.<source_name>.reader.query = NULL
 ```
 
 Default values are written, parameters with NULL has not default value. Most configuration parameters do not require any further explanation. However, some of then need to be explained.

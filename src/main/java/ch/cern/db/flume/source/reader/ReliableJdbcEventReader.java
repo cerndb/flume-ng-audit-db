@@ -20,15 +20,13 @@ import org.apache.flume.FlumeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.cern.db.flume.AuditEvent;
-import ch.cern.db.flume.source.deserializer.AuditEventDeserializer;
-import ch.cern.db.flume.source.deserializer.AuditEventDeserializerBuilderFactory;
+import ch.cern.db.flume.JSONEvent;
 
 import com.google.common.base.Preconditions;
 
-public class ReliableJdbcAuditEventReader implements ReliableEventReader {
+public class ReliableJdbcEventReader implements ReliableEventReader {
 
-	private static final Logger LOG = LoggerFactory.getLogger(ReliableJdbcAuditEventReader.class);
+	private static final Logger LOG = LoggerFactory.getLogger(ReliableJdbcEventReader.class);
 	
 	public static final String CONNECTION_DRIVER_DEFAULT = "oracle.jdbc.driver.OracleDriver";
 	public static final String CONNECTION_DRIVER_PARAM = "reader.connectionDriver";
@@ -65,10 +63,6 @@ public class ReliableJdbcAuditEventReader implements ReliableEventReader {
 	public static final String COMMITTING_FILE_PATH_PARAM = "reader.committingFile";
 	private String committing_file_path = COMMITTING_FILE_PATH_DEFAULT;
 	private File committing_file = null;
-
-	public static final String DESERIALIZER_DEFAULT = AuditEventDeserializerBuilderFactory.Types.JSON.toString();
-	public static final String DESERIALIZER_PARAM = "deserializer";
-	private AuditEventDeserializer deserializer;
 	
 	private Connection connection = null;
 	private ResultSet resultSet = null;
@@ -76,7 +70,7 @@ public class ReliableJdbcAuditEventReader implements ReliableEventReader {
 	
 	protected String last_value = null;
 	
-	public ReliableJdbcAuditEventReader(Context context) {
+	public ReliableJdbcEventReader(Context context) {
 		tableName = context.getString(TABLE_NAME_PARAM);
 		columnToCommit = context.getString(COLUMN_TO_COMMIT_PARAM);
 		configuredQuery = context.getString(QUERY_PARAM);
@@ -108,12 +102,6 @@ public class ReliableJdbcAuditEventReader implements ReliableEventReader {
 		connection_user = context.getString(USERNAME_PARAM, USERNAME_DEFAULT);
 		connection_password = context.getString(PASSWORD_PARAM, PASSWORD_DEFAULT);
 		connection_url = context.getString(CONNECTION_URL_PARAM, CONNECTION_URL_DEFAULT);
-		
-		String des_config = context.getString(DESERIALIZER_PARAM, DESERIALIZER_DEFAULT);
-		AuditEventDeserializer.Builder builder = AuditEventDeserializerBuilderFactory.newInstance(des_config);
-        builder.configure(context);
-		this.deserializer = builder.build();
-		LOG.info("Using deserializer: " + this.deserializer.getClass().getName());
 		
 		committing_file = new File(committing_file_path);
 		
@@ -157,7 +145,7 @@ public class ReliableJdbcAuditEventReader implements ReliableEventReader {
 				ResultSetMetaData metadata = resultSet.getMetaData();
 				int columnCount = metadata.getColumnCount();
 				
-				AuditEvent event = new AuditEvent();
+				JSONEvent event = new JSONEvent();
 				
 				for (int i = 1; i <= columnCount; i++) {										
 					String name = metadata.getColumnName(i);
@@ -167,24 +155,24 @@ public class ReliableJdbcAuditEventReader implements ReliableEventReader {
 					case java.sql.Types.TINYINT:
 					case java.sql.Types.INTEGER:
 					case java.sql.Types.BIGINT:
-						event.addField(name, resultSet.getInt(i));
+						event.addProperty(name, resultSet.getInt(i));
 						break;
 					case java.sql.Types.BOOLEAN:
-						event.addField(name, resultSet.getBoolean(i));
+						event.addProperty(name, resultSet.getBoolean(i));
 						break;
 					case java.sql.Types.NUMERIC:
 					case java.sql.Types.DOUBLE:
 					case java.sql.Types.FLOAT:
-						event.addField(name, resultSet.getDouble(i));
+						event.addProperty(name, resultSet.getDouble(i));
 						break;
 					case java.sql.Types.TIMESTAMP:
 					case -102: //TIMESTAMP(6) WITH LOCAL TIME ZONE
 						String ts = resultSet.getTimestamp(i).toString();
 						ts = ts.substring(0, 23).replace(" ", "T");
-						event.addField(name, ts);
+						event.addProperty(name, ts);
 						break;
 					default:
-						event.addField(name, resultSet.getString(i));
+						event.addProperty(name, resultSet.getString(i));
 						break;
 					}
 					
@@ -193,7 +181,7 @@ public class ReliableJdbcAuditEventReader implements ReliableEventReader {
 					}
 				}				
 				
-				return deserializer.process(event);
+				return event;
 			}else{
 				resultSet = null;
 				
@@ -335,8 +323,8 @@ public class ReliableJdbcAuditEventReader implements ReliableEventReader {
 		}
 
 		@Override
-		public ReliableJdbcAuditEventReader build() {
-			return new ReliableJdbcAuditEventReader(context);
+		public ReliableJdbcEventReader build() {
+			return new ReliableJdbcEventReader(context);
 		}
 		
 	}

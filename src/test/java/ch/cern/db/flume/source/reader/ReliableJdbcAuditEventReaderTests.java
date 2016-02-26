@@ -18,7 +18,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import ch.cern.db.flume.source.reader.ReliableJdbcAuditEventReader;
+import ch.cern.db.flume.source.reader.ReliableJdbcEventReader;
 
 @SuppressWarnings("resource")
 public class ReliableJdbcAuditEventReaderTests {
@@ -44,14 +44,14 @@ public class ReliableJdbcAuditEventReaderTests {
 	public void eventsFromDatabase(){
 		
 		Context context = new Context();
-		context.put(ReliableJdbcAuditEventReader.CONNECTION_DRIVER_PARAM, "org.hsqldb.jdbc.JDBCDriver");
-		context.put(ReliableJdbcAuditEventReader.CONNECTION_URL_PARAM, connection_url);
-		context.put(ReliableJdbcAuditEventReader.USERNAME_PARAM, "SA");
-		context.put(ReliableJdbcAuditEventReader.PASSWORD_PARAM, "");
-		context.put(ReliableJdbcAuditEventReader.TABLE_NAME_PARAM, " audit_data_table");
-		context.put(ReliableJdbcAuditEventReader.COLUMN_TO_COMMIT_PARAM, "ID");
-		context.put(ReliableJdbcAuditEventReader.TYPE_COLUMN_TO_COMMIT_PARAM, "numeric");
-		ReliableJdbcAuditEventReader reader = new ReliableJdbcAuditEventReader(context);
+		context.put(ReliableJdbcEventReader.CONNECTION_DRIVER_PARAM, "org.hsqldb.jdbc.JDBCDriver");
+		context.put(ReliableJdbcEventReader.CONNECTION_URL_PARAM, connection_url);
+		context.put(ReliableJdbcEventReader.USERNAME_PARAM, "SA");
+		context.put(ReliableJdbcEventReader.PASSWORD_PARAM, "");
+		context.put(ReliableJdbcEventReader.TABLE_NAME_PARAM, " audit_data_table");
+		context.put(ReliableJdbcEventReader.COLUMN_TO_COMMIT_PARAM, "ID");
+		context.put(ReliableJdbcEventReader.TYPE_COLUMN_TO_COMMIT_PARAM, "numeric");
+		ReliableJdbcEventReader reader = new ReliableJdbcEventReader(context);
 		
 		try {
 			Event event = reader.readEvent();
@@ -94,14 +94,14 @@ public class ReliableJdbcAuditEventReaderTests {
 	public void eventsFromDatabaseInBatchFasion(){
 		
 		Context context = new Context();
-		context.put(ReliableJdbcAuditEventReader.CONNECTION_DRIVER_PARAM, "org.hsqldb.jdbc.JDBCDriver");
-		context.put(ReliableJdbcAuditEventReader.CONNECTION_URL_PARAM, connection_url);
-		context.put(ReliableJdbcAuditEventReader.USERNAME_PARAM, "SA");
-		context.put(ReliableJdbcAuditEventReader.PASSWORD_PARAM, "");
-		context.put(ReliableJdbcAuditEventReader.TABLE_NAME_PARAM, " audit_data_table");
-		context.put(ReliableJdbcAuditEventReader.COLUMN_TO_COMMIT_PARAM, "ID");
-		context.put(ReliableJdbcAuditEventReader.TYPE_COLUMN_TO_COMMIT_PARAM, "numeric");
-		ReliableJdbcAuditEventReader reader = new ReliableJdbcAuditEventReader(context);
+		context.put(ReliableJdbcEventReader.CONNECTION_DRIVER_PARAM, "org.hsqldb.jdbc.JDBCDriver");
+		context.put(ReliableJdbcEventReader.CONNECTION_URL_PARAM, connection_url);
+		context.put(ReliableJdbcEventReader.USERNAME_PARAM, "SA");
+		context.put(ReliableJdbcEventReader.PASSWORD_PARAM, "");
+		context.put(ReliableJdbcEventReader.TABLE_NAME_PARAM, " audit_data_table");
+		context.put(ReliableJdbcEventReader.COLUMN_TO_COMMIT_PARAM, "ID");
+		context.put(ReliableJdbcEventReader.TYPE_COLUMN_TO_COMMIT_PARAM, "numeric");
+		ReliableJdbcEventReader reader = new ReliableJdbcEventReader(context);
 		
 		try {
 			List<Event> events = reader.readEvents(10);
@@ -164,18 +164,18 @@ public class ReliableJdbcAuditEventReaderTests {
 	public void readFromDatabaseAndCommit(){
 		
 		Context context = new Context();
-		context.put(ReliableJdbcAuditEventReader.CONNECTION_DRIVER_PARAM, "org.hsqldb.jdbc.JDBCDriver");
-		context.put(ReliableJdbcAuditEventReader.CONNECTION_URL_PARAM, connection_url);
-		context.put(ReliableJdbcAuditEventReader.USERNAME_PARAM, "SA");
-		context.put(ReliableJdbcAuditEventReader.PASSWORD_PARAM, "");
-		context.put(ReliableJdbcAuditEventReader.TABLE_NAME_PARAM, " audit_data_table");
-		context.put(ReliableJdbcAuditEventReader.COLUMN_TO_COMMIT_PARAM, "ID");
-		context.put(ReliableJdbcAuditEventReader.TYPE_COLUMN_TO_COMMIT_PARAM, "numeric");
-		ReliableJdbcAuditEventReader reader = new ReliableJdbcAuditEventReader(context);
+		context.put(ReliableJdbcEventReader.CONNECTION_DRIVER_PARAM, "org.hsqldb.jdbc.JDBCDriver");
+		context.put(ReliableJdbcEventReader.CONNECTION_URL_PARAM, connection_url);
+		context.put(ReliableJdbcEventReader.USERNAME_PARAM, "SA");
+		context.put(ReliableJdbcEventReader.PASSWORD_PARAM, "");
+		context.put(ReliableJdbcEventReader.TABLE_NAME_PARAM, " audit_data_table");
+		context.put(ReliableJdbcEventReader.COLUMN_TO_COMMIT_PARAM, "ID");
+		context.put(ReliableJdbcEventReader.TYPE_COLUMN_TO_COMMIT_PARAM, "numeric");
+		ReliableJdbcEventReader reader = new ReliableJdbcEventReader(context);
 		
 		try {
 			//Remove commit file
-			new File(ReliableJdbcAuditEventReader.COMMITTING_FILE_PATH_DEFAULT).delete();
+			new File(ReliableJdbcEventReader.COMMITTING_FILE_PATH_DEFAULT).delete();
 			
 			Event event = reader.readEvent();
 			Assert.assertNull(event);
@@ -188,7 +188,7 @@ public class ReliableJdbcAuditEventReaderTests {
 			Assert.assertEquals("{\"ID\":1,\"RETURN_CODE\":48,\"NAME\":\"name1\"}", new String(event.getBody()));
 			
 			reader.close();
-			reader = new ReliableJdbcAuditEventReader(context);
+			reader = new ReliableJdbcEventReader(context);
 			
 			event = reader.readEvent();
 			Assert.assertNotNull(event);
@@ -201,7 +201,7 @@ public class ReliableJdbcAuditEventReaderTests {
 			Assert.assertNull(event);
 			
 			reader.close();
-			reader = new ReliableJdbcAuditEventReader(context);
+			reader = new ReliableJdbcEventReader(context);
 			
 			event = reader.readEvent();
 			Assert.assertNotNull(event);
@@ -222,10 +222,10 @@ public class ReliableJdbcAuditEventReaderTests {
 	@Test
 	public void createCommitFile(){
 		Context context = new Context();
-		context.put(ReliableJdbcAuditEventReader.CONNECTION_DRIVER_PARAM, "org.hsqldb.jdbc.JDBCDriver");
-		context.put(ReliableJdbcAuditEventReader.TABLE_NAME_PARAM, "table");
-		context.put(ReliableJdbcAuditEventReader.COLUMN_TO_COMMIT_PARAM, "column");
-		ReliableJdbcAuditEventReader reader = new ReliableJdbcAuditEventReader(context);
+		context.put(ReliableJdbcEventReader.CONNECTION_DRIVER_PARAM, "org.hsqldb.jdbc.JDBCDriver");
+		context.put(ReliableJdbcEventReader.TABLE_NAME_PARAM, "table");
+		context.put(ReliableJdbcEventReader.COLUMN_TO_COMMIT_PARAM, "column");
+		ReliableJdbcEventReader reader = new ReliableJdbcEventReader(context);
 		
 		String timestamp = "2016-02-09 09:34:51.244507 Europe/Zurich";
 		
@@ -237,7 +237,7 @@ public class ReliableJdbcAuditEventReaderTests {
 		}
 		
 		try {
-			FileReader in = new FileReader(ReliableJdbcAuditEventReader.COMMITTING_FILE_PATH_DEFAULT);
+			FileReader in = new FileReader(ReliableJdbcEventReader.COMMITTING_FILE_PATH_DEFAULT);
 			char [] in_chars = new char[50];
 		    in.read(in_chars);
 			in.close();
@@ -257,7 +257,7 @@ public class ReliableJdbcAuditEventReaderTests {
 		String timestamp = "2016-02-09 09:34:51.244507 Europe/Zurich";
 		
 		try {
-			FileWriter out = new FileWriter(ReliableJdbcAuditEventReader.COMMITTING_FILE_PATH_DEFAULT, false);
+			FileWriter out = new FileWriter(ReliableJdbcEventReader.COMMITTING_FILE_PATH_DEFAULT, false);
 			out.write(timestamp);
 			out.close();
 		} catch (IOException e) {
@@ -265,10 +265,10 @@ public class ReliableJdbcAuditEventReaderTests {
 		}
 		
 		Context context = new Context();
-		context.put(ReliableJdbcAuditEventReader.CONNECTION_DRIVER_PARAM, "org.hsqldb.jdbc.JDBCDriver");
-		context.put(ReliableJdbcAuditEventReader.TABLE_NAME_PARAM, "table");
-		context.put(ReliableJdbcAuditEventReader.COLUMN_TO_COMMIT_PARAM, "column");
-		ReliableJdbcAuditEventReader reader = new ReliableJdbcAuditEventReader(context);
+		context.put(ReliableJdbcEventReader.CONNECTION_DRIVER_PARAM, "org.hsqldb.jdbc.JDBCDriver");
+		context.put(ReliableJdbcEventReader.TABLE_NAME_PARAM, "table");
+		context.put(ReliableJdbcEventReader.COLUMN_TO_COMMIT_PARAM, "column");
+		ReliableJdbcEventReader reader = new ReliableJdbcEventReader(context);
 		
 		Assert.assertEquals(timestamp, reader.committed_value);
 	}
@@ -278,14 +278,14 @@ public class ReliableJdbcAuditEventReaderTests {
 		
 		//It will create the file
 		Context context = new Context();
-		context.put(ReliableJdbcAuditEventReader.CONNECTION_DRIVER_PARAM, "org.hsqldb.jdbc.JDBCDriver");
-		context.put(ReliableJdbcAuditEventReader.TABLE_NAME_PARAM, "table");
-		context.put(ReliableJdbcAuditEventReader.COLUMN_TO_COMMIT_PARAM, "column");
-		ReliableJdbcAuditEventReader reader = new ReliableJdbcAuditEventReader(context);
+		context.put(ReliableJdbcEventReader.CONNECTION_DRIVER_PARAM, "org.hsqldb.jdbc.JDBCDriver");
+		context.put(ReliableJdbcEventReader.TABLE_NAME_PARAM, "table");
+		context.put(ReliableJdbcEventReader.COLUMN_TO_COMMIT_PARAM, "column");
+		ReliableJdbcEventReader reader = new ReliableJdbcEventReader(context);
 		Assert.assertNull(reader.last_value);
 		
 		//It will read an empty file
-		reader = new ReliableJdbcAuditEventReader(context);
+		reader = new ReliableJdbcEventReader(context);
 		Assert.assertNull(reader.last_value);
 		
 		String timestamp = "2016-02-09 09:34:51.244507 Europe/Zurich";
@@ -297,7 +297,7 @@ public class ReliableJdbcAuditEventReaderTests {
 		}
 		
 		try {
-			FileReader in = new FileReader(ReliableJdbcAuditEventReader.COMMITTING_FILE_PATH_DEFAULT);
+			FileReader in = new FileReader(ReliableJdbcEventReader.COMMITTING_FILE_PATH_DEFAULT);
 			char [] in_chars = new char[50];
 		    in.read(in_chars);
 			in.close();
@@ -315,62 +315,62 @@ public class ReliableJdbcAuditEventReaderTests {
 	public void queryCreation(){
 		
 		Context context = new Context();
-		context.put(ReliableJdbcAuditEventReader.CONNECTION_DRIVER_PARAM, "org.hsqldb.jdbc.JDBCDriver");
-		context.put(ReliableJdbcAuditEventReader.QUERY_PARAM, "new query");
-		context.put(ReliableJdbcAuditEventReader.COLUMN_TO_COMMIT_PARAM, "column");
-		ReliableJdbcAuditEventReader reader = new ReliableJdbcAuditEventReader(context);
+		context.put(ReliableJdbcEventReader.CONNECTION_DRIVER_PARAM, "org.hsqldb.jdbc.JDBCDriver");
+		context.put(ReliableJdbcEventReader.QUERY_PARAM, "new query");
+		context.put(ReliableJdbcEventReader.COLUMN_TO_COMMIT_PARAM, "column");
+		ReliableJdbcEventReader reader = new ReliableJdbcEventReader(context);
 		
 		String result = reader.createQuery(null);
 		Assert.assertEquals(result, "new query");
 		
 		context = new Context();
-		context.put(ReliableJdbcAuditEventReader.CONNECTION_DRIVER_PARAM, "org.hsqldb.jdbc.JDBCDriver");
-		context.put(ReliableJdbcAuditEventReader.QUERY_PARAM, 
+		context.put(ReliableJdbcEventReader.CONNECTION_DRIVER_PARAM, "org.hsqldb.jdbc.JDBCDriver");
+		context.put(ReliableJdbcEventReader.QUERY_PARAM, 
 				"SELECT * FROM table_name [WHERE column_name > '{$committed_value}'] ORDER BY column_name");
-		context.put(ReliableJdbcAuditEventReader.COLUMN_TO_COMMIT_PARAM, "column");
-		reader = new ReliableJdbcAuditEventReader(context);
+		context.put(ReliableJdbcEventReader.COLUMN_TO_COMMIT_PARAM, "column");
+		reader = new ReliableJdbcEventReader(context);
 		
 		result = reader.createQuery(null);
 		Assert.assertEquals(result, "SELECT * FROM table_name  ORDER BY column_name");
 		
 		
 		context = new Context();
-		context.put(ReliableJdbcAuditEventReader.CONNECTION_DRIVER_PARAM, "org.hsqldb.jdbc.JDBCDriver");
-		context.put(ReliableJdbcAuditEventReader.QUERY_PARAM, 
+		context.put(ReliableJdbcEventReader.CONNECTION_DRIVER_PARAM, "org.hsqldb.jdbc.JDBCDriver");
+		context.put(ReliableJdbcEventReader.QUERY_PARAM, 
 				"SELECT * FROM table_name [WHERE column_name > '{$committed_value}'] ORDER BY column_name");
-		context.put(ReliableJdbcAuditEventReader.COLUMN_TO_COMMIT_PARAM, "column");
-		reader = new ReliableJdbcAuditEventReader(context);
+		context.put(ReliableJdbcEventReader.COLUMN_TO_COMMIT_PARAM, "column");
+		reader = new ReliableJdbcEventReader(context);
 		
 		result = reader.createQuery("12345");
 		Assert.assertEquals(result, "SELECT * FROM table_name  WHERE column_name > '12345'  ORDER BY column_name");
 		
 		
 		context = new Context();
-		context.put(ReliableJdbcAuditEventReader.CONNECTION_DRIVER_PARAM, "org.hsqldb.jdbc.JDBCDriver");
-		context.put(ReliableJdbcAuditEventReader.TABLE_NAME_PARAM, "table");
-		context.put(ReliableJdbcAuditEventReader.COLUMN_TO_COMMIT_PARAM, "column");
-		context.put(ReliableJdbcAuditEventReader.QUERY_PARAM, "new query");
-		reader = new ReliableJdbcAuditEventReader(context);
+		context.put(ReliableJdbcEventReader.CONNECTION_DRIVER_PARAM, "org.hsqldb.jdbc.JDBCDriver");
+		context.put(ReliableJdbcEventReader.TABLE_NAME_PARAM, "table");
+		context.put(ReliableJdbcEventReader.COLUMN_TO_COMMIT_PARAM, "column");
+		context.put(ReliableJdbcEventReader.QUERY_PARAM, "new query");
+		reader = new ReliableJdbcEventReader(context);
 		
 		result = reader.createQuery("value");
 		Assert.assertEquals(result, "new query");
 		
 		
 		context = new Context();
-		context.put(ReliableJdbcAuditEventReader.CONNECTION_DRIVER_PARAM, "org.hsqldb.jdbc.JDBCDriver");
-		context.put(ReliableJdbcAuditEventReader.TABLE_NAME_PARAM, "table_name1");
-		context.put(ReliableJdbcAuditEventReader.COLUMN_TO_COMMIT_PARAM, "column_name1");
-		reader = new ReliableJdbcAuditEventReader(context);
+		context.put(ReliableJdbcEventReader.CONNECTION_DRIVER_PARAM, "org.hsqldb.jdbc.JDBCDriver");
+		context.put(ReliableJdbcEventReader.TABLE_NAME_PARAM, "table_name1");
+		context.put(ReliableJdbcEventReader.COLUMN_TO_COMMIT_PARAM, "column_name1");
+		reader = new ReliableJdbcEventReader(context);
 		
 		result = reader.createQuery(null);
 		Assert.assertEquals(result, "SELECT * FROM table_name1 ORDER BY column_name1");
 		
 		
 		context = new Context();
-		context.put(ReliableJdbcAuditEventReader.CONNECTION_DRIVER_PARAM, "org.hsqldb.jdbc.JDBCDriver");
-		context.put(ReliableJdbcAuditEventReader.TABLE_NAME_PARAM, "table_name2");
-		context.put(ReliableJdbcAuditEventReader.COLUMN_TO_COMMIT_PARAM, "column_name2");
-		reader = new ReliableJdbcAuditEventReader(context);
+		context.put(ReliableJdbcEventReader.CONNECTION_DRIVER_PARAM, "org.hsqldb.jdbc.JDBCDriver");
+		context.put(ReliableJdbcEventReader.TABLE_NAME_PARAM, "table_name2");
+		context.put(ReliableJdbcEventReader.COLUMN_TO_COMMIT_PARAM, "column_name2");
+		reader = new ReliableJdbcEventReader(context);
 		
 		result = reader.createQuery("2016-02-09 09:34:51.244");
 		Assert.assertEquals(result, "SELECT * FROM table_name2 "
@@ -379,11 +379,11 @@ public class ReliableJdbcAuditEventReaderTests {
 		
 		
 		context = new Context();
-		context.put(ReliableJdbcAuditEventReader.CONNECTION_DRIVER_PARAM, "org.hsqldb.jdbc.JDBCDriver");
-		context.put(ReliableJdbcAuditEventReader.TABLE_NAME_PARAM, "table_name2");
-		context.put(ReliableJdbcAuditEventReader.COLUMN_TO_COMMIT_PARAM, "column_name2");
-		context.put(ReliableJdbcAuditEventReader.TYPE_COLUMN_TO_COMMIT_PARAM, "timestamp");
-		reader = new ReliableJdbcAuditEventReader(context);
+		context.put(ReliableJdbcEventReader.CONNECTION_DRIVER_PARAM, "org.hsqldb.jdbc.JDBCDriver");
+		context.put(ReliableJdbcEventReader.TABLE_NAME_PARAM, "table_name2");
+		context.put(ReliableJdbcEventReader.COLUMN_TO_COMMIT_PARAM, "column_name2");
+		context.put(ReliableJdbcEventReader.TYPE_COLUMN_TO_COMMIT_PARAM, "timestamp");
+		reader = new ReliableJdbcEventReader(context);
 		
 		result = reader.createQuery("2016-02-09 09:34:51.244");
 		Assert.assertEquals(result, "SELECT * FROM table_name2 "
@@ -392,11 +392,11 @@ public class ReliableJdbcAuditEventReaderTests {
 		
 		
 		context = new Context();
-		context.put(ReliableJdbcAuditEventReader.CONNECTION_DRIVER_PARAM, "org.hsqldb.jdbc.JDBCDriver");
-		context.put(ReliableJdbcAuditEventReader.TABLE_NAME_PARAM, "table_name3");
-		context.put(ReliableJdbcAuditEventReader.COLUMN_TO_COMMIT_PARAM, "column_name3");
-		context.put(ReliableJdbcAuditEventReader.TYPE_COLUMN_TO_COMMIT_PARAM, "numeric");
-		reader = new ReliableJdbcAuditEventReader(context);
+		context.put(ReliableJdbcEventReader.CONNECTION_DRIVER_PARAM, "org.hsqldb.jdbc.JDBCDriver");
+		context.put(ReliableJdbcEventReader.TABLE_NAME_PARAM, "table_name3");
+		context.put(ReliableJdbcEventReader.COLUMN_TO_COMMIT_PARAM, "column_name3");
+		context.put(ReliableJdbcEventReader.TYPE_COLUMN_TO_COMMIT_PARAM, "numeric");
+		reader = new ReliableJdbcEventReader(context);
 		
 		result = reader.createQuery("244");
 		Assert.assertEquals(result, "SELECT * FROM table_name3 "
@@ -405,11 +405,11 @@ public class ReliableJdbcAuditEventReaderTests {
 		
 		
 		context = new Context();
-		context.put(ReliableJdbcAuditEventReader.CONNECTION_DRIVER_PARAM, "org.hsqldb.jdbc.JDBCDriver");
-		context.put(ReliableJdbcAuditEventReader.TABLE_NAME_PARAM, "table_name4");
-		context.put(ReliableJdbcAuditEventReader.COLUMN_TO_COMMIT_PARAM, "column_name4");
-		context.put(ReliableJdbcAuditEventReader.TYPE_COLUMN_TO_COMMIT_PARAM, "string");
-		reader = new ReliableJdbcAuditEventReader(context);
+		context.put(ReliableJdbcEventReader.CONNECTION_DRIVER_PARAM, "org.hsqldb.jdbc.JDBCDriver");
+		context.put(ReliableJdbcEventReader.TABLE_NAME_PARAM, "table_name4");
+		context.put(ReliableJdbcEventReader.COLUMN_TO_COMMIT_PARAM, "column_name4");
+		context.put(ReliableJdbcEventReader.TYPE_COLUMN_TO_COMMIT_PARAM, "string");
+		reader = new ReliableJdbcEventReader(context);
 		
 		result = reader.createQuery("string4");
 		Assert.assertEquals(result, "SELECT * FROM table_name4 "
@@ -418,13 +418,13 @@ public class ReliableJdbcAuditEventReaderTests {
 		
 		
 		context = new Context();
-		context.put(ReliableJdbcAuditEventReader.CONNECTION_DRIVER_PARAM, "org.hsqldb.jdbc.JDBCDriver");
-		context.put(ReliableJdbcAuditEventReader.TABLE_NAME_PARAM, "table_name4");
-		context.put(ReliableJdbcAuditEventReader.COLUMN_TO_COMMIT_PARAM, "column_name4");
-		context.put(ReliableJdbcAuditEventReader.TYPE_COLUMN_TO_COMMIT_PARAM, "does_not_exist");
+		context.put(ReliableJdbcEventReader.CONNECTION_DRIVER_PARAM, "org.hsqldb.jdbc.JDBCDriver");
+		context.put(ReliableJdbcEventReader.TABLE_NAME_PARAM, "table_name4");
+		context.put(ReliableJdbcEventReader.COLUMN_TO_COMMIT_PARAM, "column_name4");
+		context.put(ReliableJdbcEventReader.TYPE_COLUMN_TO_COMMIT_PARAM, "does_not_exist");
 		
 		try{
-			reader = new ReliableJdbcAuditEventReader(context);
+			reader = new ReliableJdbcEventReader(context);
 			Assert.fail();
 		}catch(FlumeException e){
 		}
@@ -432,7 +432,7 @@ public class ReliableJdbcAuditEventReaderTests {
 
 	@After
 	public void cleanUp(){
-		new File(ReliableJdbcAuditEventReader.COMMITTING_FILE_PATH_DEFAULT).delete();
+		new File(ReliableJdbcEventReader.COMMITTING_FILE_PATH_DEFAULT).delete();
 		
 		try {
 			connection.close();

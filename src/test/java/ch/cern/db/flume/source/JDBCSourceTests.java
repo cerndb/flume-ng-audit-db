@@ -26,10 +26,10 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import ch.cern.db.flume.source.AuditSource;
-import ch.cern.db.flume.source.reader.ReliableJdbcAuditEventReader;
+import ch.cern.db.flume.source.JDBCSource;
+import ch.cern.db.flume.source.reader.ReliableJdbcEventReader;
 
-public class AuditSourceTests{
+public class JDBCSourceTests{
 
 	String connection_url = "jdbc:hsqldb:mem:aname";
 	Connection connection = null;
@@ -57,15 +57,15 @@ public class AuditSourceTests{
 		statement.close();
 		
 		Context context = new Context();
-		context.put(ReliableJdbcAuditEventReader.CONNECTION_DRIVER_PARAM, "org.hsqldb.jdbc.JDBCDriver");
-		context.put(ReliableJdbcAuditEventReader.CONNECTION_URL_PARAM, connection_url);
-		context.put(ReliableJdbcAuditEventReader.USERNAME_PARAM, "SA");
-		context.put(ReliableJdbcAuditEventReader.PASSWORD_PARAM, "");
-		context.put(ReliableJdbcAuditEventReader.TABLE_NAME_PARAM, " audit_data_table");
-		context.put(ReliableJdbcAuditEventReader.COLUMN_TO_COMMIT_PARAM, "ID");
-		context.put(ReliableJdbcAuditEventReader.TYPE_COLUMN_TO_COMMIT_PARAM, "numeric");
+		context.put(ReliableJdbcEventReader.CONNECTION_DRIVER_PARAM, "org.hsqldb.jdbc.JDBCDriver");
+		context.put(ReliableJdbcEventReader.CONNECTION_URL_PARAM, connection_url);
+		context.put(ReliableJdbcEventReader.USERNAME_PARAM, "SA");
+		context.put(ReliableJdbcEventReader.PASSWORD_PARAM, "");
+		context.put(ReliableJdbcEventReader.TABLE_NAME_PARAM, " audit_data_table");
+		context.put(ReliableJdbcEventReader.COLUMN_TO_COMMIT_PARAM, "ID");
+		context.put(ReliableJdbcEventReader.TYPE_COLUMN_TO_COMMIT_PARAM, "numeric");
 		
-		AuditSource source = new AuditSource();
+		JDBCSource source = new JDBCSource();
 		source.configure(context);
 		
 		Map<String, String> channelContext = new HashMap<String, String>();
@@ -95,12 +95,12 @@ public class AuditSourceTests{
 	    Assert.assertNull(event);
 	    
 	    channel.getTransaction().commit();
-	    channel.getTransaction().close();;
+	    channel.getTransaction().close();
 	    
 	    runner.stop();
 	    
 	    //Check content of committing file 
-	    FileReader in = new FileReader(ReliableJdbcAuditEventReader.COMMITTING_FILE_PATH_DEFAULT);
+	    FileReader in = new FileReader(ReliableJdbcEventReader.COMMITTING_FILE_PATH_DEFAULT);
 		char [] in_chars = new char[50];
 	    in.read(in_chars);
 		in.close();
@@ -111,7 +111,7 @@ public class AuditSourceTests{
 
 	@After
 	public void cleanUp(){
-		new File(ReliableJdbcAuditEventReader.COMMITTING_FILE_PATH_DEFAULT).delete();
+		new File(ReliableJdbcEventReader.COMMITTING_FILE_PATH_DEFAULT).delete();
 		
 		try {
 			connection.close();
