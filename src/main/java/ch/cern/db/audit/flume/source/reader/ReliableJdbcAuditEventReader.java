@@ -139,7 +139,7 @@ public class ReliableJdbcAuditEventReader implements ReliableEventReader {
 			}else{
 				committing_file.createNewFile();
 				
-				LOG.info("File for storing last commited value have been created: " +
+				LOG.info("File for storing last commited value has been created: " +
 						committing_file.getAbsolutePath());
 			}
 		} catch (IOException e) {
