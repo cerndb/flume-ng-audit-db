@@ -52,9 +52,9 @@ public class JSONEventToCSVInterceptorTest {
 		
 		List<Event> intercepted_events = interceptor.intercept(events);
 		
-		Assert.assertEquals(e1, intercepted_events.get(0));
+		Assert.assertSame(e1, intercepted_events.get(0));
 		Assert.assertEquals("\"Daniel\",26,true", new String(intercepted_events.get(1).getBody()));
-		Assert.assertEquals(e3, intercepted_events.get(2));
+		Assert.assertSame(e3, intercepted_events.get(2));
 		Assert.assertEquals("\"Paco\",16", new String(intercepted_events.get(3).getBody()));
 	}
 	
