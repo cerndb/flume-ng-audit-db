@@ -273,6 +273,21 @@ public class ReliableJdbcEventReaderTest {
 	}
 	
 	@Test
+	public void loadFromConfiguredCommittedValue(){
+		
+		String timestamp = "2016-02-09 09:34:51.244507 Europe/Zurich";
+
+		Context context = new Context();
+		context.put(ReliableJdbcEventReader.CONNECTION_DRIVER_PARAM, "org.hsqldb.jdbc.JDBCDriver");
+		context.put(ReliableJdbcEventReader.TABLE_NAME_PARAM, "table");
+		context.put(ReliableJdbcEventReader.COLUMN_TO_COMMIT_PARAM, "column");
+		context.put(ReliableJdbcEventReader.COMMITTED_VALUE_TO_LOAD_PARAM, timestamp);
+		ReliableJdbcEventReader reader = new ReliableJdbcEventReader(context);
+		
+		Assert.assertEquals(timestamp, reader.committed_value);
+	}
+	
+	@Test
 	public void readEmptyCommitFile(){
 		
 		//It will create the file

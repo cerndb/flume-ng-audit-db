@@ -56,6 +56,9 @@ public class ReliableJdbcEventReader{
 	public static final ColumnType TYPE_COLUMN_TO_COMMIT_DEFUALT = ColumnType.TIMESTAMP;
 	private ColumnType type_column_to_commit = TYPE_COLUMN_TO_COMMIT_DEFUALT;
 
+	public static final String COMMITTED_VALUE_TO_LOAD_PARAM = "reader.committtedValue";
+	private String committed_value_to_load = null;
+	
 	public static final String QUERY_PARAM = "reader.query";
 	public static final String QUERY_PATH_PARAM = "reader.query.path";
 	private String configuredQuery = null;
@@ -79,7 +82,7 @@ public class ReliableJdbcEventReader{
 		Preconditions.checkNotNull(columnToCommit, "Column to commit needs to be configured with " + COLUMN_TO_COMMIT_PARAM);
 		
 		if(configuredQuery == null){
-			Preconditions.checkNotNull(tableName, "Table name needs to be configured with " + TABLE_NAME_PARAM);
+			Preconditions.checkNotNull(tableName, "Table name or query needs to be configured with " + TABLE_NAME_PARAM);
 		}
 		
 		String conf_type_column = context.getString(TYPE_COLUMN_TO_COMMIT_PARAM);
@@ -104,9 +107,14 @@ public class ReliableJdbcEventReader{
 		connection_password = context.getString(PASSWORD_PARAM, PASSWORD_DEFAULT);
 		connection_url = context.getString(CONNECTION_URL_PARAM, CONNECTION_URL_DEFAULT);
 		
+		committing_file_path = context.getString(COMMITTING_FILE_PATH_PARAM, COMMITTING_FILE_PATH_DEFAULT);
 		committing_file = new File(committing_file_path);
 		
-		loadLastCommittedValue();
+		committed_value_to_load = context.getString(COMMITTED_VALUE_TO_LOAD_PARAM);
+		if(committed_value_to_load != null)
+			committed_value = committed_value_to_load;
+		else
+			loadLastCommittedValueFromFile();
 	}
 
 	private String getConfiguredQuery(String query_string, String path_to_query_file) {
@@ -136,7 +144,7 @@ public class ReliableJdbcEventReader{
 		}
 	}
 
-	private void loadLastCommittedValue() {
+	private void loadLastCommittedValueFromFile() {
 		try {
 			if(committing_file.exists()){
 				FileReader in = new FileReader(committing_file);

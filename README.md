@@ -76,6 +76,7 @@ Find below all available configuration parameters:
 
 ```
 <agent_name>.sources.<source_name>.reader.committingFile = committed_value.backup
+<agent_name>.sources.<source_name>.reader.committtedValue = NULL
 <agent_name>.sources.<source_name>.reader.connectionDriver = oracle.jdbc.driver.OracleDriver
 <agent_name>.sources.<source_name>.reader.connectionUrl = jdbc:oracle:oci:@
 <agent_name>.sources.<source_name>.reader.username = sys as sysdba
@@ -87,16 +88,18 @@ Find below all available configuration parameters:
 <agent_name>.sources.<source_name>.reader.query.path = NULL
 ```
 
-Default values are written, parameters with NULL has not default value. Most configuration parameters do not require any further explanation. However, some of then need to be explained.
+Default values are written, parameters with NULL has not default value. Most configuration parameters do not require any further explanation. However, some of then are explained below.
 
-Since it is a reliable reader, it requires one column of the table to be used for committing its value. Column to use for this purpose is configured with ".columnToCommit" parameter. You would need to specify the type of this column in order to build the query properly.
+".table", ".query" or ".query.path" parameter must be configured. ".columnToCommit" is always required.
 
-".table" or ".query" parameter must be configured. ".columnToCommit" is always required.
+Since it is a reliable reader, it requires one column of the table to be used for committing its value. Column to use for this purpose is configured with ".columnToCommit" parameter. Therefore, this column must be returned by the query. You would need to specify the type of this column in order to build the query properly. 
+
+Last committed value is loaded when starting from ".committingFile" if specified. File is created if it does not exist. If you want to use a predefined committed value when starting, you can do it by using ".committtedValue", in that case value from existing ".committingFile" will be ignored, however, this file will be used in further queries for committing next values.
 
 In case the query is not built properly or you want to use a custom one, you can use ".query" parameter (or ".query.path" for loading the query from a file). In that case ".table" and "columnToCommit.type" parameters are ignored. You should use the following syntax:
 
 ```
-SELECT * FROM table_name [WHERE column_name > '{$committed_vale}'] ORDER BY column_name
+SELECT * FROM table_name [WHERE column_name > ':committed_vale'] ORDER BY column_name
 ```
 
 Some tips:
@@ -108,7 +111,7 @@ Some tips:
 Custom query example:
 
 ```
-reader.query = SELECT * FROM UNIFIED_AUDIT_TRAIL [WHERE EVENT_TIMESTAMP > TIMESTAMP '{$committed_value}'] ORDER BY EVENT_TIMESTAMP
+reader.query = SELECT * FROM UNIFIED_AUDIT_TRAIL [WHERE EVENT_TIMESTAMP > TIMESTAMP ':committed_value'] ORDER BY EVENT_TIMESTAMP
 ```
 
 Query to be executed when a value has not been committed yet:
