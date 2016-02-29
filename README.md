@@ -99,12 +99,12 @@ Last committed value is loaded when starting from ".committingFile" if specified
 In case the query is not built properly or you want to use a custom one, you can use ".query" parameter (or ".query.path" for loading the query from a file). In that case ".table" and "columnToCommit.type" parameters are ignored. You should use the following syntax:
 
 ```
-SELECT * FROM table_name [WHERE column_name > ':committed_vale'] ORDER BY column_name
+SELECT * FROM table_name [WHERE column_name > ':committed_value'] ORDER BY column_name
 ```
 
 Some tips:
 * ORDER BY clause is strongly recommended to be used since last value from "column to commit" will be used in further queries to get only last rows.
-* If no value has been committed yet, part of the query between [] is removed. This is the case when we first start Flume.
+* If no value has been committed yet, part of the query between [] is removed. This is the case when we first start Flume and  ".committtedValue" is not configured.
 * All occurrences of :committed_value will be replaced by last committed value.
 * :committed_value should be between [], but if there will be always a committed value you do not need to place them.
 
