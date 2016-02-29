@@ -330,18 +330,56 @@ public class ReliableJdbcEventReaderTest {
 		reader = new ReliableJdbcEventReader(context);
 		
 		result = reader.createQuery(null);
-		Assert.assertEquals(result, "SELECT * FROM table_name  ORDER BY column_name");
+		Assert.assertEquals("SELECT * FROM table_name  ORDER BY column_name", result);
 		
 		
 		context = new Context();
 		context.put(ReliableJdbcEventReader.CONNECTION_DRIVER_PARAM, "org.hsqldb.jdbc.JDBCDriver");
 		context.put(ReliableJdbcEventReader.QUERY_PARAM, 
-				"SELECT * FROM table_name [WHERE column_name > '{$committed_value}'] ORDER BY column_name");
+				"SELECT * FROM table_name [WHERE column_name > ':committed_value'] ORDER BY column_name");
 		context.put(ReliableJdbcEventReader.COLUMN_TO_COMMIT_PARAM, "column");
 		reader = new ReliableJdbcEventReader(context);
 		
 		result = reader.createQuery("12345");
-		Assert.assertEquals(result, "SELECT * FROM table_name  WHERE column_name > '12345'  ORDER BY column_name");
+		Assert.assertEquals("SELECT * FROM table_name  WHERE column_name > '12345'  ORDER BY column_name", result);
+		
+		
+		context = new Context();
+		context.put(ReliableJdbcEventReader.CONNECTION_DRIVER_PARAM, "org.hsqldb.jdbc.JDBCDriver");
+		context.put(ReliableJdbcEventReader.QUERY_PARAM, 
+				"SELECT * FROM table_name [WHERE column_name1 > ':committed_value'] "
+				+ "[AND column_name2 > ':committed_value'] ORDER BY column_name");
+		context.put(ReliableJdbcEventReader.COLUMN_TO_COMMIT_PARAM, "column");
+		reader = new ReliableJdbcEventReader(context);
+		
+		result = reader.createQuery("12345");
+		Assert.assertEquals("SELECT * FROM table_name  WHERE column_name1 > '12345' "
+				+ "  AND column_name2 > '12345'  ORDER BY column_name", result);
+		
+		
+		context = new Context();
+		context.put(ReliableJdbcEventReader.CONNECTION_DRIVER_PARAM, "org.hsqldb.jdbc.JDBCDriver");
+		context.put(ReliableJdbcEventReader.QUERY_PARAM, 
+				"SELECT * FROM table_name WHERE column_name1 > ':committed_value' "
+				+ "[AND column_name2 > ':committed_value'] ORDER BY column_name");
+		context.put(ReliableJdbcEventReader.COLUMN_TO_COMMIT_PARAM, "column");
+		reader = new ReliableJdbcEventReader(context);
+		
+		result = reader.createQuery(null);
+		Assert.assertEquals("SELECT * FROM table_name WHERE column_name1 > ':committed_value' "
+				+ " ORDER BY column_name", result);
+		
+		
+		context = new Context();
+		context.put(ReliableJdbcEventReader.CONNECTION_DRIVER_PARAM, "org.hsqldb.jdbc.JDBCDriver");
+		context.put(ReliableJdbcEventReader.QUERY_PARAM, 
+				"SELECT * FROM table_name [WHERE column_name1 > ':committed_value'] "
+				+ "[AND column_name2 > ':committed_value'] ORDER BY column_name");
+		context.put(ReliableJdbcEventReader.COLUMN_TO_COMMIT_PARAM, "column");
+		reader = new ReliableJdbcEventReader(context);
+		
+		result = reader.createQuery(null);
+		Assert.assertEquals("SELECT * FROM table_name   ORDER BY column_name", result);
 		
 		
 		context = new Context();

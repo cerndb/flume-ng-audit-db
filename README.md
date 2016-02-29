@@ -101,9 +101,9 @@ SELECT * FROM table_name [WHERE column_name > '{$committed_vale}'] ORDER BY colu
 
 Some tips:
 * ORDER BY clause is strongly recommended to be used since last value from "column to commit" will be used in further queries to get only last rows.
-* If no value has been committed, part of the query between [] is removed.
-* If there is no [], same query will be always executed.
-* {$committed_value} must be between [], it will be replace by last committed value.
+* If no value has been committed yet, part of the query between [] is removed. This is the case when we first start Flume.
+* All occurrences of :committed_value will be replaced by last committed value.
+* :committed_value should be between [], but if there will be always a committed value you do not need to place them.
 
 Custom query example:
 

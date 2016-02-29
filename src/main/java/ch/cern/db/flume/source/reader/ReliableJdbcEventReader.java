@@ -237,28 +237,31 @@ public class ReliableJdbcEventReader{
 	protected String createQuery(String committed_value) {
 		
 		if(configuredQuery != null){
-			char left = '[';
-			char right = ']';
-			String toReplace = "{$committed_value}";
+			String finalQuery = configuredQuery;
 			
-			int left_index = configuredQuery.indexOf(left);
-			int right_index = configuredQuery.indexOf(right);
-			int committed_value_index = configuredQuery.indexOf(toReplace);
-			if(committed_value_index < right_index && committed_value_index > left_index){
-				//right syntax for replacing 
-				//SELECT * FROM table_name [WHERE column_name > '{$committed_value}'] ORDER BY column_name
+			if(committed_value == null){
+				//Remove query between [] characters
+				while(true){
+					int left_index = finalQuery.indexOf('[');
+					int right_index = finalQuery.indexOf(']');
 				
-				if(committed_value == null){
-					return configuredQuery.substring(0, left_index)
-							.concat(configuredQuery.substring(right_index+1, configuredQuery.length()));
-				}else{
-					return configuredQuery.replace(left, ' ')
-							.replace(right, ' ')
-							.replace(toReplace, committed_value);
+					if(left_index == -1 || right_index == -1)
+						break;
+					
+					finalQuery = finalQuery.substring(0, left_index)
+						.concat(finalQuery.substring(right_index+1, finalQuery.length()));
 				}
 			}else{
-				return configuredQuery;
+				String toReplace = ":committed_value";
+				
+				//Replace all {$committed_value} by committed_value
+				finalQuery = finalQuery.replaceAll(toReplace, committed_value);
+				
+				//Remove [] characters
+				finalQuery = finalQuery.replaceAll("\\[", " ").replaceAll("\\]", " ");
 			}
+			
+			return finalQuery;
 		}
 		
 		String query = "SELECT * FROM " + tableName;
