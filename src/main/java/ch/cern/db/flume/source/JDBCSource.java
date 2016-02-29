@@ -67,6 +67,7 @@ public class JDBCSource extends AbstractSource implements Configurable, Pollable
 			status = Status.BACKOFF;
 			
 			LOG.error(e.getMessage(), e);
+			sleep(batchStartTime);
 			throw new EventDeliveryException(e);
 		}
 		
