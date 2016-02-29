@@ -16,6 +16,7 @@ Several implementations have been made for adapting Flume, both in the source an
 * Interceptors that can modify events produced in the source:
     * DropNoJSONEventsInterceptor: drop all events which are not of the class JSONEvents.
     * JSONEventToCSVInterceptor: convert JSONEvents into normal Flume Events which body is a CSV with the values. Headers are copied. No JSONEvents are not touched.
+    * DropDuplicatedEventsInterceptor: drop duplicated events. It only checks for duplicates from last batch events.
 * For some sinks, you may need to implement a custom parser for Flume Events:
     * JSONtoAvroParser: for Kite sink, this parser converts Flume Events which body is JSON into Avro records.
     * JSONtoElasticSearchEventSerializer: for Elasticsearch sink, this parser converts Flume Events which body is JSON into Elasticsearch XContentBuilder.
