@@ -57,6 +57,7 @@ public class ReliableJdbcEventReader{
 	private ColumnType type_column_to_commit = TYPE_COLUMN_TO_COMMIT_DEFUALT;
 
 	public static final String QUERY_PARAM = "reader.query";
+	public static final String QUERY_PATH_PARAM = "reader.query.path";
 	private String configuredQuery = null;
 	
 	public static final String COMMITTING_FILE_PATH_DEFAULT = "committed_value.backup";
@@ -73,7 +74,7 @@ public class ReliableJdbcEventReader{
 	public ReliableJdbcEventReader(Context context) {
 		tableName = context.getString(TABLE_NAME_PARAM);
 		columnToCommit = context.getString(COLUMN_TO_COMMIT_PARAM);
-		configuredQuery = context.getString(QUERY_PARAM);
+		configuredQuery = getConfiguredQuery(context.getString(QUERY_PARAM), context.getString(QUERY_PATH_PARAM));
 		
 		Preconditions.checkNotNull(columnToCommit, "Column to commit needs to be configured with " + COLUMN_TO_COMMIT_PARAM);
 		
@@ -108,11 +109,38 @@ public class ReliableJdbcEventReader{
 		loadLastCommittedValue();
 	}
 
+	private String getConfiguredQuery(String query_string, String path_to_query_file) {
+		//From configuration parameter
+		if(query_string != null)
+			return query_string;
+		
+		//Else, from file if path is configured
+		if(path_to_query_file == null)
+			return null;
+		
+		File query_file = new File(path_to_query_file); 
+		if(query_file.exists()){
+			try {
+				FileReader in = new FileReader(query_file);
+				
+				char [] in_chars = new char[(int) query_file.length()];
+			    in.read(in_chars);
+				in.close();
+				
+				return new String(in_chars).trim();
+			} catch (Exception e) {
+				throw new FlumeException(e);
+			}
+		}else{
+			throw new FlumeException("File configured with "+QUERY_PATH_PARAM+" parameter does not exist");
+		}
+	}
+
 	private void loadLastCommittedValue() {
 		try {
 			if(committing_file.exists()){
 				FileReader in = new FileReader(committing_file);
-				char [] in_chars = new char[60];
+				char [] in_chars = new char[(int) committing_file.length()];
 			    in.read(in_chars);
 				in.close();
 				String value_from_file = new String(in_chars).trim();

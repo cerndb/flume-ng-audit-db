@@ -429,6 +429,44 @@ public class ReliableJdbcEventReaderTest {
 		}
 	}
 
+	@Test
+	public void getConfiguredQuery(){
+		
+		Context context = new Context();
+		context.put(ReliableJdbcEventReader.CONNECTION_DRIVER_PARAM, "org.hsqldb.jdbc.JDBCDriver");
+		context.put(ReliableJdbcEventReader.QUERY_PARAM, "parameter_new_query");
+		context.put(ReliableJdbcEventReader.COLUMN_TO_COMMIT_PARAM, "column");
+		ReliableJdbcEventReader reader = new ReliableJdbcEventReader(context);
+		
+		Assert.assertEquals("parameter_new_query", reader.createQuery(""));
+		
+		context = new Context();
+		context.put(ReliableJdbcEventReader.CONNECTION_DRIVER_PARAM, "org.hsqldb.jdbc.JDBCDriver");
+		context.put(ReliableJdbcEventReader.QUERY_PARAM, "parameter_new_query");
+		context.put(ReliableJdbcEventReader.QUERY_PATH_PARAM, "path/to/not/existing/file");
+		context.put(ReliableJdbcEventReader.COLUMN_TO_COMMIT_PARAM, "column");
+		reader = new ReliableJdbcEventReader(context);
+		
+		Assert.assertEquals("parameter_new_query", reader.createQuery(""));
+		
+		context = new Context();
+		context.put(ReliableJdbcEventReader.CONNECTION_DRIVER_PARAM, "org.hsqldb.jdbc.JDBCDriver");
+		context.put(ReliableJdbcEventReader.QUERY_PATH_PARAM, "path/to/not/existing/file");
+		context.put(ReliableJdbcEventReader.COLUMN_TO_COMMIT_PARAM, "column");
+		try{
+			reader = new ReliableJdbcEventReader(context);
+			Assert.fail();
+		}catch(FlumeException e){}
+		
+		context = new Context();
+		context.put(ReliableJdbcEventReader.CONNECTION_DRIVER_PARAM, "org.hsqldb.jdbc.JDBCDriver");
+		context.put(ReliableJdbcEventReader.QUERY_PATH_PARAM, "src/test/resources/file.query");
+		context.put(ReliableJdbcEventReader.COLUMN_TO_COMMIT_PARAM, "column");
+		reader = new ReliableJdbcEventReader(context);
+		
+		Assert.assertEquals("query in file\nwith several\nlines", reader.createQuery(""));
+	}
+	
 	@After
 	public void cleanUp(){
 		new File(ReliableJdbcEventReader.COMMITTING_FILE_PATH_DEFAULT).delete();

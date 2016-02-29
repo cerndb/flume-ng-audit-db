@@ -84,6 +84,7 @@ Find below all available configuration parameters:
 <agent_name>.sources.<source_name>.reader.table.columnToCommit = NULL
 <agent_name>.sources.<source_name>.reader.table.columnToCommit.type = [TIMESTAMP (default)|NUMERIC|STRING]
 <agent_name>.sources.<source_name>.reader.query = NULL
+<agent_name>.sources.<source_name>.reader.query.path = NULL
 ```
 
 Default values are written, parameters with NULL has not default value. Most configuration parameters do not require any further explanation. However, some of then need to be explained.
@@ -92,7 +93,7 @@ Since it is a reliable reader, it requires one column of the table to be used fo
 
 ".table" or ".query" parameter must be configured. ".columnToCommit" is always required.
 
-In case the query is not built properly or you want to use a custom one, you can use ".query" parameter. In that case ".table" and "columnToCommit.type" parameters are ignored. You should use the following syntax:
+In case the query is not built properly or you want to use a custom one, you can use ".query" parameter (or ".query.path" for loading the query from a file). In that case ".table" and "columnToCommit.type" parameters are ignored. You should use the following syntax:
 
 ```
 SELECT * FROM table_name [WHERE column_name > '{$committed_vale}'] ORDER BY column_name
