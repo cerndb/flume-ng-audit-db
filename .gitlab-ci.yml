@@ -1,3 +1,5 @@
+before_script:
+  - apt-get install maven
 package:
   script:
-    - mvn install
+    - mvn package
