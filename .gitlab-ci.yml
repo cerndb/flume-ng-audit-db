@@ -1,0 +1,3 @@
+package:
+	script:
+		- mvn install
