@@ -1,5 +1,5 @@
-before_script:
-  - apt-get install maven
+image: maven:3-jdk-7
+
 package:
   script:
-    - mvn package
+    - mvn package -B
