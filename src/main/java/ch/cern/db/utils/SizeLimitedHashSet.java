@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 
 /**
- * It acts as a queue, removing last element inserted when Set reach maximun size.
+ * It acts as a queue, removing last element inserted when Set reach maximum size.
  * 
  * @author daniellanzagarcia
  *
@@ -16,16 +16,16 @@ public class SizeLimitedHashSet<E> extends HashSet<E> {
 	
 	private LinkedList<E> list;
 	
-	private int maximunSize = -1; //No limit
+	private int maximumSize = 0; //Unilimited
 
 	public SizeLimitedHashSet() {
-		this(-1);
+		this(0);
 	}
 	
 	public SizeLimitedHashSet(int maximunSize) {
 		super();
 		
-		this.maximunSize = maximunSize;
+		this.maximumSize = maximunSize;
 		
 		list = new LinkedList<E>();
 	}
@@ -33,7 +33,7 @@ public class SizeLimitedHashSet<E> extends HashSet<E> {
 	@Override
 	public boolean add(E e) {
 		if(super.add(e)){
-			if(maximunSize > -1 && list.size() >= maximunSize)
+			if(maximumSize > 0 && list.size() >= maximumSize)
 				remove(list.removeFirst());
 			
 			return list.add(e);
@@ -45,10 +45,10 @@ public class SizeLimitedHashSet<E> extends HashSet<E> {
 	@Override
 	public boolean addAll(Collection<? extends E> c) {
 		boolean modified = false;
-        for (E e : c)
-            if (add(e))
-                modified = true;
-        return modified;
+		for (E e : c)
+			if (add(e))
+				modified = true;
+		return modified;
 	}
 	
 	@Override
