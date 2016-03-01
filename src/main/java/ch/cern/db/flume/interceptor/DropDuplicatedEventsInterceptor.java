@@ -1,42 +1,47 @@
 package ch.cern.db.flume.interceptor;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.flume.Context;
 import org.apache.flume.Event;
-import org.apache.flume.FlumeException;
 import org.apache.flume.interceptor.Interceptor;
 
+import ch.cern.db.utils.SizeLimitedHashSet;
+
 /**
- * This intercepted works only if source puts
- * events into batches (getChannelProcessor().processEventBatch(events))
- * not single events.
+ * Compare current event with last events to check it was already processed
  */
 public class DropDuplicatedEventsInterceptor implements Interceptor {
 
-	private boolean checkHeaders = true;
-	private boolean checkBody = true;
+	private boolean checkHeaders;
+	private boolean checkBody;
 	
-	private HashSet<Integer> hashes_previous_batch;
-	private HashSet<Integer> hashes_current_batch;
+	private int size;
+	
+	private SizeLimitedHashSet<Integer> last_hashes;
 	
 	private DropDuplicatedEventsInterceptor(Context context){
 		checkHeaders = context.getBoolean("headers", true);
 		checkBody = context.getBoolean("body", true);
+		size = context.getInteger("size", 1000);
 	}
 	
 	@Override
 	public void initialize() {
-		hashes_previous_batch = new HashSet<Integer>();
-		hashes_current_batch = new HashSet<Integer>();
+		last_hashes = new SizeLimitedHashSet<Integer>(size);
 	}
 
 	@Override
 	public Event intercept(Event event) {
-		throw new FlumeException(this.getClass().getName()+" is only compatible with sources that process events in batches");
+		int event_hash = hashCode(event);
+		
+		if(last_hashes.contains(event_hash))
+			return null;
+		
+		last_hashes.add(event_hash);
+		return event;
 	}
 
 	private int hashCode(Event event) {
@@ -60,17 +65,10 @@ public class DropDuplicatedEventsInterceptor implements Interceptor {
 
 	@Override
 	public List<Event> intercept(List<Event> events) {
-		hashes_previous_batch = hashes_current_batch;
-		hashes_current_batch = new HashSet<Integer>();
-		
 		LinkedList<Event> intercepted_events = new LinkedList<Event>();
 		
 		for (Event event : events) {
-			int event_hash = hashCode(event);
-			
-			hashes_current_batch.add(event_hash);
-			
-			Event intercepted_event = hashes_previous_batch.contains(event_hash) ? null : event;;
+			Event intercepted_event = intercept(event);
 			if(intercepted_event != null)
 				intercepted_events.add(event);
 		}
@@ -80,6 +78,7 @@ public class DropDuplicatedEventsInterceptor implements Interceptor {
 
 	@Override
 	public void close() {
+		last_hashes.clear();
 	}
 
 	/**

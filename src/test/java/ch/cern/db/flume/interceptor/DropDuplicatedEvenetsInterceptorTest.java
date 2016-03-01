@@ -18,6 +18,7 @@ public class DropDuplicatedEvenetsInterceptorTest {
 	public void differentBody(){
 		Builder interceptor_builder = new DropDuplicatedEventsInterceptor.Builder();
 		Context context = new Context();
+		context.put("size", "2");
 		interceptor_builder.configure(context);
 		
 		Interceptor interceptor = interceptor_builder.build();
@@ -45,15 +46,15 @@ public class DropDuplicatedEvenetsInterceptorTest {
 		Assert.assertSame(e3, b2_events_intercepted.get(0));
 		
 		//Batch 3
-		//e5 will pass since it was 2 batches ago
 		LinkedList<Event> b3_events = new LinkedList<Event>();
 		Event e5 = EventBuilder.withBody("1111".getBytes());
 		b3_events.add(e5);
 		Event e6 = EventBuilder.withBody("2222".getBytes());
 		b3_events.add(e6);
 		List<Event> b3_events_intercepted = interceptor.intercept(b3_events);
-		Assert.assertEquals(1, b3_events_intercepted.size());
+		Assert.assertEquals(2, b3_events_intercepted.size());
 		Assert.assertSame(e5, b3_events_intercepted.get(0));
+		Assert.assertSame(e6, b3_events_intercepted.get(1));
 	}
 	
 }

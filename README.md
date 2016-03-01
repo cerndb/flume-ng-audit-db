@@ -16,7 +16,7 @@ Several implementations have been made for adapting Flume, both in the source an
 * Interceptors that can modify events produced in the source:
     * DropNoJSONEventsInterceptor: drop all events which are not of the class JSONEvents.
     * JSONEventToCSVInterceptor: convert JSONEvents into normal Flume Events which body is a CSV with the values. Headers are copied. No JSONEvents are not touched.
-    * DropDuplicatedEventsInterceptor: drop duplicated events. It only checks for duplicates from last batch events.
+    * DropDuplicatedEventsInterceptor: drop duplicated events. It only checks with the last "size" events.
 * For some sinks, you may need to implement a custom parser for Flume Events:
     * JSONtoAvroParser: for Kite sink, this parser converts Flume Events which body is JSON into Avro records.
     * JSONtoElasticSearchEventSerializer: for Elasticsearch sink, this parser converts Flume Events which body is JSON into Elasticsearch XContentBuilder.
@@ -129,6 +129,12 @@ As soon as a value has been committed, query will be like:
 ```
 SELECT * FROM UNIFIED_AUDIT_TRAIL WHERE EVENT_TIMESTAMP > TIMESTAMP '2013-11-08 12:11:31.123123 Europe/Zurich' ORDER BY EVENT_TIMESTAMP
 ```
+
+### DropDuplicatedEventsInterceptor
+
+It compares new Events with last events. A set of last Event hashes is maintained, the size of this set can be configured with "size" parameter, default size is 1000.
+
+Event's hash is calculate by default from headers (disabled if "header" parameter is set to false) and body (disabled if "body" parameter is set to false).
 
 ### JSONtoAvroParser and JSONtoElasticSearchEventSerializer
 
