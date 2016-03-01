@@ -4,3 +4,4 @@
 ../src/main/java/ch/cern/db/flume/interceptor/*.java \
 ../src/main/java/ch/cern/db/flume/source/*.java \
 ../src/main/java/ch/cern/db/flume/source/reader/*.java \
+../src/main/java/ch/cern/db/utils/*.java
