@@ -21,6 +21,7 @@ public class DropDuplicatedEvenetsInterceptorTest {
 		interceptor_builder.configure(context);
 		
 		Interceptor interceptor = interceptor_builder.build();
+		interceptor.initialize();
 		
 		//Batch 1
 		LinkedList<Event> b1_events = new LinkedList<Event>();

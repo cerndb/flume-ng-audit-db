@@ -7,10 +7,11 @@ import java.util.List;
 
 import org.apache.flume.Context;
 import org.apache.flume.Event;
+import org.apache.flume.FlumeException;
 import org.apache.flume.interceptor.Interceptor;
 
 /**
- * This intercepted works properly only if source puts
+ * This intercepted works only if source puts
  * events into batches (getChannelProcessor().processEventBatch(events))
  * not single events.
  */
@@ -23,24 +24,19 @@ public class DropDuplicatedEventsInterceptor implements Interceptor {
 	private HashSet<Integer> hashes_current_batch;
 	
 	private DropDuplicatedEventsInterceptor(Context context){
-		hashes_previous_batch = new HashSet<Integer>();
-		hashes_current_batch = new HashSet<Integer>();
-		
 		checkHeaders = context.getBoolean("headers", true);
 		checkBody = context.getBoolean("body", true);
 	}
 	
 	@Override
 	public void initialize() {
+		hashes_previous_batch = new HashSet<Integer>();
+		hashes_current_batch = new HashSet<Integer>();
 	}
 
 	@Override
 	public Event intercept(Event event) {
-		int event_hash = hashCode(event);
-		
-		hashes_current_batch.add(event_hash);
-		
-		return hashes_previous_batch.contains(event_hash) ? null : event;
+		throw new FlumeException(this.getClass().getName()+" is only compatible with sources that process events in batches");
 	}
 
 	private int hashCode(Event event) {
@@ -67,16 +63,19 @@ public class DropDuplicatedEventsInterceptor implements Interceptor {
 		hashes_previous_batch = hashes_current_batch;
 		hashes_current_batch = new HashSet<Integer>();
 		
-		LinkedList<Event> intercepted = new LinkedList<Event>();
+		LinkedList<Event> intercepted_events = new LinkedList<Event>();
 		
 		for (Event event : events) {
-			Event intercepted_event = intercept(event);
+			int event_hash = hashCode(event);
 			
+			hashes_current_batch.add(event_hash);
+			
+			Event intercepted_event = hashes_previous_batch.contains(event_hash) ? null : event;;
 			if(intercepted_event != null)
-				intercepted.add(event);
+				intercepted_events.add(event);
 		}
 		
-		return intercepted;
+		return intercepted_events;
 	}
 
 	@Override
