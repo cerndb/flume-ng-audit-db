@@ -7,6 +7,7 @@ import java.util.List;
 import org.apache.flume.Context;
 import org.apache.flume.Event;
 import org.apache.flume.interceptor.Interceptor;
+import org.mortbay.log.Log;
 
 import ch.cern.db.utils.SizeLimitedHashSet;
 
@@ -31,6 +32,8 @@ public class DropDuplicatedEventsInterceptor implements Interceptor {
 	@Override
 	public void initialize() {
 		last_hashes = new SizeLimitedHashSet<Integer>(size);
+		
+		Log.info("Intialized with size="+size+", headers="+checkHeaders+", body="+checkBody);
 	}
 
 	@Override
