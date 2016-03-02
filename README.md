@@ -20,6 +20,10 @@ Several implementations have been made for adapting Flume, both in the source an
 * For some sinks, you may need to implement a custom parser for Flume Events:
     * JSONtoAvroParser: for Kite sink, this parser converts Flume Events which body is JSON into Avro records.
     * JSONtoElasticSearchEventSerializer: for Elasticsearch sink, this parser converts Flume Events which body is JSON into Elasticsearch XContentBuilder.
+    
+## Build
+
+In order to build he project you will need to execute "bin/compile" script.
 
 ## Schema creation utility for Kite sink and JDBC source 
 
