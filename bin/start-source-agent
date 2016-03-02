@@ -9,12 +9,12 @@ while [ -h "$SOURCE" ]; do
 done
 SCRIPT_DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
-HOME=../$SCRIPT_DIR
+HOME=$SCRIPT_DIR/..
 
 FLUME_BIN_DIR=/usr/lib/aimon-flume-ng/bin/
 
 $FLUME_BIN_DIR/flume-ng agent \
-	--classpath $ORACLE_HOME/jdbc/lib/ojdbc8.jar:$HOME/src/main/java/ \
+	--classpath $ORACLE_HOME/jdbc/lib/ojdbc8.jar:$HOME/target/* \
 	-n audit_agent \
 	-f $HOME/conf/source/agent.conf \
 	-c $HOME/conf/source/

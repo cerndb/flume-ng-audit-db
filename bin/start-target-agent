@@ -9,10 +9,10 @@ while [ -h "$SOURCE" ]; do
 done
 SCRIPT_DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
-HOME=../$SCRIPT_DIR
+HOME=$SCRIPT_DIR/..
 
 flume-ng agent \
-	--classpath $HOME/target/flume-ng-customizations-0.0.1-SNAPSHOT.jar \
+	--classpath $HOME/target/flume-ng-customizations*.jar \
 	-n audit_agent \
 	-f $HOME/conf/target/agent.conf \
 	-c $HOME/lib/elasticsearch-sink2-1.0.jar 

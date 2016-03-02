@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# Reference: http://stackoverflow.com/questions/59895/can-a-bash-script-tell-what-directory-its-stored-in
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do
+  DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE"
+done
+SCRIPT_DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+
+HOME=$SCRIPT_DIR/..
+
+if command -v "mvn" &> /dev/null ;
+then
+	mvn -f $HOME/pom.xml install
+else
+	# https://github.com/lucidfrontier45/ElasticsearchSink2/archive/master.zip
+
+	JDK_BIN_DIR=/ORA/dbs01/oracle/product/rdbms/jdk/bin/
+
+	$JDK_BIN_DIR/javac \
+		-cp /usr/lib/aimon-flume-ng/lib/*:/usr/lib/hadoop/* \
+		$HOME/src/main/java/ch/cern/db/flume/*.java \
+		$HOME/src/main/java/ch/cern/db/flume/interceptor/*.java \
+		$HOME/src/main/java/ch/cern/db/flume/source/*.java \
+		$HOME/src/main/java/ch/cern/db/flume/source/reader/*.java \
+		$HOME/src/main/java/ch/cern/db/utils/*.java
+	
+	mkdir -p $HOME/target
+	
+	$JDK_BIN_DIR/jar cf $HOME/target/flume-ng-customizations.jar -C $HOME/src/main/java/ .
+fi
+
