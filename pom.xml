@@ -23,24 +23,6 @@
 					<target>1.7</target>
 				</configuration>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.2</version>
-				<configuration>
-					<descriptorRefs>
-						<descriptorRef>jar-with-dependencies</descriptorRef>
-					</descriptorRefs>
-				</configuration>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
 		</plugins>
 	</build>
 	<dependencies>
@@ -55,11 +37,9 @@
 			<version>1.6.0-cdh5.5.1</version>
 		</dependency>
 		<dependency>
-			<groupId>ElasticsearchSink2</groupId>
+			<groupId>com.github.lucidfrontier45.ElasticsearchSink2</groupId>
 			<artifactId>elasticsearch-sink2</artifactId>
 			<version>1.0</version>
-			<scope>system</scope>
-			<systemPath>${basedir}/lib/elasticsearch-sink2-1.0.jar</systemPath>
 		</dependency>
 		<dependency>
 			<!-- build will fail if this is not hadoop-common 2.* because kite uses 

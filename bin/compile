@@ -13,16 +13,22 @@ HOME=$SCRIPT_DIR/..
 
 if command -v "mvn" &> /dev/null ;
 then
+	mvn install:install-file \
+		-Dfile=$HOME/lib/elasticsearch-sink2-1.0.jar \
+		-DgroupId=com.github.lucidfrontier45.ElasticsearchSink2 \
+		-DartifactId=elasticsearch-sink2 \
+		-Dversion=1.0 \
+		-Dpackaging=jar
+
 	mvn -f $HOME/pom.xml install
 else
-	# https://github.com/lucidfrontier45/ElasticsearchSink2/archive/master.zip
-
 	JDK_BIN_DIR=/ORA/dbs01/oracle/product/rdbms/jdk/bin/
 
 	$JDK_BIN_DIR/javac \
-		-cp /usr/lib/aimon-flume-ng/lib/*:/usr/lib/hadoop/* \
+		-cp /usr/lib/aimon-flume-ng/lib/*:$HOME/lib/elasticsearch-sink2-1.0.jar \
 		$HOME/src/main/java/ch/cern/db/flume/*.java \
 		$HOME/src/main/java/ch/cern/db/flume/interceptor/*.java \
+		$HOME/src/main/java/ch/cern/db/flume/sink/elasticsearch/serializer/*.java \
 		$HOME/src/main/java/ch/cern/db/flume/source/*.java \
 		$HOME/src/main/java/ch/cern/db/flume/source/reader/*.java \
 		$HOME/src/main/java/ch/cern/db/utils/*.java
