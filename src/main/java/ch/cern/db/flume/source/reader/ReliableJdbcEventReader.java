@@ -237,9 +237,9 @@ public class ReliableJdbcEventReader{
 		
 		String query = createQuery(committed_value);
 		
-		resultSet = statement.executeQuery(query);
-		
 		LOG.info("Executing query: " + query);
+		
+		resultSet = statement.executeQuery(query);
 	}
 
 	protected String createQuery(String committed_value) {

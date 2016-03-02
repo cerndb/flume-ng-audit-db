@@ -14,7 +14,7 @@ import org.junit.Test;
 import ch.cern.db.flume.sink.kite.util.InferSchemaFromTable;
 
 
-public class GenerateSchemaFromTableTest {
+public class InferSchemaFromTableTest {
 	
 	String connection_url = "jdbc:hsqldb:mem:testdb";
 	Connection connection = null;
