@@ -12,7 +12,7 @@ SCRIPT_DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 HOME=$SCRIPT_DIR/..
 
 flume-ng agent \
-	--classpath $HOME/target/flume-ng-customizations*.jar \
+	--classpath $HOME/target/flume-ng-customizations*.jar:$HOME/lib/elasticsearch-sink2-1.0.jar \
 	-n audit_agent \
 	-f $HOME/conf/target/agent.conf \
-	-c $HOME/lib/elasticsearch-sink2-1.0.jar 
+	-c $HOME/conf/target/ 
