@@ -17,7 +17,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
-public class GenerateSchemaFromTable {
+public class InferSchemaFromTable {
 	
 	private static boolean showHelp;
 
@@ -33,7 +33,7 @@ public class GenerateSchemaFromTable {
 	private String tableCatalog;
 	private String tableSchema;
 
-	public GenerateSchemaFromTable() {
+	public InferSchemaFromTable() {
 		options = new Options();
 		options.addOption(Option.builder("p")
 				.desc("User's password")
@@ -109,7 +109,7 @@ public class GenerateSchemaFromTable {
 	}
 	
 	public static void main(String[] args) {
-		GenerateSchemaFromTable schemaGenerator = new GenerateSchemaFromTable();
+		InferSchemaFromTable schemaGenerator = new InferSchemaFromTable();
 		schemaGenerator.configure(args);
 		
 		if(showHelp){

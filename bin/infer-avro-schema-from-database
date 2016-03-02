@@ -11,4 +11,4 @@ SCRIPT_DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
 HOME=$SCRIPT_DIR/..
 
-java -cp $HOME/target/*:$HOME/lib/* ch.cern.db.flume.sink.kite.util.GenerateSchemaFromTable "$@"
+java -cp $HOME/target/*:$HOME/lib/* ch.cern.db.flume.sink.kite.util.InferSchemaFromTable "$@"

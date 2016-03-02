@@ -11,7 +11,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import ch.cern.db.flume.sink.kite.util.GenerateSchemaFromTable;
+import ch.cern.db.flume.sink.kite.util.InferSchemaFromTable;
 
 
 public class GenerateSchemaFromTableTest {
@@ -36,7 +36,7 @@ public class GenerateSchemaFromTableTest {
 	@Test
 	public void generateSchema() throws SQLException{
 		
-		GenerateSchemaFromTable generator = new GenerateSchemaFromTable();
+		InferSchemaFromTable generator = new InferSchemaFromTable();
 		generator.configure(new String[]{
 				"-dc", "org.hsqldb.jdbc.JDBCDriver",
 				"-c", connection_url,
@@ -58,7 +58,7 @@ public class GenerateSchemaFromTableTest {
 	@Test(expected=SQLException.class)
 	public void noTableFound() throws SQLException{
 		
-		GenerateSchemaFromTable generator = new GenerateSchemaFromTable();
+		InferSchemaFromTable generator = new InferSchemaFromTable();
 		generator.configure(new String[]{
 				"-dc", "org.hsqldb.jdbc.JDBCDriver",
 				"-c", connection_url,
