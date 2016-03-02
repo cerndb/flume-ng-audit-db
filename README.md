@@ -102,7 +102,7 @@ Default values are written, parameters with NULL has not default value. Most con
 
 Since it is a reliable reader, it requires one column of the table to be used for committing its value. Column to use for this purpose is configured with ".columnToCommit" parameter. Therefore, this column must be returned by the query. You would need to specify the type of this column in order to build the query properly. 
 
-Last committed value is loaded when starting from ".committingFile" if specified. File is created if it does not exist. If you want to use a predefined committed value when starting, you can do it by using ".committtedValue", in that case value from existing ".committingFile" will be ignored, however, this file will be used in further queries for committing next values.
+Last committed value is loaded when starting from ".committingFile" if specified. File is created if it does not exist. In case ".committingFile" does not exist or is empty, last committed value will be ".committedValue" if specified.
 
 In case the query is not built properly or you want to use a custom one, you can use ".query" parameter (or ".query.path" for loading the query from a file). In that case ".table" and "columnToCommit.type" parameters are ignored. You should use the following syntax:
 

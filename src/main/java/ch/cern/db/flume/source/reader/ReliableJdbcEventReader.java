@@ -110,11 +110,11 @@ public class ReliableJdbcEventReader{
 		committing_file_path = context.getString(COMMITTING_FILE_PATH_PARAM, COMMITTING_FILE_PATH_DEFAULT);
 		committing_file = new File(committing_file_path);
 		
-		committed_value_to_load = context.getString(COMMITTED_VALUE_TO_LOAD_PARAM);
-		if(committed_value_to_load != null)
+		loadLastCommittedValueFromFile();
+		if(committed_value == null){
+			committed_value_to_load = context.getString(COMMITTED_VALUE_TO_LOAD_PARAM);
 			committed_value = committed_value_to_load;
-		else
-			loadLastCommittedValueFromFile();
+		}
 	}
 
 	private String getConfiguredQuery(String query_string, String path_to_query_file) {
