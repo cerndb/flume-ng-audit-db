@@ -38,7 +38,7 @@ This command receives an argument which points out a file (schema.avsc) containi
 Below command should be used for running this utility.
 
 ```
-bin/infer-avro-schema-from-database -c <Connection URL> -t <TABLE_NAME> -u <USERNSME> -p <PASSWORD> [-dc <DRIVER_FQCN>] [-catalog <CATALOG_NAME>] [-schema <SCHEMA_NAME>] [-help]
+bin/infer-avro-schema-from-table -c <Connection URL> -t <TABLE_NAME> -u <USERNSME> -p <PASSWORD> [-dc <DRIVER_FQCN>] [-catalog <CATALOG_NAME>] [-schema <SCHEMA_NAME>] [-help]
  -c <CONNECTION_URL>       URL for connecting to database
  -t <TABLE_NAME>           Table from which schema is inferred
  -u <USERNSME>             User to authenticate against database
@@ -54,7 +54,7 @@ This script adds to classpath all JAR files contained in lib folder, there shoul
 You can redirect the output of previous command to a local file and then, use this file for creating a Kite datasest. 
 
 ```
-bin/infer-avro-schema-from-database -c jdbc:oracle:thin:@itrac13108.cern.ch:10121:IMT -u <user> -p <password> -t ADMIN_EMP > schema.avsc
+bin/infer-avro-schema-from-table -c jdbc:oracle:thin:@itrac13108.cern.ch:10121:IMT -u <user> -p <password> -t ADMIN_EMP > schema.avsc
 kite-dataset create ADMIN_EMP_DATASET -s schema.avsc
 ```
 

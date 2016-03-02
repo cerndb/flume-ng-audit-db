@@ -14,7 +14,7 @@ HOME=$SCRIPT_DIR/..
 if command -v "mvn" &> /dev/null ;
 then
 	mvn install:install-file \
-		-Dfile=$HOME/lib/elasticsearch-sink2-1.0.jar \
+		-Dfile=$HOME/lib/elasticsearch-sink2-assembly-1.0.jar \
 		-DgroupId=com.github.lucidfrontier45.ElasticsearchSink2 \
 		-DartifactId=elasticsearch-sink2 \
 		-Dversion=1.0 \
