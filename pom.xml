@@ -58,6 +58,7 @@
 			<groupId>com.github.lucidfrontier45.ElasticsearchSink2</groupId>
 			<artifactId>elasticsearch-sink2</artifactId>
 			<version>1.0</version>
+			<scope>provided</scope> <!-- remove from jar-with-dependencies -->
 		</dependency>
 		<dependency>
 			<!-- build will fail if this is not hadoop-common 2.* because kite uses 
