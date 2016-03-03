@@ -26,7 +26,12 @@ public class InferSchemaFromTableTest {
 			
 			Statement statement = connection.createStatement();
 			statement.execute("DROP TABLE IF EXISTS audit_data_table;");
-			statement.execute("CREATE TABLE audit_data_table (id INTEGER, return_code BIGINT, name VARCHAR(20));");
+			statement.execute("CREATE TABLE audit_data_table ("
+					+ "id INTEGER, "
+					+ "return_code BIGINT, "
+					+ "name VARCHAR(20) NOT NULL,"
+					+ "lastname VARCHAR(20) NULL"
+					+ ");");
 			statement.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -43,15 +48,16 @@ public class InferSchemaFromTableTest {
 				"-t", "AUDIT_DATA_TABLE",
 				"-u", "sa",
 				"-p", "",
-				"-schema", "PUBLIC" //Can be removed
 				});
 		
 		Schema schema = generator.getSchema();
 		
-		Assert.assertEquals("{\"type\":\"record\",\"name\":\"audit\",\"fields\":["
+		Assert.assertEquals("{\"type\":\"record\",\"name\":\"log\",\"fields\":["
 				+ "{\"name\":\"ID\",\"type\":[\"int\",\"null\"]},"
 				+ "{\"name\":\"RETURN_CODE\",\"type\":[\"int\",\"null\"]},"
-				+ "{\"name\":\"NAME\",\"type\":[\"string\",\"null\"]}]}", 
+				+ "{\"name\":\"NAME\",\"type\":\"string\"},"
+				+ "{\"name\":\"LASTNAME\",\"type\":[\"string\",\"null\"]}"
+				+ "]}", 
 				schema.toString(false));
 	}
 	

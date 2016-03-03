@@ -3,12 +3,15 @@ package ch.cern.db.flume.sink.kite.util;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Comparator;
 
 import org.apache.avro.Schema;
 import org.apache.avro.SchemaBuilder;
 import org.apache.avro.SchemaBuilder.FieldAssembler;
+import org.apache.avro.SchemaBuilder.FieldTypeBuilder;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -16,8 +19,12 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class InferSchemaFromTable {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(InferSchemaFromTable.class);
 	
 	private static boolean showHelp;
 
@@ -30,8 +37,6 @@ public class InferSchemaFromTable {
 	private String connection_password;
 
 	private String tableName;
-	private String tableCatalog;
-	private String tableSchema;
 
 	public InferSchemaFromTable() {
 		options = new Options();
@@ -64,16 +69,6 @@ public class InferSchemaFromTable {
 				.hasArg()
 				.argName("DRIVER_FQCN")
 				.build());
-		options.addOption(Option.builder("catalog")
-				.desc("Catalog table")
-				.hasArg()
-				.argName("CATALOG_NAME")
-				.build());
-		options.addOption(Option.builder("schema")
-				.desc("Table schema")
-				.hasArg()
-				.argName("SCHEMA_NAME")
-				.build());
 		options.addOption(Option.builder("help")
 				.desc("Print help")
 				.build());
@@ -104,8 +99,6 @@ public class InferSchemaFromTable {
 		connection_user = cmd.getOptionValue("u");
 		connection_password = cmd.getOptionValue("p");
 		tableName = cmd.getOptionValue("t");
-		tableSchema = cmd.getOptionValue("schema");
-		tableCatalog = cmd.getOptionValue("catalog");
 	}
 	
 	public static void main(String[] args) {
@@ -129,52 +122,70 @@ public class InferSchemaFromTable {
 
 	public Schema getSchema() throws SQLException {
 
-		FieldAssembler<Schema> builder = SchemaBuilder.record("audit").fields();
+		FieldAssembler<Schema> builder = SchemaBuilder.record("log").fields();
 		
 		Connection connection = DriverManager.getConnection(
 				connection_url, 
 				connection_user, 
 				connection_password);
+		
+		Statement statement = connection.createStatement();
+		String query = "SELECT * "
+				+ "FROM " + tableName 
+				+ " WHERE 0=1";
+		
+		LOG.info("Running query for obtaining metadata: " + query);
+		
+		ResultSet result = statement.executeQuery(query);
+		ResultSetMetaData metadata = result.getMetaData();
+		int columnCount = metadata.getColumnCount();
 
-		ResultSet result = connection.getMetaData().getColumns(tableCatalog, tableSchema, tableName, null);
-		boolean tableFound = false;
-		while(result.next()){
-			tableFound = true;
+		for (int i = 1; i <= columnCount; i++) {
+			String columnName = metadata.getColumnName(i);
+		    int    columnType = metadata.getColumnType(i);
+		    boolean nullable  = metadata.isNullable(i) == ResultSetMetaData.columnNullable;
 			
-		    String columnName = result.getString(4);
-		    int    columnType = result.getInt(5);
+		    FieldTypeBuilder<Schema> field = builder.name(columnName).type();
 		    
 		    switch (columnType) {
 			case java.sql.Types.SMALLINT:
 			case java.sql.Types.TINYINT:
 			case java.sql.Types.INTEGER:
 			case java.sql.Types.BIGINT:
-				builder.name(columnName).type().nullable().intType().noDefault();
+				if(nullable)
+					field.nullable().intType().noDefault();
+				else
+					field.intType().noDefault();
 				break;
 			case java.sql.Types.BOOLEAN:
-				builder.name(columnName).type().nullable().booleanType().noDefault();
+				if(nullable)
+					field.nullable().booleanType().noDefault();
+				else
+					field.booleanType().noDefault();
 				break;
 			case java.sql.Types.NUMERIC:
 			case java.sql.Types.DOUBLE:
 			case java.sql.Types.FLOAT:
-				builder.name(columnName).type().nullable().doubleType().noDefault();
+				if(nullable)
+					field.doubleType().noDefault();
+				else
+					field.nullable().doubleType().noDefault();
 				break;
 			case java.sql.Types.TIMESTAMP:
 			case -102: //TIMESTAMP(6) WITH LOCAL TIME ZONE
-				builder.name(columnName).type().nullable().longType().noDefault();
+				if(nullable)
+					field.nullable().longType().noDefault();
+				else
+					field.longType().noDefault();
 				break;
 			default:
-				builder.name(columnName).type().nullable().stringType().noDefault();
+				if(nullable)
+					field.nullable().stringType().noDefault();
+				else
+					field.stringType().noDefault();
 				break;
 			}
 		}
-		
-		if(!tableFound)
-			throw new SQLException("A table with configured specifications ("
-					+ "catalog=" + tableCatalog
-					+ ", schema=" + tableSchema
-					+ ", name=" + tableName
-					+ ") could not be found");
 		
 		return builder.endRecord();
 	}

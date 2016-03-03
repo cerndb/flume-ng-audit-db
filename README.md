@@ -38,14 +38,12 @@ This command receives an argument which points out a file (schema.avsc) containi
 Below command should be used for running this utility.
 
 ```
-bin/infer-avro-schema-from-table -c <Connection URL> -t <TABLE_NAME> -u <USERNSME> -p <PASSWORD> [-dc <DRIVER_FQCN>] [-catalog <CATALOG_NAME>] [-schema <SCHEMA_NAME>] [-help]
+bin/infer-avro-schema-from-table -c <Connection URL> -t [<SCHEMA_NAME>.]<TABLE_NAME> -u <USERNSME> -p <PASSWORD> [-help]
  -c <CONNECTION_URL>       URL for connecting to database
- -t <TABLE_NAME>           Table from which schema is inferred
+ -t [<SCHEMA_NAME>.]<TABLE_NAME>           Table from which schema is inferred
  -u <USERNSME>             User to authenticate against database
  -p <PASSWORD>             User's password
  -dc <DRIVER_FQCN>         Fully qualified class name of JDBC driver (default: oracle.jdbc.driver.OracleDriver)
- -catalog <CATALOG_NAME>   Table catalog
- -schema <SCHEMA_NAME>     Table schema
  -help                     Print help
 ```
 
