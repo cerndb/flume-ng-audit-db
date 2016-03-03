@@ -66,6 +66,8 @@ In order to use JDBCSource as source in your Flume agent, you need to specify th
 <agent_name>.sources.<source_name>.type = ch.cern.db.flume.source.JDBCSource 
 ```
 
+NOTE: you must add the JDBC driver library to Flume's classpath when running Flume agent.
+
 Find below all available configuration parameters:
 
 ```
