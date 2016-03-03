@@ -60,27 +60,17 @@ kite-dataset create ADMIN_EMP_DATASET -s schema.avsc
 
 ### AuditSource
 
-In order to use AuditSource as source in your Flume agent, you need to specify the type of agent source as:
+In order to use JDBCSource as source in your Flume agent, you need to specify the type of agent source as:
 
 ```
 <agent_name>.sources.<source_name>.type = ch.cern.db.flume.source.JDBCSource 
 ```
 
-Set number of events to be processed in every batch:
-```
-<agent_name>.sources.<source_name>.batch.size = 100
-```
-
-Minimun time in milliseconds a batch must last:
-```
-<agent_name>.sources.<source_name>.batch.minimumTime = 10000
-```
-
-### ReliableJdbcAuditEventReader
-
 Find below all available configuration parameters:
 
 ```
+<agent_name>.sources.<source_name>.batch.size = 100
+<agent_name>.sources.<source_name>.batch.minimumTime = 10000
 <agent_name>.sources.<source_name>.reader.committingFile = committed_value.backup
 <agent_name>.sources.<source_name>.reader.committtedValue = NULL
 <agent_name>.sources.<source_name>.reader.connectionDriver = oracle.jdbc.driver.OracleDriver
@@ -138,7 +128,7 @@ It compares new Events with last events. A set of last Event hashes is maintaine
 
 Event's hash is calculate by default from headers (disabled if "header" parameter is set to false) and body (disabled if "body" parameter is set to false).
 
-### JSONtoAvroParser and JSONtoElasticSearchEventSerializer
+### Other components
 
 They do not have any configuration parameters.
 
