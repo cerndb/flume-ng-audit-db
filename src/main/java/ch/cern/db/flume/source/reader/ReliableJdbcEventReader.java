@@ -388,11 +388,11 @@ public class ReliableJdbcEventReader implements Configurable{
 		if(last_value == null)
 			return;
 		
-		committed_value = last_value;
-		
 		FileWriter out = new FileWriter(committing_file, false);
-		out.write(committed_value);
+		out.write(last_value);
 		out.close();
+		
+		committed_value = last_value;
 		
 		last_value = null;
 	}
