@@ -17,16 +17,19 @@ import java.util.List;
 import org.apache.flume.Context;
 import org.apache.flume.Event;
 import org.apache.flume.FlumeException;
+import org.apache.flume.conf.Configurable;
+import org.apache.flume.conf.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.cern.db.flume.JSONEvent;
 
-import com.google.common.base.Preconditions;
-
-public class ReliableJdbcEventReader{
+public class ReliableJdbcEventReader implements Configurable{
 
 	private static final Logger LOG = LoggerFactory.getLogger(ReliableJdbcEventReader.class);
+	
+	enum State{INITIALIZED, CONFIGURED};
+	private State state;
 	
 	public static final String CONNECTION_DRIVER_DEFAULT = "oracle.jdbc.driver.OracleDriver";
 	public static final String CONNECTION_DRIVER_PARAM = "reader.connectionDriver";
@@ -74,16 +77,22 @@ public class ReliableJdbcEventReader{
 	
 	protected String last_value = null;
 	
-	public ReliableJdbcEventReader(Context context) {
+	public ReliableJdbcEventReader() {
+		initialize();
+	}
+	
+	@Override
+	public void configure(Context context) {
+		initialize();
+		
 		tableName = context.getString(TABLE_NAME_PARAM);
-		columnToCommit = context.getString(COLUMN_TO_COMMIT_PARAM);
 		configuredQuery = getConfiguredQuery(context.getString(QUERY_PARAM), context.getString(QUERY_PATH_PARAM));
+		if(configuredQuery == null && tableName == null)
+			throw new ConfigurationException("Table name or query needs to be configured with " + TABLE_NAME_PARAM);
 		
-		Preconditions.checkNotNull(columnToCommit, "Column to commit needs to be configured with " + COLUMN_TO_COMMIT_PARAM);
-		
-		if(configuredQuery == null){
-			Preconditions.checkNotNull(tableName, "Table name or query needs to be configured with " + TABLE_NAME_PARAM);
-		}
+		columnToCommit = context.getString(COLUMN_TO_COMMIT_PARAM);
+		if(columnToCommit == null)
+			throw new ConfigurationException("Column to commit needs to be configured with " + COLUMN_TO_COMMIT_PARAM);
 		
 		String conf_type_column = context.getString(TYPE_COLUMN_TO_COMMIT_PARAM);
 		if(conf_type_column != null){
@@ -115,9 +124,37 @@ public class ReliableJdbcEventReader{
 			committed_value_to_load = context.getString(COMMITTED_VALUE_TO_LOAD_PARAM);
 			committed_value = committed_value_to_load;
 		}
+		
+		state = State.CONFIGURED;
+	}
+
+	private void initialize() {
+		try{			
+			if(resultSet != null){
+				resultSet.close();
+				resultSet = null;
+			}
+			if(statement != null){
+				statement.close();
+				statement = null;
+			}
+			if(connection != null){
+				connection.close();
+				connection = null;
+			}
+		} catch (Exception e) {
+			LOG.warn(e.getMessage());
+		}
+		
+		last_value = null;
+		
+		state = State.INITIALIZED;
 	}
 
 	private String getConfiguredQuery(String query_string, String path_to_query_file) {
+		if(state != State.INITIALIZED)
+			throw new ConfigurationException(getClass().getSimpleName() + " is not initialized");
+		
 		//From configuration parameter
 		if(query_string != null)
 			return query_string;
@@ -145,6 +182,9 @@ public class ReliableJdbcEventReader{
 	}
 
 	private void loadLastCommittedValueFromFile() {
+		if(state != State.INITIALIZED)
+			throw new ConfigurationException(getClass().getSimpleName() + " is not initialized");
+		
 		try {
 			if(committing_file.exists()){
 				FileReader in = new FileReader(committing_file);
@@ -172,6 +212,9 @@ public class ReliableJdbcEventReader{
 	}
 
 	public Event readEvent() throws IOException {
+		if(state != State.CONFIGURED)
+			throw new ConfigurationException(getClass().getSimpleName() + " is not configured");
+		
 		try {
 			if(resultSet == null)
 				runQuery();
@@ -227,7 +270,10 @@ public class ReliableJdbcEventReader{
 		}
 	}
 
-	private void runQuery() throws SQLException {	
+	private void runQuery() throws SQLException {
+		if(state != State.CONFIGURED)
+			throw new ConfigurationException(getClass().getSimpleName() + " is not configured");
+		
 		if(statement != null)
 			statement.close();
 		
@@ -243,6 +289,8 @@ public class ReliableJdbcEventReader{
 	}
 
 	protected String createQuery(String committed_value) {
+		if(state != State.CONFIGURED)
+			throw new ConfigurationException(getClass().getSimpleName() + " is not configured");
 		
 		if(configuredQuery != null){
 			String finalQuery = configuredQuery;
@@ -296,6 +344,9 @@ public class ReliableJdbcEventReader{
 	}
 
 	private void connect() throws SQLException{
+		if(state != State.CONFIGURED)
+			throw new ConfigurationException(getClass().getSimpleName() + " is not configured");
+		
 		try {
 			if(connection == null || connection.isClosed()){
 				connection = DriverManager.getConnection(
@@ -310,6 +361,9 @@ public class ReliableJdbcEventReader{
 	}
 	
 	public List<Event> readEvents(int numberOfEventToRead) throws IOException {
+		if(state != State.CONFIGURED)
+			throw new ConfigurationException(getClass().getSimpleName() + " is not configured");
+		
 		LinkedList<Event> events = new LinkedList<Event>();
 		
 		for (int i = 0; i < numberOfEventToRead; i++){
@@ -328,6 +382,9 @@ public class ReliableJdbcEventReader{
 	}
 
 	public void commit() throws IOException {
+		if(state != State.CONFIGURED)
+			throw new ConfigurationException(getClass().getSimpleName() + " is not configured");
+		
 		if(last_value == null)
 			return;
 		
@@ -342,8 +399,10 @@ public class ReliableJdbcEventReader{
 
 	public void close() throws IOException {
 		try {
-			connection.close();
-			statement.close();
+			if(statement != null)
+				statement.close();
+			if(connection != null)
+				connection.close();
 		} catch (Throwable e) {
 		}
 	}

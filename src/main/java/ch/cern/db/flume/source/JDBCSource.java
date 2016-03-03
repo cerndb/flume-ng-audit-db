@@ -29,6 +29,12 @@ public class JDBCSource extends AbstractSource implements Configurable, Pollable
 
 	private ReliableJdbcEventReader reader;
 	
+	public JDBCSource() {
+		super();
+		
+		reader = new ReliableJdbcEventReader();
+	}
+	
 	@Override
 	public void configure(Context context) {
 		try{
@@ -46,7 +52,7 @@ public class JDBCSource extends AbstractSource implements Configurable, Pollable
 			throw new FlumeException("Configured value for " + MINIMUM_BATCH_TIME_PARAM + " is not a number", e);
 		}
 		
-		reader = new ReliableJdbcEventReader(context);
+		reader.configure(context);
 	}
 	
 	@Override
