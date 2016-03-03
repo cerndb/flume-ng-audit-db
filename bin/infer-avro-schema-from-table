@@ -11,4 +11,9 @@ SCRIPT_DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
 HOME=$SCRIPT_DIR/..
 
-java -cp $HOME/target/*:$HOME/lib/* ch.cern.db.flume.sink.kite.util.InferSchemaFromTable "$@"
+DEFAULT_ORACLE_HOME=/ORA/dbs01/oracle/product/rdbms/
+: ${ORACLE_HOME:=$DEFAULT_ORACLE_HOME} 
+
+: ${JDBC_DRIVER:=$ORACLE_HOME/jdbc/lib/*}
+
+java -cp $HOME/conf/target/:$HOME/target/*:$HOME/lib/*:$JDBC_DRIVER ch.cern.db.flume.sink.kite.util.InferSchemaFromTable "$@"
