@@ -10,11 +10,17 @@ import org.apache.flume.interceptor.Interceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.cern.db.flume.source.DropDuplicatedEventsProcessor;
 import ch.cern.db.utils.SizeLimitedHashSet;
 
 /**
  * Compare current event with last events to check it was already processed
+ * 
+ * @deprecated duplicated event processors as {@link DropDuplicatedEventsProcessor} should
+ * be used in sources for dropping duplicated events. This interceptor will drop events in case
+ * transaction to channel fails or agent is restarted.
  */
+@Deprecated
 public class DropDuplicatedEventsInterceptor implements Interceptor {
 
 	private static final Logger LOG = LoggerFactory.getLogger(DropDuplicatedEventsInterceptor.class);
