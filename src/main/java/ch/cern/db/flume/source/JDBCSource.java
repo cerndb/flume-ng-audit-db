@@ -30,6 +30,7 @@ public class JDBCSource extends AbstractSource implements Configurable, Pollable
 	private ReliableJdbcEventReader reader;
 
 	private static final String DUPLICATED_EVENTS_PROCESSOR_PARAM = "duplicatedEventsProcessor";
+	private static final Boolean DUPLICATED_EVENTS_PROCESSOR_DEFAULT = true;
 	private static final String SIZE_DUPLICATED_EVENTS_PROCESSOR_PARAM = 
 			DUPLICATED_EVENTS_PROCESSOR_PARAM + ".size";
 	private static final Integer SIZE_DUPLICATED_EVENTS_PROCESSOR_DEFAULT = 1000;
@@ -66,7 +67,8 @@ public class JDBCSource extends AbstractSource implements Configurable, Pollable
 		
 		reader.configure(context);
 		
-		if(duplicatedEventsProccesor == null){
+		if(duplicatedEventsProccesor == null &&
+				context.getBoolean(DUPLICATED_EVENTS_PROCESSOR_PARAM, DUPLICATED_EVENTS_PROCESSOR_DEFAULT)){
 			duplicatedEventsProccesor = new DropDuplicatedEventsProcessor(
 					context.getInteger(SIZE_DUPLICATED_EVENTS_PROCESSOR_PARAM, 
 							SIZE_DUPLICATED_EVENTS_PROCESSOR_DEFAULT),
@@ -91,13 +93,16 @@ public class JDBCSource extends AbstractSource implements Configurable, Pollable
 			getChannelProcessor().processEventBatch(events);
 			
 			reader.commit();
-			duplicatedEventsProccesor.commit();
+			
+			if(duplicatedEventsProccesor != null)
+				duplicatedEventsProccesor.commit();
 			
 			status = Status.READY;
 		}catch(Throwable e){
 			status = Status.BACKOFF;
 			
-			duplicatedEventsProccesor.rollback();
+			if(duplicatedEventsProccesor != null)
+				duplicatedEventsProccesor.rollback();
 			
 			LOG.error(e.getMessage(), e);
 			sleep(batchStartTime);
@@ -123,7 +128,9 @@ public class JDBCSource extends AbstractSource implements Configurable, Pollable
 	public synchronized void stop() {
 		try {
 			reader.close();
-			duplicatedEventsProccesor.close();
+			
+			if(duplicatedEventsProccesor != null)
+				duplicatedEventsProccesor.close();
 		} catch (IOException e){}
 	}
 
