@@ -1,11 +1,17 @@
 package ch.cern.db.flume.source;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.flume.Context;
 import org.apache.flume.Event;
+import org.apache.flume.FlumeException;
 import org.apache.flume.conf.Configurable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +26,9 @@ public class DropDuplicatedEventsProcessor implements Configurable{
 	private static final Logger LOG = LoggerFactory.getLogger(DropDuplicatedEventsProcessor.class);
 	
 	public static final String PARAM = "duplicatedEventsProcessor";
+	
+	public static final String PATH_PARAM = PARAM + ".path";
+	private File committing_file = null;
 	
 	public static final String SIZE_PARAM = PARAM + ".size";
 	public static final Integer SIZE_DEFAULT = 1000;
@@ -65,10 +74,64 @@ public class DropDuplicatedEventsProcessor implements Configurable{
 		this.checkHeaders = context.getBoolean(CHECK_HEADER_PARAM, CHECK_HEADER_DEFAULT);
 		this.checkBody = context.getBoolean(CHECK_BODY_PARAM, CHECK_BODY_DEFAULT);
 		
-		LOG.info("Configured with size="+size+", headers="+checkHeaders+", body="+checkBody);
+		String path = context.getString(PATH_PARAM);
+		if(path != null){
+			File file = new File(path);
+			
+			if(this.committing_file == null || !this.committing_file.equals(path)){
+				this.committing_file = file;
+				loadLastHashesFromFile();
+			}
+		}else{
+			this.committing_file = null;
+		}
+
+		LOG.info("Configured with size="+size+", headers="+checkHeaders+", body="+checkBody+", path="+path);
+	}
+	
+	private void loadLastHashesFromFile() {
+		if(committing_file == null)
+			return;
+		
+		try {
+			if(committing_file.exists()){
+				previous_hashes.clear();
+				
+				BufferedReader br = new BufferedReader(new FileReader(committing_file));
+				String line = null;
+				while ((line = br.readLine()) != null) {
+					int hash = Integer.parseInt(line);
+					
+					previous_hashes.add(hash);
+				}
+				br.close();
+				
+				LOG.info("Last hashes loaded from file: " + committing_file);
+			}else{
+				LOG.info("File for storing last hashes does not exist (" +
+						committing_file.getAbsolutePath() + "). Therefore hashes list is not modified");
+			}
+		} catch (IOException e) {
+			throw new FlumeException(e);
+		}
 	}
 	
 	public void commit() {
+		if(committing_file != null){
+			try {
+				FileWriter fw = new FileWriter(committing_file);
+				
+				for(Integer hash:previous_hashes.getInmutableList())
+					fw.write(hash.toString() + System.lineSeparator());
+				for(Integer hash:hashes_current_batch.getInmutableList())
+					fw.write(hash.toString() + System.lineSeparator());
+				
+				fw.close();
+			} catch (IOException e) {
+				throw new FlumeException(e);
+			}
+		}
+		
 		previous_hashes.addAll(hashes_current_batch.getInmutableList());
 		
 		hashes_current_batch.clear();

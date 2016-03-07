@@ -1,5 +1,6 @@
 package ch.cern.db.flume.source;
 
+import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -183,6 +184,62 @@ public class DropDuplicatedEvenetsProcessorTest {
 		Event e6 = EventBuilder.withBody("2222".getBytes());
 		b3_events.add(e6);
 		Event e7 = EventBuilder.withBody("1111".getBytes());
+		b3_events.add(e7);
+		List<Event> b3_events_intercepted = interceptor.process(b3_events);
+		Assert.assertEquals(1, b3_events_intercepted.size());
+		Assert.assertSame(e5, b3_events_intercepted.get(0));
+	}
+	
+	@Test
+	public void persistingHash(){
+		new File("src/test/resources/last.hashes").delete();
+		
+		Context context = new Context();
+		context.put(DropDuplicatedEventsProcessor.SIZE_PARAM, "2");
+		context.put(DropDuplicatedEventsProcessor.PATH_PARAM, "src/test/resources/last.hashes");
+		DropDuplicatedEventsProcessor interceptor = new DropDuplicatedEventsProcessor();
+		interceptor.configure(context);
+		
+		//Batch 1
+		LinkedList<Event> b1_events = new LinkedList<Event>();
+		Event e1 = EventBuilder.withBody("1111".getBytes());
+		b1_events.add(e1);
+		Event e2 = EventBuilder.withBody("2222".getBytes());
+		b1_events.add(e2);
+		List<Event> b1_events_intercepted = interceptor.process(b1_events);
+		Assert.assertEquals(2, b1_events_intercepted.size());
+		Assert.assertSame(e1, b1_events_intercepted.get(0));
+		Assert.assertSame(e2, b1_events_intercepted.get(1));
+		
+		interceptor.commit();
+		interceptor = new DropDuplicatedEventsProcessor();
+		interceptor.configure(context);
+		//2222 		1111
+		//[2462721, 2431937]
+		
+		//Batch 2
+		LinkedList<Event> b2_events = new LinkedList<Event>();
+		Event e3 = EventBuilder.withBody("3333".getBytes());
+		b2_events.add(e3);
+		Event e4 = EventBuilder.withBody("2222".getBytes());
+		b2_events.add(e4);
+		List<Event> b2_events_intercepted = interceptor.process(b2_events);
+		Assert.assertEquals(1, b2_events_intercepted.size());
+		Assert.assertSame(e3, b2_events_intercepted.get(0));
+		
+		interceptor.commit();
+		interceptor = new DropDuplicatedEventsProcessor();
+		interceptor.configure(context);
+		//3333 2222
+		//[2493505, 2462721] 
+		
+		//Batch 3
+		LinkedList<Event> b3_events = new LinkedList<Event>();
+		Event e5 = EventBuilder.withBody("1111".getBytes());
+		b3_events.add(e5);
+		Event e6 = EventBuilder.withBody("2222".getBytes());
+		b3_events.add(e6);
+		Event e7 = EventBuilder.withBody("3333".getBytes());
 		b3_events.add(e7);
 		List<Event> b3_events_intercepted = interceptor.process(b3_events);
 		Assert.assertEquals(1, b3_events_intercepted.size());

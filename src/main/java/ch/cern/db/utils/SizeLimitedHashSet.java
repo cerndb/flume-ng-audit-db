@@ -81,4 +81,9 @@ public class SizeLimitedHashSet<E> extends HashSet<E> {
 	public Collection<? extends E> getInmutableList() {
 		return (Collection<? extends E>) Collections.unmodifiableList(list);
 	}
+	
+	@Override
+	public String toString() {
+		return list.toString();
+	}
 }
