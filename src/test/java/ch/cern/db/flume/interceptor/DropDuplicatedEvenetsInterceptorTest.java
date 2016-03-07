@@ -12,6 +12,7 @@ import org.junit.Test;
 
 import ch.cern.db.flume.interceptor.DropDuplicatedEventsInterceptor.Builder;
 
+@SuppressWarnings("deprecation")
 public class DropDuplicatedEvenetsInterceptorTest {
 
 	@Test

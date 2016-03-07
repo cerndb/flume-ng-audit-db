@@ -1,6 +1,7 @@
 package ch.cern.db.utils;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 
@@ -34,7 +35,7 @@ public class SizeLimitedHashSet<E> extends HashSet<E> {
 	public boolean add(E e) {
 		if(super.add(e)){
 			if(maximumSize > 0 && list.size() >= maximumSize)
-				remove(list.removeFirst());
+				removeFirst();
 			
 			return list.add(e);
 		}else{
@@ -67,9 +68,17 @@ public class SizeLimitedHashSet<E> extends HashSet<E> {
 			return false;
 	}
 	
+	public void removeFirst(){
+		super.remove(list.removeFirst());
+	}
+	
 	@Override
 	public void clear() {
 		super.clear();
 		list.clear();
+	}
+	
+	public Collection<? extends E> getInmutableList() {
+		return (Collection<? extends E>) Collections.unmodifiableList(list);
 	}
 }
