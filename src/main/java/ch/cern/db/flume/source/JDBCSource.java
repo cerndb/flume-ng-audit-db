@@ -91,10 +91,13 @@ public class JDBCSource extends AbstractSource implements Configurable, Pollable
 			getChannelProcessor().processEventBatch(events);
 			
 			reader.commit();
+			duplicatedEventsProccesor.commit();
 			
 			status = Status.READY;
 		}catch(Throwable e){
 			status = Status.BACKOFF;
+			
+			duplicatedEventsProccesor.rollback();
 			
 			LOG.error(e.getMessage(), e);
 			sleep(batchStartTime);
@@ -120,6 +123,7 @@ public class JDBCSource extends AbstractSource implements Configurable, Pollable
 	public synchronized void stop() {
 		try {
 			reader.close();
+			duplicatedEventsProccesor.close();
 		} catch (IOException e){}
 	}
 

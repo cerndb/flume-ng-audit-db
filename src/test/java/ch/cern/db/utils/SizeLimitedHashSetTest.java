@@ -1,5 +1,6 @@
 package ch.cern.db.utils;
 
+import java.util.Arrays;
 import java.util.HashSet;
 
 import org.junit.Assert;
@@ -55,6 +56,13 @@ public class SizeLimitedHashSetTest<E> extends HashSet<E> {
 		Assert.assertTrue(set.contains(4));
 		Assert.assertTrue(set.contains(5));
 		Assert.assertTrue(set.contains(1));
+		
+		set.addAll(Arrays.asList(6, 7));
+		
+		Assert.assertEquals(3, set.size());
+		Assert.assertTrue(set.contains(1));
+		Assert.assertTrue(set.contains(6));
+		Assert.assertTrue(set.contains(7));
 	}
 	
 }

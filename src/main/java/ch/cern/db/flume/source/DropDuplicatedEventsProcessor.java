@@ -20,23 +20,38 @@ public class DropDuplicatedEventsProcessor {
 	private boolean checkHeaders;
 	private boolean checkBody;
 	
-	private SizeLimitedHashSet<Integer> last_hashes;
+	private SizeLimitedHashSet<Integer> previous_hashes;
+	
+	private SizeLimitedHashSet<Integer> hashes_current_batch;
 	
 	public DropDuplicatedEventsProcessor(Integer size, Boolean checkHeaders, Boolean checkBody){
-		last_hashes = new SizeLimitedHashSet<Integer>(size);
+		previous_hashes = new SizeLimitedHashSet<Integer>(size);
+		hashes_current_batch = new SizeLimitedHashSet<Integer>(size);
 		this.checkHeaders = checkHeaders;
 		this.checkBody = checkBody;
 		
 		LOG.info("Configured with size="+size+", headers="+checkHeaders+", body="+checkBody);
 	}
+	
+
+	public void commit() {
+		previous_hashes.addAll(hashes_current_batch.getInmutableList());
+		
+		hashes_current_batch.clear();
+	}
+	
+	public void rollback() {
+		hashes_current_batch.clear();
+	}
 
 	public Event process(Event event) {
 		int event_hash = hashCode(event);
 		
-		if(last_hashes.contains(event_hash))
+		if(previous_hashes.contains(event_hash)
+				|| hashes_current_batch.contains(event_hash))
 			return null;
 		
-		last_hashes.add(event_hash);
+		hashes_current_batch.add(event_hash);
 		return event;
 	}
 
@@ -72,7 +87,8 @@ public class DropDuplicatedEventsProcessor {
 	}
 
 	public void close() {
-		last_hashes.clear();
+		previous_hashes.clear();
+		hashes_current_batch.clear();
 	}
 
 }

@@ -1,6 +1,7 @@
 package ch.cern.db.utils;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 
@@ -75,5 +76,9 @@ public class SizeLimitedHashSet<E> extends HashSet<E> {
 	public void clear() {
 		super.clear();
 		list.clear();
+	}
+	
+	public Collection<? extends E> getInmutableList() {
+		return (Collection<? extends E>) Collections.unmodifiableList(list);
 	}
 }
