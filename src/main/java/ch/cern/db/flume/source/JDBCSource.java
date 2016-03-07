@@ -29,17 +29,6 @@ public class JDBCSource extends AbstractSource implements Configurable, Pollable
 
 	private ReliableJdbcEventReader reader;
 
-	private static final String DUPLICATED_EVENTS_PROCESSOR_PARAM = "duplicatedEventsProcessor";
-	private static final Boolean DUPLICATED_EVENTS_PROCESSOR_DEFAULT = true;
-	private static final String SIZE_DUPLICATED_EVENTS_PROCESSOR_PARAM = 
-			DUPLICATED_EVENTS_PROCESSOR_PARAM + ".size";
-	private static final Integer SIZE_DUPLICATED_EVENTS_PROCESSOR_DEFAULT = 1000;
-	private static final String CHECK_HEADER_DUPLICATED_EVENTS_PROCESSOR_PARAM = 
-			DUPLICATED_EVENTS_PROCESSOR_PARAM + ".header";
-	private static final Boolean CHECK_HEADER_DUPLICATED_EVENTS_PROCESSOR_DEFAULT = true;
-	private static final String CHECK_BODY_DUPLICATED_EVENTS_PROCESSOR_PARAM = 
-			DUPLICATED_EVENTS_PROCESSOR_PARAM + ".body";
-	private static final Boolean CHECK_BODY_DUPLICATED_EVENTS_PROCESSOR_DEFAULT = true;
 	private DropDuplicatedEventsProcessor duplicatedEventsProccesor;
 	
 	public JDBCSource() {
@@ -68,14 +57,8 @@ public class JDBCSource extends AbstractSource implements Configurable, Pollable
 		reader.configure(context);
 		
 		if(duplicatedEventsProccesor == null &&
-				context.getBoolean(DUPLICATED_EVENTS_PROCESSOR_PARAM, DUPLICATED_EVENTS_PROCESSOR_DEFAULT)){
-			duplicatedEventsProccesor = new DropDuplicatedEventsProcessor(
-					context.getInteger(SIZE_DUPLICATED_EVENTS_PROCESSOR_PARAM, 
-							SIZE_DUPLICATED_EVENTS_PROCESSOR_DEFAULT),
-					context.getBoolean(CHECK_HEADER_DUPLICATED_EVENTS_PROCESSOR_PARAM, 
-							CHECK_HEADER_DUPLICATED_EVENTS_PROCESSOR_DEFAULT),
-					context.getBoolean(CHECK_BODY_DUPLICATED_EVENTS_PROCESSOR_PARAM,
-							CHECK_BODY_DUPLICATED_EVENTS_PROCESSOR_DEFAULT));
+				context.getBoolean(DropDuplicatedEventsProcessor.PARAM, true)){
+			duplicatedEventsProccesor = new DropDuplicatedEventsProcessor(context);
 		}
 	}
 	
