@@ -56,9 +56,16 @@ public class JDBCSource extends AbstractSource implements Configurable, Pollable
 		
 		reader.configure(context);
 		
-		if(duplicatedEventsProccesor == null &&
-				context.getBoolean(DropDuplicatedEventsProcessor.PARAM, true)){
-			duplicatedEventsProccesor = new DropDuplicatedEventsProcessor(context);
+		if(context.getBoolean(DropDuplicatedEventsProcessor.PARAM, true)){
+			if(duplicatedEventsProccesor == null){
+				duplicatedEventsProccesor = new DropDuplicatedEventsProcessor();
+			}
+			duplicatedEventsProccesor.configure(context);
+		}else{
+			if(duplicatedEventsProccesor != null){
+				duplicatedEventsProccesor.close();
+				duplicatedEventsProccesor = null;
+			}
 		}
 	}
 	

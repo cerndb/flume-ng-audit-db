@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.apache.flume.Context;
 import org.apache.flume.Event;
+import org.apache.flume.conf.Configurable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,7 +15,7 @@ import ch.cern.db.utils.SizeLimitedHashSet;
 /**
  * Compare current event with last events to check it was already processed
  */
-public class DropDuplicatedEventsProcessor {
+public class DropDuplicatedEventsProcessor implements Configurable{
 
 	private static final Logger LOG = LoggerFactory.getLogger(DropDuplicatedEventsProcessor.class);
 	
@@ -35,10 +36,31 @@ public class DropDuplicatedEventsProcessor {
 	
 	private SizeLimitedHashSet<Integer> hashes_current_batch;
 	
-	public DropDuplicatedEventsProcessor(Context context){
+	public DropDuplicatedEventsProcessor(){
+		Integer size = SIZE_DEFAULT;
+		previous_hashes = new SizeLimitedHashSet<Integer>(SIZE_DEFAULT);
+		hashes_current_batch = new SizeLimitedHashSet<Integer>(SIZE_DEFAULT);
+		
+		this.checkHeaders = CHECK_HEADER_DEFAULT;
+		this.checkBody = CHECK_BODY_DEFAULT;
+		
+		LOG.info("Initializated with defaults size="+size+", headers="+checkHeaders+", body="+checkBody);
+	}
+	
+	@Override
+	public void configure(Context context){
 		Integer size = context.getInteger(SIZE_PARAM, SIZE_DEFAULT);
-		previous_hashes = new SizeLimitedHashSet<Integer>(size);
-		hashes_current_batch = new SizeLimitedHashSet<Integer>(size);
+		if(size != previous_hashes.size()){
+			SizeLimitedHashSet<Integer> tmp = previous_hashes;
+			previous_hashes = new SizeLimitedHashSet<Integer>(size);
+			previous_hashes.addAll(tmp.getInmutableList());
+			tmp.clear();
+			
+			tmp = hashes_current_batch;
+			hashes_current_batch = new SizeLimitedHashSet<Integer>(size);
+			hashes_current_batch.addAll(tmp.getInmutableList());
+			tmp.clear();
+		}
 		
 		this.checkHeaders = context.getBoolean(CHECK_HEADER_PARAM, CHECK_HEADER_DEFAULT);
 		this.checkBody = context.getBoolean(CHECK_BODY_PARAM, CHECK_BODY_DEFAULT);
@@ -46,7 +68,6 @@ public class DropDuplicatedEventsProcessor {
 		LOG.info("Configured with size="+size+", headers="+checkHeaders+", body="+checkBody);
 	}
 	
-
 	public void commit() {
 		previous_hashes.addAll(hashes_current_batch.getInmutableList());
 		
