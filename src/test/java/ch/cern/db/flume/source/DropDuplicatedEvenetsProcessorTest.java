@@ -1,28 +1,18 @@
-package ch.cern.db.flume.interceptor;
+package ch.cern.db.flume.source;
 
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.flume.Context;
 import org.apache.flume.Event;
 import org.apache.flume.event.EventBuilder;
-import org.apache.flume.interceptor.Interceptor;
 import org.junit.Assert;
 import org.junit.Test;
 
-import ch.cern.db.flume.interceptor.DropDuplicatedEventsInterceptor.Builder;
-
-public class DropDuplicatedEvenetsInterceptorTest {
+public class DropDuplicatedEvenetsProcessorTest {
 
 	@Test
 	public void differentBody(){
-		Builder interceptor_builder = new DropDuplicatedEventsInterceptor.Builder();
-		Context context = new Context();
-		context.put("size", "2");
-		interceptor_builder.configure(context);
-		
-		Interceptor interceptor = interceptor_builder.build();
-		interceptor.initialize();
+		DropDuplicatedEventsProcessor interceptor = new DropDuplicatedEventsProcessor(2, true, true);
 		
 		//Batch 1
 		LinkedList<Event> b1_events = new LinkedList<Event>();
@@ -30,7 +20,7 @@ public class DropDuplicatedEvenetsInterceptorTest {
 		b1_events.add(e1);
 		Event e2 = EventBuilder.withBody("2222".getBytes());
 		b1_events.add(e2);
-		List<Event> b1_events_intercepted = interceptor.intercept(b1_events);
+		List<Event> b1_events_intercepted = interceptor.process(b1_events);
 		Assert.assertEquals(2, b1_events_intercepted.size());
 		Assert.assertSame(e1, b1_events_intercepted.get(0));
 		Assert.assertSame(e2, b1_events_intercepted.get(1));
@@ -41,7 +31,7 @@ public class DropDuplicatedEvenetsInterceptorTest {
 		b2_events.add(e3);
 		Event e4 = EventBuilder.withBody("2222".getBytes());
 		b2_events.add(e4);
-		List<Event> b2_events_intercepted = interceptor.intercept(b2_events);
+		List<Event> b2_events_intercepted = interceptor.process(b2_events);
 		Assert.assertEquals(1, b2_events_intercepted.size());
 		Assert.assertSame(e3, b2_events_intercepted.get(0));
 		
@@ -51,7 +41,7 @@ public class DropDuplicatedEvenetsInterceptorTest {
 		b3_events.add(e5);
 		Event e6 = EventBuilder.withBody("2222".getBytes());
 		b3_events.add(e6);
-		List<Event> b3_events_intercepted = interceptor.intercept(b3_events);
+		List<Event> b3_events_intercepted = interceptor.process(b3_events);
 		Assert.assertEquals(2, b3_events_intercepted.size());
 		Assert.assertSame(e5, b3_events_intercepted.get(0));
 		Assert.assertSame(e6, b3_events_intercepted.get(1));

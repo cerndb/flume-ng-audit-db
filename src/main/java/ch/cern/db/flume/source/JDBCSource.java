@@ -25,9 +25,15 @@ public class JDBCSource extends AbstractSource implements Configurable, Pollable
 
 	private static final long MINIMUM_BATCH_TIME_DEFAULT = 10000;
 	private static final String MINIMUM_BATCH_TIME_PARAM = "batch.minimumTime";
+
 	private long minimum_batch_time = MINIMUM_BATCH_TIME_DEFAULT;
 
 	private ReliableJdbcEventReader reader;
+
+	private static final String SIZE_DUPLICATED_EVENTS_PROCESSOR_PARAM = "duplicatedEventsProcessor.size";
+	private static final String CHECK_HEADER_DUPLICATED_EVENTS_PROCESSOR_PARAM = "duplicatedEventsProcessor.header";
+	private static final String CHECK_BODY_DUPLICATED_EVENTS_PROCESSOR_PARAM = "duplicatedEventsProcessor.body";
+	private DropDuplicatedEventsProcessor duplicatedEventsProccesor;
 	
 	public JDBCSource() {
 		super();
@@ -53,6 +59,13 @@ public class JDBCSource extends AbstractSource implements Configurable, Pollable
 		}
 		
 		reader.configure(context);
+		
+		if(duplicatedEventsProccesor == null){
+			duplicatedEventsProccesor = new DropDuplicatedEventsProcessor(
+					context.getInteger(SIZE_DUPLICATED_EVENTS_PROCESSOR_PARAM, 1000),
+					context.getBoolean(CHECK_HEADER_DUPLICATED_EVENTS_PROCESSOR_PARAM,  true),
+					context.getBoolean(CHECK_BODY_DUPLICATED_EVENTS_PROCESSOR_PARAM,  true));
+		}
 	}
 	
 	@Override
@@ -63,6 +76,8 @@ public class JDBCSource extends AbstractSource implements Configurable, Pollable
 		
 		try{
 			List<Event> events = reader.readEvents(batch_size);
+			
+			events = duplicatedEventsProccesor.process(events);
 			
 			getChannelProcessor().processEventBatch(events);
 			

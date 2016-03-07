@@ -1,12 +1,10 @@
-package ch.cern.db.flume.interceptor;
+package ch.cern.db.flume.source;
 
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.flume.Context;
 import org.apache.flume.Event;
-import org.apache.flume.interceptor.Interceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,32 +13,24 @@ import ch.cern.db.utils.SizeLimitedHashSet;
 /**
  * Compare current event with last events to check it was already processed
  */
-public class DropDuplicatedEventsInterceptor implements Interceptor {
+public class DropDuplicatedEventsProcessor {
 
-	private static final Logger LOG = LoggerFactory.getLogger(DropDuplicatedEventsInterceptor.class);
+	private static final Logger LOG = LoggerFactory.getLogger(DropDuplicatedEventsProcessor.class);
 	
 	private boolean checkHeaders;
 	private boolean checkBody;
 	
-	private int size;
-	
 	private SizeLimitedHashSet<Integer> last_hashes;
 	
-	private DropDuplicatedEventsInterceptor(Context context){
-		checkHeaders = context.getBoolean("headers", true);
-		checkBody = context.getBoolean("body", true);
-		size = context.getInteger("size", 1000);
-	}
-	
-	@Override
-	public void initialize() {
+	public DropDuplicatedEventsProcessor(Integer size, Boolean checkHeaders, Boolean checkBody){
 		last_hashes = new SizeLimitedHashSet<Integer>(size);
+		this.checkHeaders = checkHeaders;
+		this.checkBody = checkBody;
 		
-		LOG.info("Intialized with size="+size+", headers="+checkHeaders+", body="+checkBody);
+		LOG.info("Configured with size="+size+", headers="+checkHeaders+", body="+checkBody);
 	}
 
-	@Override
-	public Event intercept(Event event) {
+	public Event process(Event event) {
 		int event_hash = hashCode(event);
 		
 		if(last_hashes.contains(event_hash))
@@ -69,12 +59,11 @@ public class DropDuplicatedEventsInterceptor implements Interceptor {
 			return 0;
 	}
 
-	@Override
-	public List<Event> intercept(List<Event> events) {
+	public List<Event> process(List<Event> events) {
 		LinkedList<Event> intercepted_events = new LinkedList<Event>();
 		
 		for (Event event : events) {
-			Event intercepted_event = intercept(event);
+			Event intercepted_event = process(event);
 			if(intercepted_event != null)
 				intercepted_events.add(event);
 		}
@@ -82,28 +71,8 @@ public class DropDuplicatedEventsInterceptor implements Interceptor {
 		return intercepted_events;
 	}
 
-	@Override
 	public void close() {
 		last_hashes.clear();
 	}
 
-	/**
-	 * Builder which builds new instance of this class
-	 */
-	public static class Builder implements Interceptor.Builder {
-
-		private Context context;
-		
-		@Override
-		public void configure(Context context) {
-			this.context = context;
-		}
-
-		@Override
-		public Interceptor build() {
-			return new DropDuplicatedEventsInterceptor(context);
-		}
-
-	}
-	
 }

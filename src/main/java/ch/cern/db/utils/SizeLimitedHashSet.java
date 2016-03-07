@@ -34,7 +34,7 @@ public class SizeLimitedHashSet<E> extends HashSet<E> {
 	public boolean add(E e) {
 		if(super.add(e)){
 			if(maximumSize > 0 && list.size() >= maximumSize)
-				remove(list.removeFirst());
+				removeFirst();
 			
 			return list.add(e);
 		}else{
@@ -65,6 +65,10 @@ public class SizeLimitedHashSet<E> extends HashSet<E> {
 			return list.removeAll(e);
 		else
 			return false;
+	}
+	
+	public void removeFirst(){
+		super.remove(list.removeFirst());
 	}
 	
 	@Override
