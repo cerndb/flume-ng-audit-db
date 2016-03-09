@@ -11,7 +11,9 @@ before_script:
 
 avro_schema_utility:
   stage: test
-  script:
+  script:   
+    - cat src/test/resources/prepare-test.sql | mysql -u root --password=
     - wget -O $JDBC_DRIVER http://central.maven.org/maven2/org/mariadb/jdbc/mariadb-java-client/1.1.9/mariadb-java-client-1.1.9.jar
     - bin/infer-avro-schema-from-table -dc org.mariadb.jdbc.Driver -c jdbc:mariadb://localhost/testdb -t customers -u testuser -p password > out
+    - cat out
     - \[ `cat out | grep -v INFO | wc -l` -eq 14 \]   
