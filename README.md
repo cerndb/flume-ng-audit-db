@@ -88,6 +88,7 @@ Find below all available configuration parameters:
 <agent_name>.sources.<source_name>.duplicatedEventsProcessor.size = 1000
 <agent_name>.sources.<source_name>.duplicatedEventsProcessor.header = true
 <agent_name>.sources.<source_name>.duplicatedEventsProcessor.body = true
+<agent_name>.sources.<source_name>.duplicatedEventsProcessor.path = NULL
 ```
 
 Default values are written, parameters with NULL has not default value. Most configuration parameters do not require any further explanation. However, some of then are explained below.
