@@ -145,8 +145,11 @@ public class DropDuplicatedEventsProcessor implements Configurable{
 		int event_hash = hashCode(event);
 		
 		if(previous_hashes.contains(event_hash)
-				|| hashes_current_batch.contains(event_hash))
+				|| hashes_current_batch.contains(event_hash)){
+			LOG.debug("Event dropped: " + event.toString());
+			
 			return null;
+		}
 		
 		hashes_current_batch.add(event_hash);
 		return event;
@@ -179,6 +182,10 @@ public class DropDuplicatedEventsProcessor implements Configurable{
 			if(intercepted_event != null)
 				intercepted_events.add(event);
 		}
+		
+		int eventsDropped = events.size() - intercepted_events.size();
+		if(eventsDropped > 0)
+			LOG.debug("Number of events dropped: " + eventsDropped);
 		
 		return intercepted_events;
 	}

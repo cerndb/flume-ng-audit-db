@@ -19,12 +19,12 @@ public class JDBCSource extends AbstractSource implements Configurable, Pollable
 
 	private static final Logger LOG = LoggerFactory.getLogger(JDBCSource.class);
 
-	private static final int BATCH_SIZE_DEFAULT = 100;
-	private static final String BATCH_SIZE_PARAM = "batch.size";
+	public static final int BATCH_SIZE_DEFAULT = 100;
+	public static final String BATCH_SIZE_PARAM = "batch.size";
 	private int batch_size = BATCH_SIZE_DEFAULT;
 
-	private static final long MINIMUM_BATCH_TIME_DEFAULT = 10000;
-	private static final String MINIMUM_BATCH_TIME_PARAM = "batch.minimumTime";
+	public static final long MINIMUM_BATCH_TIME_DEFAULT = 10000;
+	public static final String MINIMUM_BATCH_TIME_PARAM = "batch.minimumTime";
 	private long minimum_batch_time = MINIMUM_BATCH_TIME_DEFAULT;
 
 	private ReliableJdbcEventReader reader;
@@ -79,6 +79,8 @@ public class JDBCSource extends AbstractSource implements Configurable, Pollable
 			List<Event> events = reader.readEvents(batch_size);
 			
 			events = duplicatedEventsProccesor.process(events);
+			
+			LOG.info("Number of events produced: " + events.size());
 			
 			getChannelProcessor().processEventBatch(events);
 			

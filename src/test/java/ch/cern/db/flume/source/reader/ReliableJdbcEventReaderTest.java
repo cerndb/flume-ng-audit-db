@@ -121,7 +121,7 @@ public class ReliableJdbcEventReaderTest {
 	}
 	
 	@Test
-	public void eventsFromDatabaseInBatchFasion(){
+	public void eventsFromDatabaseInBatchFashion(){
 		
 		Context context = new Context();
 		context.put(ReliableJdbcEventReader.CONNECTION_DRIVER_PARAM, "org.hsqldb.jdbc.JDBCDriver");
@@ -161,7 +161,9 @@ public class ReliableJdbcEventReaderTest {
 			
 			reader.commit();
 			events = reader.readEvents(10);
-			Assert.assertEquals(0, events.size());
+			Assert.assertEquals(1, events.size());
+			Assert.assertEquals("{\"ID\":3,\"RETURN_CODE\":48,\"NAME\":\"name3\"}", 
+					new String(events.get(0).getBody()));
 			
 			statement = connection.createStatement();
 			statement.execute("INSERT INTO audit_data_table VALUES 4, 48, 'name4';");
@@ -170,16 +172,20 @@ public class ReliableJdbcEventReaderTest {
 			events = reader.readEvents(1);
 			Assert.assertNotNull(events);
 			Assert.assertEquals(1, events.size());
-			Assert.assertEquals("{\"ID\":4,\"RETURN_CODE\":48,\"NAME\":\"name4\"}", 
+			Assert.assertEquals("{\"ID\":3,\"RETURN_CODE\":48,\"NAME\":\"name3\"}", 
 					new String(events.get(0).getBody()));
 			reader.commit();
+			events = reader.readEvents(1);
+			Assert.assertNotNull(events);
+			Assert.assertEquals(1, events.size());
+			Assert.assertEquals("{\"ID\":4,\"RETURN_CODE\":48,\"NAME\":\"name4\"}", 
+					new String(events.get(0).getBody()));
 			events = reader.readEvents(1);
 			Assert.assertNotNull(events);
 			Assert.assertEquals(1, events.size());
 			Assert.assertEquals("{\"ID\":5,\"RETURN_CODE\":48,\"NAME\":\"name5\"}", 
 					new String(events.get(0).getBody()));
 			events = reader.readEvents(1);
-			Assert.assertNotNull(events);
 			Assert.assertEquals(0, events.size());
 			
 		} catch (IOException e) {
@@ -215,6 +221,7 @@ public class ReliableJdbcEventReaderTest {
 			Statement statement = connection.createStatement();
 			statement.execute("INSERT INTO audit_data_table VALUES 1, 48, 'name1';");
 			statement.execute("INSERT INTO audit_data_table VALUES 2, 48, 'name2';");
+			statement.execute("INSERT INTO audit_data_table VALUES 3, 48, 'name3';");
 			event = reader.readEvent();
 			Assert.assertNotNull(event);
 			Assert.assertEquals("{\"ID\":1,\"RETURN_CODE\":48,\"NAME\":\"name1\"}", new String(event.getBody()));
@@ -224,10 +231,13 @@ public class ReliableJdbcEventReaderTest {
 			event = reader.readEvent();
 			Assert.assertNotNull(event);
 			Assert.assertEquals("{\"ID\":1,\"RETURN_CODE\":48,\"NAME\":\"name1\"}", new String(event.getBody()));
-			reader.commit();
 			event = reader.readEvent();
 			Assert.assertNotNull(event);
 			Assert.assertEquals("{\"ID\":2,\"RETURN_CODE\":48,\"NAME\":\"name2\"}", new String(event.getBody()));
+			reader.commit();
+			event = reader.readEvent();
+			Assert.assertNotNull(event);
+			Assert.assertEquals("{\"ID\":3,\"RETURN_CODE\":48,\"NAME\":\"name3\"}", new String(event.getBody()));
 			event = reader.readEvent();
 			Assert.assertNull(event);
 			
@@ -236,6 +246,9 @@ public class ReliableJdbcEventReaderTest {
 			event = reader.readEvent();
 			Assert.assertNotNull(event);
 			Assert.assertEquals("{\"ID\":2,\"RETURN_CODE\":48,\"NAME\":\"name2\"}", new String(event.getBody()));
+			event = reader.readEvent();
+			Assert.assertNotNull(event);
+			Assert.assertEquals("{\"ID\":3,\"RETURN_CODE\":48,\"NAME\":\"name3\"}", new String(event.getBody()));
 			event = reader.readEvent();
 			Assert.assertNull(event);
 			
@@ -486,7 +499,7 @@ public class ReliableJdbcEventReaderTest {
 		
 		result = reader.createQuery("2016-02-09 09:34:51.244");
 		Assert.assertEquals(result, "SELECT * FROM table_name2 "
-				+ "WHERE column_name2 > TIMESTAMP '2016-02-09 09:34:51.244' "
+				+ "WHERE column_name2 >= TIMESTAMP '2016-02-09 09:34:51.244' "
 				+ "ORDER BY column_name2");
 		
 		
@@ -499,7 +512,7 @@ public class ReliableJdbcEventReaderTest {
 		
 		result = reader.createQuery("2016-02-09 09:34:51.244");
 		Assert.assertEquals(result, "SELECT * FROM table_name2 "
-				+ "WHERE column_name2 > TIMESTAMP '2016-02-09 09:34:51.244' "
+				+ "WHERE column_name2 >= TIMESTAMP '2016-02-09 09:34:51.244' "
 				+ "ORDER BY column_name2");
 		
 		
@@ -512,7 +525,7 @@ public class ReliableJdbcEventReaderTest {
 		
 		result = reader.createQuery("244");
 		Assert.assertEquals(result, "SELECT * FROM table_name3 "
-				+ "WHERE column_name3 > 244 "
+				+ "WHERE column_name3 >= 244 "
 				+ "ORDER BY column_name3");
 		
 		
@@ -525,7 +538,7 @@ public class ReliableJdbcEventReaderTest {
 		
 		result = reader.createQuery("string4");
 		Assert.assertEquals(result, "SELECT * FROM table_name4 "
-				+ "WHERE column_name4 > \'string4\' "
+				+ "WHERE column_name4 >= \'string4\' "
 				+ "ORDER BY column_name4");
 		
 		

@@ -284,7 +284,7 @@ public class ReliableJdbcEventReader implements Configurable{
 		
 		String query = createQuery(committed_value);
 		
-		LOG.info("Executing query: " + query);
+		LOG.debug("Executing query: " + query);
 		
 		resultSet = statement.executeQuery(query);
 	}
@@ -324,7 +324,7 @@ public class ReliableJdbcEventReader implements Configurable{
 		String query = "SELECT * FROM " + tableName;
 		
 		if(committed_value != null){
-			query = query.concat(" WHERE " + columnToCommit + " > ");
+			query = query.concat(" WHERE " + columnToCommit + " >= ");
 		
 			switch (type_column_to_commit) {
 			case NUMERIC:
@@ -370,10 +370,12 @@ public class ReliableJdbcEventReader implements Configurable{
 		for (int i = 0; i < numberOfEventToRead; i++){
 			Event event = readEvent();
 			
-			if(event != null)
+			if(event != null){
+				LOG.trace("New event: " + event);
+				
 				events.add(event);
-			else{
-				LOG.info("Number of events returned: " + events.size());
+			}else{
+				LOG.debug("Number of events returned: " + events.size());
 				return events;
 			}
 		}

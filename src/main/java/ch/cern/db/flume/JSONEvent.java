@@ -54,4 +54,10 @@ public class JSONEvent implements Event{
 	public void setBody(byte[] body) {
 		json = new JsonParser().parse(new String(body)).getAsJsonObject();
 	}
+
+	@Override
+	public String toString() {
+		return "JSONEvent [headers=" + headers + ", body=" + json + "]";
+	}
+	
 }
