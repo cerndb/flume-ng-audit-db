@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# Enviorenment variables for configuration
+# 
+# FORCE_JAVAC = true if you do not want to use Maven (default Maven is used)
+# JAVA_BIN_PATH = path to java bin (default: /usr/bin/)
+
 # Reference: http://stackoverflow.com/questions/59895/can-a-bash-script-tell-what-directory-its-stored-in
 SOURCE="${BASH_SOURCE[0]}"
 while [ -h "$SOURCE" ]; do
@@ -11,7 +16,7 @@ SCRIPT_DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
 HOME=$SCRIPT_DIR/..
 
-if command -v "mvn" &> /dev/null ;
+if `command -v "mvn" &> /dev/null` && ! [ "$FORCE_JAVAC" == "true" ] ;
 then
 	mvn install:install-file \
 		-Dfile=$HOME/lib/elasticsearch-sink2-assembly-1.0.jar \
@@ -22,10 +27,10 @@ then
 
 	mvn -f $HOME/pom.xml install
 else
-	JDK_BIN_DIR=/ORA/dbs01/oracle/product/rdbms/jdk/bin/
-
-	$JDK_BIN_DIR/javac \
-		-cp /usr/lib/aimon-flume-ng/lib/*:$HOME/lib/elasticsearch-sink2-1.0.jar \
+	: ${JAVA_BIN_PATH:="/usr/bin/"}
+	
+	$JAVA_BIN_PATH/javac \
+		-cp /usr/lib/aimon-flume-ng/lib/*:$HOME/lib/* \
 		$HOME/src/main/java/ch/cern/db/flume/*.java \
 		$HOME/src/main/java/ch/cern/db/flume/interceptor/*.java \
 		$HOME/src/main/java/ch/cern/db/flume/sink/elasticsearch/serializer/*.java \
@@ -35,6 +40,6 @@ else
 	
 	mkdir -p $HOME/target
 	
-	$JDK_BIN_DIR/jar cf $HOME/target/flume-ng-customizations.jar -C $HOME/src/main/java/ .
+	$JAVA_BIN_PATH/jar cf $HOME/target/flume-ng-customizations.jar -C $HOME/src/main/java/ .
 fi
 

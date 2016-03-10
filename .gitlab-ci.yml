@@ -4,16 +4,30 @@ stages:
 
 variables:
   JDBC_DRIVER: 'lib/mariadb-java-client.jar'
-  
 
+compile:
+  stage: build
+  script:   
+    - bin/compile
+    
 before_script:
-  - bin/compile
+  - wget -O $JDBC_DRIVER http://central.maven.org/maven2/org/mariadb/jdbc/mariadb-java-client/1.1.9/mariadb-java-client-1.1.9.jar
+  - cat src/test/resources/prepare-test.sql | mysql -u root --password=
 
 avro_schema_utility:
   stage: test
   script:   
-    - cat src/test/resources/prepare-test.sql | mysql -u root --password=
-    - wget -O $JDBC_DRIVER http://central.maven.org/maven2/org/mariadb/jdbc/mariadb-java-client/1.1.9/mariadb-java-client-1.1.9.jar
+    - bin/compile
     - bin/infer-avro-schema-from-table -dc org.mariadb.jdbc.Driver -c jdbc:mariadb://localhost/testdb -t customers -u testuser -p password > out
     - cat out
     - \[ `cat out | grep -v INFO | wc -l` -eq 14 \]   
+    
+jdbc_source:
+  stage: test
+  script:  
+    - export FORCE_JAVAC=true
+    - bin/compile
+    - timeout 10s /usr/lib/aimon-flume-ng/bin/flume-ng agent --classpath $JDBC_DRIVER:target/* -n test_agent -f src/test/ci/source-agent/agent.conf -c src/test/ci/source-agent/ > out &
+    - sleep 10
+    - cat out
+    - \[ `cat out | grep LoggerSink | wc -l` -eq 3 \]
