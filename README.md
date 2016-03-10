@@ -105,6 +105,8 @@ In case the query is not built properly or you want to use a custom one, you can
 SELECT * FROM table_name [WHERE column_name > ':committed_value'] ORDER BY column_name
 ```
 
+NOTICE: default generated query makes use of ">=" for filtering new rows. Duplicated rows will be loaded from source table but they will be dropped by "duplicatedEventsProcessor" (default enabled). If "duplicatedEventsProcessor" is disabled and default generated query is used, duplicated events will be produced. You can configure your custom query in order to avoid duplicates when "duplicatedEventsProcessor" is not enabled. For more details of default behaviour please refer to: https://its.cern.ch/jira/browse/HRFAL-13
+
 Some tips:
 * ORDER BY clause is strongly recommended to be used since last value from "column to commit" will be used in further queries to get only last rows.
 * If no value has been committed yet, part of the query between [] is removed. This is the case when we first start Flume and  ".committtedValue" is not configured.
