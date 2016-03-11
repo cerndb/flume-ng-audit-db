@@ -7,10 +7,9 @@ import java.util.List;
 import org.apache.flume.Context;
 import org.apache.flume.Event;
 import org.apache.flume.event.EventBuilder;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
-
-import ch.cern.db.flume.source.DropDuplicatedEventsProcessor;
 
 public class DropDuplicatedEvenetsProcessorTest {
 	
@@ -244,6 +243,11 @@ public class DropDuplicatedEvenetsProcessorTest {
 		List<Event> b3_events_intercepted = interceptor.process(b3_events);
 		Assert.assertEquals(1, b3_events_intercepted.size());
 		Assert.assertSame(e5, b3_events_intercepted.get(0));
+	}
+	
+	@After
+	public void cleanUp(){
+		new File(DropDuplicatedEventsProcessor.PATH_DEFAULT).delete();
 	}
 	
 }

@@ -16,7 +16,7 @@ Several implementations have been made for adapting Flume, both in the source an
 * Interceptors that can modify events produced in the source:
     * DropNoJSONEventsInterceptor: drop all events which are not of the class JSONEvents.
     * JSONEventToCSVInterceptor: convert JSONEvents into normal Flume Events which body is a CSV with the values. Headers are copied. No JSONEvents are not touched.
-    * DropDuplicatedEventsInterceptor: drop duplicated events. It only checks with the last "size" events. WARNING: this interceptor will drop events in case transaction to channel fails or agent is restarted.
+    * DropDuplicatedEventsInterceptor: drop duplicated events. It only checks with the last "size" events. WARNING: this interceptor will drop events in case transaction to channel fails. In case the agent is restarted, hash for last events is lost so duplicates can appear.
 * For some sinks, you may need to implement a custom parser for Flume Events:
     * JSONtoAvroParser: for Kite sink, this parser converts Flume Events which body is JSON into Avro records.
     * JSONtoElasticSearchEventSerializer: for Elasticsearch sink, this parser converts Flume Events which body is JSON into Elasticsearch XContentBuilder.
@@ -88,7 +88,7 @@ Find below all available configuration parameters:
 <agent_name>.sources.<source_name>.duplicatedEventsProcessor.size = 1000
 <agent_name>.sources.<source_name>.duplicatedEventsProcessor.header = true
 <agent_name>.sources.<source_name>.duplicatedEventsProcessor.body = true
-<agent_name>.sources.<source_name>.duplicatedEventsProcessor.path = NULL
+<agent_name>.sources.<source_name>.duplicatedEventsProcessor.path = last_events.hash_list
 ```
 
 Default values are written, parameters with NULL has not default value. Most configuration parameters do not require any further explanation. However, some of then are explained below.
@@ -102,7 +102,7 @@ Last committed value is loaded when starting from ".committingFile" if specified
 In case the query is not built properly or you want to use a custom one, you can use ".query" parameter (or ".query.path" for loading the query from a file). In that case ".table" and "columnToCommit.type" parameters are ignored. You should use the following syntax:
 
 ```
-SELECT * FROM table_name [WHERE column_name > ':committed_value'] ORDER BY column_name
+SELECT * FROM table_name [WHERE column_name >= ':committed_value'] ORDER BY column_name
 ```
 
 NOTICE: default generated query makes use of ">=" for filtering new rows. Duplicated rows will be loaded from source table but they will be dropped by "duplicatedEventsProcessor" (default enabled). If "duplicatedEventsProcessor" is disabled and default generated query is used, duplicated events will be produced. You can configure your custom query in order to avoid duplicates when "duplicatedEventsProcessor" is not enabled. For more details of default behaviour please refer to: https://its.cern.ch/jira/browse/HRFAL-13
@@ -131,11 +131,21 @@ As soon as a value has been committed, query will be like:
 SELECT * FROM UNIFIED_AUDIT_TRAIL WHERE EVENT_TIMESTAMP > TIMESTAMP '2013-11-08 12:11:31.123123 Europe/Zurich' ORDER BY EVENT_TIMESTAMP
 ```
 
-### DropDuplicatedEventsInterceptor && duplicatedEventsProcessor in JDBCSource
+### duplicatedEventsProcessor in JDBCSource
 
 It compares new Events with last events. A set of last Event hashes is maintained, the size of this set can be configured with "size" parameter, default size is 1000.
 
 Event's hash is calculate by default from headers (disabled if "header" parameter is set to false) and body (disabled if "body" parameter is set to false).
+
+List of hashes is persisted into disk, it allows to maintain the list in case agent is restarted. File to persist hashes can be configured by "path" parameter.
+
+### DropDuplicatedEventsInterceptor 
+
+It compares new Events with last events. A set of last Event hashes is maintained, the size of this set can be configured with "size" parameter, default size is 1000.
+
+Event's hash is calculate by default from headers (disabled if "header" parameter is set to false) and body (disabled if "body" parameter is set to false).
+
+WARNINGS: this interceptor will drop not duplicated events in case transaction to channel fails. In case the agent is restarted, hash for last events is lost so duplicates could appear.
 
 ### Other components
 

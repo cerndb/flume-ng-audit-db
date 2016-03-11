@@ -195,6 +195,7 @@ public class JDBCSourceTest{
 	@After
 	public void cleanUp(){
 		new File(ReliableJdbcEventReader.COMMITTING_FILE_PATH_DEFAULT).delete();
+		new File(DropDuplicatedEventsProcessor.PATH_DEFAULT).delete();
 		
 		try {
 			connection.close();
