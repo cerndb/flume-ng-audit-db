@@ -173,11 +173,6 @@ public class InferSchemaFromTable {
 				break;
 			case java.sql.Types.TIMESTAMP:
 			case -102: //TIMESTAMP(6) WITH LOCAL TIME ZONE
-				if(nullable)
-					field.nullable().longType().noDefault();
-				else
-					field.longType().noDefault();
-				break;
 			default:
 				if(nullable)
 					field.nullable().stringType().noDefault();

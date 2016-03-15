@@ -80,14 +80,14 @@ public class JDBCSource extends AbstractSource implements Configurable, Pollable
 			
 			events = duplicatedEventsProccesor.process(events);
 			
-			LOG.info("Number of events produced: " + events.size());
-			
 			getChannelProcessor().processEventBatch(events);
 			
 			reader.commit();
 			
 			if(duplicatedEventsProccesor != null)
 				duplicatedEventsProccesor.commit();
+			
+			LOG.info("Number of events produced: " + events.size());
 			
 			status = Status.READY;
 		}catch(Throwable e){
