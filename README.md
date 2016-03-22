@@ -93,11 +93,11 @@ Find below all available configuration parameters:
 
 Default values are written, parameters with NULL has not default value. Most configuration parameters do not require any further explanation. However, some of then are explained below.
 
-".table", ".query" or ".query.path" parameter must be configured. ".columnToCommit" is always required.
+".table", ".query" or ".query.path" parameter must be configured. If ".columnToCommit" is not configured, same query will be always run and comittingFile and committtedValue parameters will be ignored.
 
-Since it is a reliable reader, it requires one column of the table to be used for committing its value. Column to use for this purpose is configured with ".columnToCommit" parameter. Therefore, this column must be returned by the query. You would need to specify the type of this column in order to build the query properly. 
+If ".columnToCommit" is configured, the value of this column will be committed to "committingFile". This column must be returned by the query. You would need to specify the type of this column in order to build the query properly (default type TIMESTAMP). 
 
-Last committed value is loaded when starting from ".committingFile" if specified. File is created if it does not exist. In case ".committingFile" does not exist or is empty, last committed value will be ".committedValue" if specified.
+When starting, last committed value is loaded from ".committingFile" if specified. File is created if it does not exist. In case ".committingFile" does not exist or is empty, last committed value will be ".committedValue" if specified.
 
 In case the query is not built properly or you want to use a custom one, you can use ".query" parameter (or ".query.path" for loading the query from a file). In that case ".table" and "columnToCommit.type" parameters are ignored. You should use the following syntax:
 

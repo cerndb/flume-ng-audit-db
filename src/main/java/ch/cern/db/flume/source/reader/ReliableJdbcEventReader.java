@@ -102,8 +102,6 @@ public class ReliableJdbcEventReader implements Configurable{
 			throw new ConfigurationException("Table name or query needs to be configured with " + TABLE_NAME_PARAM);
 		
 		columnToCommit = context.getString(COLUMN_TO_COMMIT_PARAM);
-		if(columnToCommit == null)
-			throw new ConfigurationException("Column to commit needs to be configured with " + COLUMN_TO_COMMIT_PARAM);
 		
 		String conf_type_column = context.getString(TYPE_COLUMN_TO_COMMIT_PARAM);
 		if(conf_type_column != null){
@@ -130,10 +128,12 @@ public class ReliableJdbcEventReader implements Configurable{
 		committing_file_path = context.getString(COMMITTING_FILE_PATH_PARAM, COMMITTING_FILE_PATH_DEFAULT);
 		committing_file = new File(committing_file_path);
 		
-		loadLastCommittedValueFromFile();
-		if(committed_value == null){
-			committed_value_to_load = context.getString(COMMITTED_VALUE_TO_LOAD_PARAM);
-			committed_value = committed_value_to_load;
+		if(columnToCommit != null){
+			loadLastCommittedValueFromFile();
+			if(committed_value == null){
+				committed_value_to_load = context.getString(COMMITTED_VALUE_TO_LOAD_PARAM);
+				committed_value = committed_value_to_load;
+			}
 		}
 		
 		state = State.CONFIGURED;
@@ -263,7 +263,7 @@ public class ReliableJdbcEventReader implements Configurable{
 						break;
 					}
 					
-					if(name.equals(columnToCommit)){
+					if(columnToCommit != null && name.equals(columnToCommit)){
 						last_value = resultSet.getString(i);
 					}
 				}				
@@ -319,7 +319,7 @@ public class ReliableJdbcEventReader implements Configurable{
 			}else{
 				String toReplace = ":committed_value";
 				
-				//Replace all {$committed_value} by committed_value
+ 				//Replace all {$committed_value} by committed_value
 				finalQuery = finalQuery.replaceAll(toReplace, committed_value);
 				
 				//Remove [] characters
@@ -331,7 +331,7 @@ public class ReliableJdbcEventReader implements Configurable{
 		
 		String query = "SELECT * FROM " + tableName;
 		
-		if(committed_value != null){
+		if(columnToCommit != null && committed_value != null){
 			query = query.concat(" WHERE " + columnToCommit + " >= ");
 		
 			switch (type_column_to_commit) {
@@ -347,7 +347,9 @@ public class ReliableJdbcEventReader implements Configurable{
 			}
 		}
 		
-		query = query.concat(" ORDER BY " + columnToCommit);
+		if(columnToCommit != null){
+			query = query.concat(" ORDER BY " + columnToCommit);
+		}
 		
 		return query;
 	}

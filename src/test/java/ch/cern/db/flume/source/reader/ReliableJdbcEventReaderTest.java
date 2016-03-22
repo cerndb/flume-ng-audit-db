@@ -129,6 +129,67 @@ public class ReliableJdbcEventReaderTest {
 	}
 	
 	@Test
+	public void sameQuery(){
+		
+		Context context = new Context();
+		context.put(ReliableJdbcEventReader.CONNECTION_DRIVER_PARAM, "org.hsqldb.jdbc.JDBCDriver");
+		context.put(ReliableJdbcEventReader.CONNECTION_URL_PARAM, connection_url);
+		context.put(ReliableJdbcEventReader.USERNAME_PARAM, "SA");
+		context.put(ReliableJdbcEventReader.PASSWORD_PARAM, "");
+		context.put(ReliableJdbcEventReader.TABLE_NAME_PARAM, " audit_data_table");
+		ReliableJdbcEventReader reader = new ReliableJdbcEventReader();
+		reader.configure(context);
+		
+		try {
+			Event event = reader.readEvent();
+			Assert.assertNull(event);
+			
+			Statement statement = connection.createStatement();
+			statement.execute("INSERT INTO audit_data_table VALUES 2, 48, 'name2';");
+			event = reader.readEvent();
+			Assert.assertNotNull(event);
+			Assert.assertEquals("{\"ID\":2,\"RETURN_CODE\":48,\"NAME\":\"name2\"}", new String(event.getBody()));
+			event = reader.readEvent();
+			Assert.assertNull(event);
+			
+			statement = connection.createStatement();
+			statement.execute("INSERT INTO audit_data_table VALUES 1, 48, 'name1';");
+			statement.execute("INSERT INTO audit_data_table VALUES 3, 48, 'name3';");
+			statement.close();
+			event = reader.readEvent();
+			Assert.assertNotNull(event);
+			Assert.assertEquals("{\"ID\":2,\"RETURN_CODE\":48,\"NAME\":\"name2\"}", new String(event.getBody()));
+			event = reader.readEvent();
+			Assert.assertNotNull(event);
+			Assert.assertEquals("{\"ID\":1,\"RETURN_CODE\":48,\"NAME\":\"name1\"}", new String(event.getBody()));
+			event = reader.readEvent();
+			Assert.assertNotNull(event);
+			Assert.assertEquals("{\"ID\":3,\"RETURN_CODE\":48,\"NAME\":\"name3\"}", new String(event.getBody()));
+			event = reader.readEvent();
+			Assert.assertNull(event);
+			
+			event = reader.readEvent();
+			Assert.assertNotNull(event);
+			Assert.assertEquals("{\"ID\":2,\"RETURN_CODE\":48,\"NAME\":\"name2\"}", new String(event.getBody()));
+			event = reader.readEvent();
+			Assert.assertNotNull(event);
+			Assert.assertEquals("{\"ID\":1,\"RETURN_CODE\":48,\"NAME\":\"name1\"}", new String(event.getBody()));
+			event = reader.readEvent();
+			Assert.assertNotNull(event);
+			Assert.assertEquals("{\"ID\":3,\"RETURN_CODE\":48,\"NAME\":\"name3\"}", new String(event.getBody()));
+			event = reader.readEvent();
+			Assert.assertNull(event);
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+			Assert.fail();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			Assert.fail();
+		}
+	}
+	
+	@Test
 	public void eventsFromDatabaseInBatchFashion(){
 		
 		Context context = new Context();
@@ -561,6 +622,15 @@ public class ReliableJdbcEventReaderTest {
 			Assert.fail();
 		}catch(FlumeException e){
 		}
+		
+		context = new Context();
+		context.put(ReliableJdbcEventReader.CONNECTION_DRIVER_PARAM, "org.hsqldb.jdbc.JDBCDriver");
+		context.put(ReliableJdbcEventReader.TABLE_NAME_PARAM, "table_name5");
+		context.put(ReliableJdbcEventReader.TYPE_COLUMN_TO_COMMIT_PARAM, "string");
+		reader.configure(context);
+		
+		result = reader.createQuery("string4");
+		Assert.assertEquals(result, "SELECT * FROM table_name5");
 	}
 
 	@Test
