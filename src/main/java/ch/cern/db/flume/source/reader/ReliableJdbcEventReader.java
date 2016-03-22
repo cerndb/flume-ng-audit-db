@@ -390,7 +390,7 @@ public class ReliableJdbcEventReader implements Configurable{
 			}
 		}
 		
-		LOG.info("Number of events returned: " + events.size());
+		LOG.debug("Number of events returned: " + events.size());
 		return events;
 	}
 
