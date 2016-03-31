@@ -19,7 +19,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class DropDuplicatedEvenetsProcessorTest {
+public class DropDuplicatedEventsProcessorTest {
 	
 	@Test
 	public void reconfigure(){
