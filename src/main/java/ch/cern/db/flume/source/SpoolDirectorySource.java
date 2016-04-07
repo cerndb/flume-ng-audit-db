@@ -17,20 +17,36 @@
 
 package ch.cern.db.flume.source;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Preconditions;
-import com.google.common.base.Throwables;
-
-import ch.cern.db.flume.source.reader.ReliableSpoolingFileEventReader;
-
-import org.apache.flume.*;
-import org.apache.flume.conf.Configurable;
-import org.apache.flume.instrumentation.SourceCounter;
-import org.apache.flume.serialization.DecodeErrorPolicy;
-import org.apache.flume.serialization.LineDeserializer;
-import org.apache.flume.source.AbstractSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.apache.flume.source.SpoolDirectorySourceConfigurationConstants.BASENAME_HEADER;
+import static org.apache.flume.source.SpoolDirectorySourceConfigurationConstants.BASENAME_HEADER_KEY;
+import static org.apache.flume.source.SpoolDirectorySourceConfigurationConstants.BATCH_SIZE;
+import static org.apache.flume.source.SpoolDirectorySourceConfigurationConstants.BUFFER_MAX_LINE_LENGTH;
+import static org.apache.flume.source.SpoolDirectorySourceConfigurationConstants.CONSUME_ORDER;
+import static org.apache.flume.source.SpoolDirectorySourceConfigurationConstants.DECODE_ERROR_POLICY;
+import static org.apache.flume.source.SpoolDirectorySourceConfigurationConstants.DEFAULT_BASENAME_HEADER;
+import static org.apache.flume.source.SpoolDirectorySourceConfigurationConstants.DEFAULT_BASENAME_HEADER_KEY;
+import static org.apache.flume.source.SpoolDirectorySourceConfigurationConstants.DEFAULT_BATCH_SIZE;
+import static org.apache.flume.source.SpoolDirectorySourceConfigurationConstants.DEFAULT_CONSUME_ORDER;
+import static org.apache.flume.source.SpoolDirectorySourceConfigurationConstants.DEFAULT_DECODE_ERROR_POLICY;
+import static org.apache.flume.source.SpoolDirectorySourceConfigurationConstants.DEFAULT_DELETE_POLICY;
+import static org.apache.flume.source.SpoolDirectorySourceConfigurationConstants.DEFAULT_DESERIALIZER;
+import static org.apache.flume.source.SpoolDirectorySourceConfigurationConstants.DEFAULT_FILENAME_HEADER_KEY;
+import static org.apache.flume.source.SpoolDirectorySourceConfigurationConstants.DEFAULT_FILE_HEADER;
+import static org.apache.flume.source.SpoolDirectorySourceConfigurationConstants.DEFAULT_IGNORE_PAT;
+import static org.apache.flume.source.SpoolDirectorySourceConfigurationConstants.DEFAULT_INPUT_CHARSET;
+import static org.apache.flume.source.SpoolDirectorySourceConfigurationConstants.DEFAULT_MAX_BACKOFF;
+import static org.apache.flume.source.SpoolDirectorySourceConfigurationConstants.DEFAULT_SPOOLED_FILE_SUFFIX;
+import static org.apache.flume.source.SpoolDirectorySourceConfigurationConstants.DEFAULT_TRACKER_DIR;
+import static org.apache.flume.source.SpoolDirectorySourceConfigurationConstants.DELETE_POLICY;
+import static org.apache.flume.source.SpoolDirectorySourceConfigurationConstants.DESERIALIZER;
+import static org.apache.flume.source.SpoolDirectorySourceConfigurationConstants.FILENAME_HEADER;
+import static org.apache.flume.source.SpoolDirectorySourceConfigurationConstants.FILENAME_HEADER_KEY;
+import static org.apache.flume.source.SpoolDirectorySourceConfigurationConstants.IGNORE_PAT;
+import static org.apache.flume.source.SpoolDirectorySourceConfigurationConstants.INPUT_CHARSET;
+import static org.apache.flume.source.SpoolDirectorySourceConfigurationConstants.MAX_BACKOFF;
+import static org.apache.flume.source.SpoolDirectorySourceConfigurationConstants.SPOOLED_FILE_SUFFIX;
+import static org.apache.flume.source.SpoolDirectorySourceConfigurationConstants.SPOOL_DIRECTORY;
+import static org.apache.flume.source.SpoolDirectorySourceConfigurationConstants.TRACKER_DIR;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,7 +56,25 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static org.apache.flume.source.SpoolDirectorySourceConfigurationConstants.*;
+import org.apache.flume.ChannelException;
+import org.apache.flume.Context;
+import org.apache.flume.Event;
+import org.apache.flume.EventDrivenSource;
+import org.apache.flume.FlumeException;
+import org.apache.flume.conf.Configurable;
+import org.apache.flume.instrumentation.SourceCounter;
+import org.apache.flume.serialization.DecodeErrorPolicy;
+import org.apache.flume.serialization.LineDeserializer;
+import org.apache.flume.source.AbstractSource;
+import org.apache.flume.source.SpoolDirectorySourceConfigurationConstants.ConsumeOrder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Throwables;
+
+import ch.cern.db.flume.source.reader.ReliableSpoolingFileEventReader;
 
 public class SpoolDirectorySource extends AbstractSource implements Configurable, EventDrivenSource {
 

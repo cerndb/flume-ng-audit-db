@@ -71,7 +71,7 @@ import com.google.common.io.Files;
  *
  * <p/>
  * This reader assumes that files with unique file names are left in the
- * spooling directory and not modified once they are placed there. Any user
+ * spooling directory and not modified once they are placed there and closed. Any user
  * behavior which violates these assumptions, when detected, will result in a
  * FlumeException being thrown.
  *
@@ -455,8 +455,11 @@ public class ReliableSpoolingFileEventReader implements ReliableEventReader {
 						return false;
 					}
 					
-					if(isFileOpen(candidate))
+					if(isFileOpen(candidate)){
+						logger.debug("File is still open: " + candidate.getAbsolutePath());
+						
 						return false;
+					}
 					
 					return true;
 				}
