@@ -92,7 +92,7 @@ public class SpoolDirectorySourceTest{
 	    file2.println("file2-line1");
 	    file2.println("file2-line2");
 	    
-	    Thread.sleep(1000);
+	    Thread.sleep(2000);
 	    
 	    channel.getTransaction().begin();
 	    event = channel.take();
@@ -103,7 +103,7 @@ public class SpoolDirectorySourceTest{
 	    //Once file is closed, it must be processed
 	    file2.close();
 	    
-	    Thread.sleep(1000);
+	    Thread.sleep(2000);
 	    
 	    channel.getTransaction().begin();
 	    

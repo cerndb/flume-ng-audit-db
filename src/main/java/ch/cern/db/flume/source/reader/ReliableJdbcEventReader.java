@@ -18,7 +18,6 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -85,8 +84,6 @@ public class ReliableJdbcEventReader implements Configurable{
 	private Statement statement = null;
 	
 	protected String last_value = null;
-	
-	private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:SSZ");
 	
 	public ReliableJdbcEventReader() {
 		initialize();
@@ -256,7 +253,7 @@ public class ReliableJdbcEventReader implements Configurable{
 						break;
 					case java.sql.Types.TIMESTAMP:
 					case -102: //TIMESTAMP(6) WITH LOCAL TIME ZONE
-						event.addProperty(name, dateFormat.format(resultSet.getTimestamp(i)));
+						event.addProperty(name, resultSet.getTimestamp(i));
 						break;
 					default:
 						event.addProperty(name, resultSet.getString(i));
