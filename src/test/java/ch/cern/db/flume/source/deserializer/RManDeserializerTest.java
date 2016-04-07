@@ -95,4 +95,35 @@ public class RManDeserializerTest {
 		metaFile.delete();
 	}
 	
+	@Test
+	public void parseFromFile() throws IOException{
+		
+		File file = new File("src/test/resources/rman-logs/level_arch_newdisk.edhp_rac51.05042016_0531");
+		
+		File metaFile = new File("src/test/resources/RManDeserializerTest.metafile");
+		
+		PositionTracker tracker = DurablePositionTracker.getInstance(metaFile, file.getAbsolutePath());
+		ResettableInputStream in = new ResettableFileInputStream(file, tracker);
+		
+		RManDeserializer des = (RManDeserializer) new RManDeserializer.Builder().build(new Context(), in);
+	
+		Event event = des.readEvent();
+		JSONObject json = null;
+		try {
+			json = new JSONObject(new String(event.getBody()));
+			
+			Assert.assertEquals("2016-04-05T05:31:00+0200", json.get("startTimestamp"));
+			Assert.assertEquals("level_arch_newdisk", json.get("backupType"));
+			Assert.assertEquals("edhp_rac51", json.get("entityNmae"));
+			
+		} catch (JSONException e) {
+			e.printStackTrace();
+			Assert.fail();
+		}
+		
+		System.out.println(json);
+
+		metaFile.delete();
+	}
+	
 }

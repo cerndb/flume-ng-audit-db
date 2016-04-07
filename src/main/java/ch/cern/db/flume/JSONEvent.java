@@ -43,6 +43,9 @@ public class JSONEvent implements Event{
 	}
 	
 	public void addProperty(String name, Object value){
+		if(value == null)
+			return;
+		
 		if(value instanceof Date){
 			json.addProperty(name, dateFormat.format((Date) value));
 		}else if(value instanceof Number){
@@ -52,7 +55,7 @@ public class JSONEvent implements Event{
 		}else if(value instanceof JsonElement){
 			json.add(name, (JsonElement) value);
 		}else{
-			json.addProperty(name, (String) value);
+			json.addProperty(name, value.toString());
 		}
 	}
 	

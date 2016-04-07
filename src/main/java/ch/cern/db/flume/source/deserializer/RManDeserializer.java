@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import ch.cern.db.flume.JSONEvent;
 import ch.cern.db.utils.SUtils;
@@ -58,6 +59,8 @@ public class RManDeserializer implements EventDeserializer {
 	private static final Pattern propertyPattern = Pattern.compile("^([A-z,0-9]+)[ ]+=[ ]+(.+)");
 	private static final Pattern ORAPattern = Pattern.compile("^[ ]?ORA-\\d{5}[:][ ].*");
 	private static final Pattern RMANPattern = Pattern.compile("^[ ]?RMAN-\\d{5}[:][ ].*");
+	private static final Pattern getJsonPattern = Pattern.compile("(?s).*(\\{.*?\\}).*");
+	private static final Pattern emptyLinePattern = Pattern.compile("^\\s*$");
 	
 	RManDeserializer(Context context, ResettableInputStream in) {
 		this.in = in;
@@ -129,7 +132,26 @@ public class RManDeserializer implements EventDeserializer {
 		}
 		event.addProperty("ORA-", oraErrors);
 		
+		event.addProperty("v_params", getJsonObject(lines, "Main: params passed: \\$v_params"));  
+		event.addProperty("mountPointNASRegex.result", 
+				getJsonObject(lines, "RunTime\\.GetMountPointNASRegex : result: \\$VAR1"));
+		event.addProperty("volInfoBackuptoDisk.finalResult", 
+				getJsonObject(lines, "RunTime\\.GetVolInfoBackuptoDisk : final result \\$VAR1"));
+
 		return event;
+	}
+
+	private JsonObject getJsonObject(List<String> lines, String regex) {
+		List<String> getMountPointNASRegexlines = SUtils.linesFromTo(lines, 
+				Pattern.compile(".*" + regex + ".*"), 
+				emptyLinePattern);
+		
+		Matcher matcher = getJsonPattern.matcher(SUtils.join(getMountPointNASRegexlines, '\n'));
+		
+		if(matcher.matches())
+			return new JsonParser().parse(matcher.group(1)).getAsJsonObject();
+		
+		return null;
 	}
 
 	/**

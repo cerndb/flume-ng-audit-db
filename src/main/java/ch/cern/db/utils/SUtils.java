@@ -8,6 +8,7 @@
  */
 package ch.cern.db.utils;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -20,13 +21,7 @@ import java.util.regex.Pattern;
 public class SUtils {
 
 	public static List<String> grep(List<String> lines, String regex) {
-		List<String> returnLines = new LinkedList<>();
-		
-		for (String line : lines)
-			if(line.matches(regex))
-				returnLines.add(line);
-		
-		return returnLines;
+		return grep(lines, Pattern.compile(regex));
 	}
 
 	public static List<String>  grep(List<String> lines, Pattern pattern) {
@@ -39,5 +34,42 @@ public class SUtils {
 		return returnLines;
 	}
 
+	public static List<String> linesFromTo(List<String> lines, Pattern patternStart, Pattern patternEnd) {
+		List<String> returnLines = new LinkedList<>();
+		
+		Iterator<String> it = lines.iterator();
+		
+		while (it.hasNext()){
+			String line = it.next();
+			
+			if(patternStart.matcher(line).matches()){
+				returnLines.add(line);
+				
+				break;
+			}
+		}
+		
+		while (it.hasNext()){
+			String line = it.next();
+			
+			returnLines.add(line);
+			
+			if(patternEnd.matcher(line).matches())
+				break;
+		}
+		
+		return returnLines;	
+	}
+
+	public static String join(List<String> lines, char delim) {
+		StringBuilder sb = new StringBuilder();
+		
+		for (String string : lines) {
+			sb.append(string);
+			sb.append(delim);
+		}
+		
+		return sb.toString();
+	}
 	
 }
