@@ -28,6 +28,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 import ch.cern.db.flume.JSONEvent;
 import ch.cern.db.utils.SUtils;
@@ -54,6 +56,8 @@ public class RManDeserializer implements EventDeserializer {
 	private static final DateFormat dateFormatter = new SimpleDateFormat("'['EEE MMM dd HH:mm:ss z yyyy']'");
 	
 	private static final Pattern propertyPattern = Pattern.compile("^([A-z,0-9]+)[ ]+=[ ]+(.+)");
+	private static final Pattern ORAPattern = Pattern.compile("^[ ]?ORA-\\d{5}[:][ ].*");
+	private static final Pattern RMANPattern = Pattern.compile("^[ ]?RMAN-\\d{5}[:][ ].*");
 	
 	RManDeserializer(Context context, ResettableInputStream in) {
 		this.in = in;
@@ -98,6 +102,32 @@ public class RManDeserializer implements EventDeserializer {
 			if(m.find())
 				event.addProperty(m.group(1), m.group(2));
 		}
+		
+		//Process RMAN-XXXXX
+		JsonArray rmanErrors = new JsonArray();
+		for (String line : SUtils.grep(lines, RMANPattern)) {
+			JsonObject element = new JsonObject();
+			String[] splitted = line.trim().split(":", 2);
+			
+			element.addProperty("id", Integer.valueOf(splitted[0].split("-")[1]));
+			element.addProperty("message", splitted[1]);
+			
+			rmanErrors.add(element);
+		}
+		event.addProperty("RMAN-", rmanErrors);
+		
+		//Process ORA-XXXXX
+		JsonArray oraErrors = new JsonArray();
+		for (String line : SUtils.grep(lines, ORAPattern)) {
+			JsonObject element = new JsonObject();
+			String[] splitted = line.trim().split(":", 2);
+				
+			element.addProperty("id", Integer.valueOf(splitted[0].split("-")[1]));
+			element.addProperty("message", splitted[1]);
+				
+			oraErrors.add(element);
+		}
+		event.addProperty("ORA-", oraErrors);
 		
 		return event;
 	}

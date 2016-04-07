@@ -18,6 +18,7 @@ import org.apache.flume.serialization.DurablePositionTracker;
 import org.apache.flume.serialization.PositionTracker;
 import org.apache.flume.serialization.ResettableFileInputStream;
 import org.apache.flume.serialization.ResettableInputStream;
+import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.junit.Assert;
@@ -41,6 +42,11 @@ public class RManDeserializerTest {
 		writer.println("remoteTsmServer         = TSM514_ORA");
 		writer.println("tabxmlTDPONode          = edhp");
 		writer.println("remoteTDPONode          = edhp_ora");
+		writer.println(" RMAN-03009: failure of backup command on ORA_SBT_TAPE_1 channel at 01/27/2016 18:56:50");
+		writer.println(" ORA-27028: skgfqcre: sbtbackup returned error");
+		writer.println("ORA-19511: Error received from media manager layer, error text:");
+		writer.println("    ANS1017E (RC-50)  Session rejected: TCP/IP connection failure.");
+		writer.println("RMAN-00569: =============== ERROR MESSAGE STACK FOLLOWS ===============");
 		writer.close();
 	    
 		File metaFile = new File("src/test/resources/RManDeserializerTest.metafile");
@@ -65,6 +71,21 @@ public class RManDeserializerTest {
 			Assert.assertEquals("TSM514_ORA", json.get("remoteTsmServer"));
 			Assert.assertEquals("edhp", json.get("tabxmlTDPONode"));
 			Assert.assertEquals("edhp_ora", json.get("remoteTDPONode"));
+			
+			Assert.assertEquals(3009, ((JSONObject) ((JSONArray) json.get("RMAN-")).get(0)).getInt("id"));
+			Assert.assertEquals(" failure of backup command on ORA_SBT_TAPE_1 channel at 01/27/2016 18:56:50", 
+					((JSONObject) ((JSONArray) json.get("RMAN-")).get(0)).getString("message"));
+			Assert.assertEquals(569, ((JSONObject) ((JSONArray) json.get("RMAN-")).get(1)).getInt("id"));
+			Assert.assertEquals(" =============== ERROR MESSAGE STACK FOLLOWS ===============", 
+					((JSONObject) ((JSONArray) json.get("RMAN-")).get(1)).getString("message"));
+
+			Assert.assertEquals(27028, ((JSONObject) ((JSONArray) json.get("ORA-")).get(0)).getInt("id"));
+			Assert.assertEquals(" skgfqcre: sbtbackup returned error", 
+					((JSONObject) ((JSONArray) json.get("ORA-")).get(0)).getString("message"));
+			Assert.assertEquals(19511, ((JSONObject) ((JSONArray) json.get("ORA-")).get(1)).getInt("id"));
+			Assert.assertEquals(" Error received from media manager layer, error text:", 
+					((JSONObject) ((JSONArray) json.get("ORA-")).get(1)).getString("message"));
+			
 		} catch (JSONException e) {
 			e.printStackTrace();
 			Assert.fail();

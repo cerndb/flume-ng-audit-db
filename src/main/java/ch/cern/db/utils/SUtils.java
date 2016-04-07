@@ -10,6 +10,7 @@ package ch.cern.db.utils;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * String utilities
@@ -23,6 +24,16 @@ public class SUtils {
 		
 		for (String line : lines)
 			if(line.matches(regex))
+				returnLines.add(line);
+		
+		return returnLines;
+	}
+
+	public static List<String>  grep(List<String> lines, Pattern pattern) {
+		List<String> returnLines = new LinkedList<>();
+		
+		for (String line : lines)
+			if(pattern.matcher(line).matches())
 				returnLines.add(line);
 		
 		return returnLines;
