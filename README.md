@@ -84,6 +84,8 @@ Find below all available configuration parameters:
 <agent_name>.sources.<source_name>.reader.table.columnToCommit.type = [TIMESTAMP (default)|NUMERIC|STRING]
 <agent_name>.sources.<source_name>.reader.query = NULL
 <agent_name>.sources.<source_name>.reader.query.path = NULL
+<agent_name>.sources.<source_name>.reader.scaleAwareNumeric = false
+<agent_name>.sources.<source_name>.reader.expandBigFloats = false
 <agent_name>.sources.<source_name>.duplicatedEventsProcessor = true
 <agent_name>.sources.<source_name>.duplicatedEventsProcessor.size = 1000
 <agent_name>.sources.<source_name>.duplicatedEventsProcessor.header = true
@@ -91,7 +93,7 @@ Find below all available configuration parameters:
 <agent_name>.sources.<source_name>.duplicatedEventsProcessor.path = last_events.hash_list
 ```
 
-Default values are written, parameters with NULL has not default value. Most configuration parameters do not require any further explanation. However, some of then are explained below.
+Default values are written, parameters with NULL have no default value. Most configuration parameters do not require any further explanation. However, some of them are explained below.
 
 ".table", ".query" or ".query.path" parameter must be configured. If ".columnToCommit" is not configured, same query will be always run and comittingFile and committtedValue parameters will be ignored.
 
@@ -130,6 +132,12 @@ As soon as a value has been committed, query will be like:
 ```
 SELECT * FROM UNIFIED_AUDIT_TRAIL WHERE EVENT_TIMESTAMP > TIMESTAMP '2013-11-08 12:11:31.123123 Europe/Zurich' ORDER BY EVENT_TIMESTAMP
 ```
+
+The configuration parameters ".scaleAwareNumeric" and ".expandBigFloats" have influence on the output of reader.
+
+If ".scaleAwareNumeric" is enabled, the reader checks the scale of NUMERIC/NUMBER types, and if it is 0, it will treat the type as an integer value. This means that a number like `1234` will show up as `1234` instead of `1234.0` in the output.
+
+The parameter ".expandBigFloats" changes the output of floating-point types when enabled. A number as `2245245222.222` will be displayed as `2.245245222222E9` in a JSON event by default. When this parameter is enabled, the output will change to `2245245222.222`.
 
 ### duplicatedEventsProcessor in JDBCSource
 
