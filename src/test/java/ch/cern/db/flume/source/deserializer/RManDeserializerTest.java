@@ -100,6 +100,9 @@ public class RManDeserializerTest {
 		
 		File file = new File("src/test/resources/rman-logs/level_arch_newdisk.edhp_rac51.05042016_0531");
 		
+		if(!file.exists())
+			return;
+		
 		File metaFile = new File("src/test/resources/RManDeserializerTest.metafile");
 		
 		PositionTracker tracker = DurablePositionTracker.getInstance(metaFile, file.getAbsolutePath());

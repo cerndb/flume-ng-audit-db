@@ -181,6 +181,7 @@ public class SpoolDirectorySource extends AbstractSource implements Configurable
 
 		// "Hack" to support backwards compatibility with previous generation of
 		// spooling directory source, which did not support deserializers
+		@SuppressWarnings("deprecation")
 		Integer bufferMaxLineLength = context.getInteger(BUFFER_MAX_LINE_LENGTH);
 		if (bufferMaxLineLength != null && deserializerType != null
 				&& deserializerType.equalsIgnoreCase(DEFAULT_DESERIALIZER)) {

@@ -9,14 +9,7 @@
 package ch.cern.db.flume.source.deserializer;
 
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.flume.Context;
 import org.apache.flume.Event;
@@ -24,8 +17,6 @@ import org.apache.flume.annotations.InterfaceAudience;
 import org.apache.flume.annotations.InterfaceStability;
 import org.apache.flume.serialization.EventDeserializer;
 import org.apache.flume.serialization.ResettableInputStream;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
@@ -33,7 +24,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import ch.cern.db.flume.JSONEvent;
-import ch.cern.db.utils.SUtils;
+import ch.cern.db.utils.Pair;
 
 /**
  * A deserializer that parses text lines from a file.
@@ -41,8 +32,6 @@ import ch.cern.db.utils.SUtils;
 @InterfaceAudience.Private
 @InterfaceStability.Evolving
 public class RManDeserializer implements EventDeserializer {
-
-	private static final Logger logger = LoggerFactory.getLogger(RManDeserializer.class);
 
 	private final ResettableInputStream in;
 	private final int maxLineLength;
@@ -53,14 +42,6 @@ public class RManDeserializer implements EventDeserializer {
 
 	public static final String MAXLINE_KEY = "maxLineLength";
 	public static final int MAXLINE_DFLT = 2048;
-
-	private static final DateFormat dateFormatter = new SimpleDateFormat("'['EEE MMM dd HH:mm:ss z yyyy']'");
-	
-	private static final Pattern propertyPattern = Pattern.compile("^([A-z,0-9]+)[ ]+=[ ]+(.+)");
-	private static final Pattern ORAPattern = Pattern.compile("^[ ]?ORA-\\d{5}[:][ ].*");
-	private static final Pattern RMANPattern = Pattern.compile("^[ ]?RMAN-\\d{5}[:][ ].*");
-	private static final Pattern getJsonPattern = Pattern.compile("(?s).*(\\{.*?\\}).*");
-	private static final Pattern emptyLinePattern = Pattern.compile("^\\s*$");
 	
 	RManDeserializer(Context context, ResettableInputStream in) {
 		this.in = in;
@@ -78,80 +59,51 @@ public class RManDeserializer implements EventDeserializer {
 	public Event readEvent() throws IOException {
 		ensureOpen();
 		
+		RManagerFile rman_log = new RManagerFile(in, maxLineLength);
+		
 		JSONEvent event = new JSONEvent();
-		
-		List<String> lines = readAllLines();
-		
-		String[] fieldsFirstLine = SUtils.grep(lines, "^\\[.*").get(0).split("\\s+(?![^\\[]*\\])");
-		
-		Date startTimestamp = null;
-		try {
-			startTimestamp = (Date) dateFormatter.parse(fieldsFirstLine[0]);
-		} catch (ParseException e) {
-			logger.error("When parsing timestamp: " + fieldsFirstLine[0], e);
-		}
-		event.addProperty("startTimestamp", startTimestamp);
-		
-		String backupType = fieldsFirstLine[1];
-		event.addProperty("backupType", backupType);
-		
-		String entityNmae = fieldsFirstLine[2];
-		event.addProperty("entityNmae", entityNmae);
+
+		event.addProperty("startTimestamp", rman_log.getStartTimestamp());
+		event.addProperty("backupType", rman_log.getBackupType());
+		event.addProperty("entityNmae", rman_log.getEntityName());
 		
 		//Process properties like (name = value)
-		for (String line : lines) {
-			Matcher m = propertyPattern.matcher(line);
-			
-			if(m.find())
-				event.addProperty(m.group(1), m.group(2));
-		}
+		for (Pair<String, String> property : rman_log.getProperties())
+			event.addProperty(property.getFirst(), property.getSecond());
 		
 		//Process RMAN-XXXXX
-		JsonArray rmanErrors = new JsonArray();
-		for (String line : SUtils.grep(lines, RMANPattern)) {
-			JsonObject element = new JsonObject();
-			String[] splitted = line.trim().split(":", 2);
-			
-			element.addProperty("id", Integer.valueOf(splitted[0].split("-")[1]));
-			element.addProperty("message", splitted[1]);
-			
-			rmanErrors.add(element);
-		}
-		event.addProperty("RMAN-", rmanErrors);
+		event.addProperty("RMAN-", toJSON(rman_log.getRMANs()));
 		
 		//Process ORA-XXXXX
-		JsonArray oraErrors = new JsonArray();
-		for (String line : SUtils.grep(lines, ORAPattern)) {
-			JsonObject element = new JsonObject();
-			String[] splitted = line.trim().split(":", 2);
-				
-			element.addProperty("id", Integer.valueOf(splitted[0].split("-")[1]));
-			element.addProperty("message", splitted[1]);
-				
-			oraErrors.add(element);
-		}
-		event.addProperty("ORA-", oraErrors);
+		event.addProperty("ORA-", toJSON(rman_log.getORAs()));
 		
-		event.addProperty("v_params", getJsonObject(lines, "Main: params passed: \\$v_params"));  
-		event.addProperty("mountPointNASRegex.result", 
-				getJsonObject(lines, "RunTime\\.GetMountPointNASRegex : result: \\$VAR1"));
-		event.addProperty("volInfoBackuptoDisk.finalResult", 
-				getJsonObject(lines, "RunTime\\.GetVolInfoBackuptoDisk : final result \\$VAR1"));
+		String v_params = rman_log.getVParams();
+		event.addProperty("v_params", v_params != null ? new JsonParser().parse(v_params).getAsJsonObject() : null);
+		
+		String mountPointNASRegexResult = rman_log.getMountPointNASRegexResult();
+		event.addProperty("mountPointNASRegex.result", mountPointNASRegexResult != null ?
+				new JsonParser().parse(mountPointNASRegexResult).getAsJsonObject() : null);
+		
+		String volInfoBackuptoDiskFinalResult = rman_log.getVolInfoBackuptoDiskFinalResult();
+		event.addProperty("volInfoBackuptoDisk.finalResult", volInfoBackuptoDiskFinalResult != null ?
+				new JsonParser().parse(volInfoBackuptoDiskFinalResult).getAsJsonObject() : null);
 
 		return event;
 	}
 
-	private JsonObject getJsonObject(List<String> lines, String regex) {
-		List<String> getMountPointNASRegexlines = SUtils.linesFromTo(lines, 
-				Pattern.compile(".*" + regex + ".*"), 
-				emptyLinePattern);
+	private JsonArray toJSON(List<Pair<Integer, String>> list) {
+		JsonArray array = new JsonArray();
 		
-		Matcher matcher = getJsonPattern.matcher(SUtils.join(getMountPointNASRegexlines, '\n'));
+		for (Pair<Integer, String> rmanError : list) {
+			JsonObject element = new JsonObject();
+			
+			element.addProperty("id", rmanError.getFirst());
+			element.addProperty("message", rmanError.getSecond()); 
+			
+			array.add(element);
+		}
 		
-		if(matcher.matches())
-			return new JsonParser().parse(matcher.group(1)).getAsJsonObject();
-		
-		return null;
+		return array;
 	}
 
 	/**
@@ -201,47 +153,6 @@ public class RManDeserializer implements EventDeserializer {
 		}
 	}
 	
-	private List<String> readAllLines() throws IOException {
-		List<String> lines = new LinkedList<>();
-		
-		String line = readLine();
-		while(line != null){
-			lines.add(line);
-			line = readLine();
-		}
-		
-		return lines;
-	}
-
-	// TODO: consider not returning a final character that is a high surrogate
-	// when truncating
-	private String readLine() throws IOException {
-		StringBuilder sb = new StringBuilder();
-		int c;
-		int readChars = 0;
-		while ((c = in.readChar()) != -1) {
-			readChars++;
-
-			// FIXME: support \r\n
-			if (c == '\n') {
-				break;
-			}
-
-			sb.append((char) c);
-
-			if (readChars >= maxLineLength) {
-				logger.warn("Line length exceeds max ({}), truncating line!", maxLineLength);
-				break;
-			}
-		}
-
-		if (readChars > 0) {
-			return sb.toString();
-		} else {
-			return null;
-		}
-	}
-
 	public static class Builder implements EventDeserializer.Builder {
 
 		@Override
