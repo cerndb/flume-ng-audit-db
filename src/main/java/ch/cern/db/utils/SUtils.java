@@ -8,6 +8,7 @@
  */
 package ch.cern.db.utils;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -70,6 +71,32 @@ public class SUtils {
 		}
 		
 		return sb.toString();
+	}
+
+	public static List<String> linesFrom(List<String> linesClone, Pattern pattern) {
+		List<String> returnLines = new LinkedList<>();
+		
+		Iterator<String> it = linesClone.iterator();
+		
+		while (it.hasNext()){
+			String line = it.next();
+			
+			if(pattern.matcher(line).matches()){
+				break;
+			}
+		}
+		
+		while (it.hasNext()){
+			String line = it.next();
+			
+			returnLines.add(line);
+		}
+		
+		return returnLines;	
+	}
+
+	public static List<String> toLines(String in) {
+		return Arrays.asList(in.split("\n"));
 	}
 	
 }

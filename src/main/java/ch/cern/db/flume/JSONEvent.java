@@ -9,7 +9,6 @@
 
 package ch.cern.db.flume;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,9 +19,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import ch.cern.db.utils.JSONUtils;
+
 public class JSONEvent implements Event{
-	
-	private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:SSZ");
 	
 	private Map<String, String> headers;
 	private JsonObject json;
@@ -44,7 +43,7 @@ public class JSONEvent implements Event{
 	
 	public void addProperty(String name, Object value){
 		if(value instanceof Date){
-			json.addProperty(name, dateFormat.format((Date) value));
+			json.addProperty(name, JSONUtils.to((Date) value));
 		}else if(value instanceof Number){
 			json.addProperty(name, (Number) value);
 		}else if(value instanceof Boolean){

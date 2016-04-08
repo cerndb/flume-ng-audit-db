@@ -24,6 +24,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import ch.cern.db.flume.JSONEvent;
+import ch.cern.db.utils.JSONUtils;
 import ch.cern.db.utils.Pair;
 
 /**
@@ -65,17 +66,11 @@ public class RManDeserializer implements EventDeserializer {
 
 		event.addProperty("startTimestamp", rman_log.getStartTimestamp());
 		event.addProperty("backupType", rman_log.getBackupType());
-		event.addProperty("entityNmae", rman_log.getEntityName());
+		event.addProperty("entityName", rman_log.getEntityName());
 		
 		//Process properties like (name = value)
 		for (Pair<String, String> property : rman_log.getProperties())
 			event.addProperty(property.getFirst(), property.getSecond());
-		
-		//Process RMAN-XXXXX
-		event.addProperty("RMAN-", toJSON(rman_log.getRMANs()));
-		
-		//Process ORA-XXXXX
-		event.addProperty("ORA-", toJSON(rman_log.getORAs()));
 		
 		String v_params = rman_log.getVParams();
 		event.addProperty("v_params", v_params != null ? new JsonParser().parse(v_params).getAsJsonObject() : null);
@@ -87,8 +82,30 @@ public class RManDeserializer implements EventDeserializer {
 		String volInfoBackuptoDiskFinalResult = rman_log.getVolInfoBackuptoDiskFinalResult();
 		event.addProperty("volInfoBackuptoDisk.finalResult", volInfoBackuptoDiskFinalResult != null ?
 				new JsonParser().parse(volInfoBackuptoDiskFinalResult).getAsJsonObject() : null);
+		
+		List<RecoveryManagerReport> recoveryManagerReports = rman_log.getRecoveryManagerReports();
+		event.addProperty("recoveryManagerReports", recoveryManagerReportsToJSON(recoveryManagerReports));
 
 		return event;
+	}
+
+	private JsonArray recoveryManagerReportsToJSON(List<RecoveryManagerReport> recoveryManagerReports) {
+		JsonArray array = new JsonArray();
+		
+		for (RecoveryManagerReport recoveryManagerReport : recoveryManagerReports) {
+			JsonObject element = new JsonObject();
+			
+			element.addProperty("startingTime", JSONUtils.to(recoveryManagerReport.getStartingTime()));
+			
+			List<Pair<Integer, String>> rmans = recoveryManagerReport.getRMANs();
+			element.add("RMAN-", toJSON(rmans));
+			element.add("ORA-", toJSON(recoveryManagerReport.getORAs())); 
+			element.addProperty("status", rmans.size() == 0 ? "Successful" : "Failed");
+			
+			array.add(element);
+		}
+		
+		return array;
 	}
 
 	private JsonArray toJSON(List<Pair<Integer, String>> list) {

@@ -27,17 +27,16 @@ public class RManagerFile {
 	private static final DateFormat dateFormatter = new SimpleDateFormat("'['EEE MMM dd HH:mm:ss z yyyy']'");
 	
 	private static final Pattern propertyPattern = Pattern.compile("^([A-z,0-9]+)[ ]+=[ ]+(.+)");
-	private static final Pattern ORAPattern = Pattern.compile("^[ ]?ORA-\\d{5}[:][ ].*");
-	private static final Pattern RMANPattern = Pattern.compile("^[ ]?RMAN-\\d{5}[:][ ].*");
-	private static final Pattern getJsonPattern = Pattern.compile("(?s).*(\\{.*?\\}).*");
+	private static final Pattern getJsonPattern = Pattern.compile("(?s)[^\\{]*(\\{.*\\})[^\\}]*");
 	private static final Pattern emptyLinePattern = Pattern.compile("^\\s*$");
+	private static final Pattern resourceManagerStartsPattern = Pattern.compile(".*Recovery Manager: Release.*");
+	private static final Pattern resourceManagerEndsPattern = Pattern.compile(".*Recovery Manager complete.*");
 	
 	public RManagerFile(ResettableInputStream in, int maxLineLength) throws IOException {
 		this.maxLineLength = maxLineLength;
 		
 		lines = readAllLines(in);
 	}
-
 
 	private List<String> readAllLines(ResettableInputStream in) throws IOException {
 		List<String> lines = new LinkedList<>();
@@ -127,36 +126,12 @@ public class RManagerFile {
 		return properties;
 	}
 
-	public List<Pair<Integer, String>> getORAs() {
-		List<Pair<Integer, String>> list = new LinkedList<>();
-		
-		for (String line : SUtils.grep(lines, ORAPattern)) {
-			String[] splitted = line.trim().split(":", 2);
-				
-			list.add(new Pair<Integer, String>(Integer.valueOf(splitted[0].split("-")[1]), splitted[1]));
-		}
-		
-		return list;
-	}
-
-	public List<Pair<Integer, String>> getRMANs() {
-		List<Pair<Integer, String>> list = new LinkedList<>();
-		
-		for (String line : SUtils.grep(lines, RMANPattern)) {
-			String[] splitted = line.trim().split(":", 2);
-				
-			list.add(new Pair<Integer, String>(Integer.valueOf(splitted[0].split("-")[1]), splitted[1]));
-		}
-		
-		return list;
-	}
-
 	public String getJSONString(String regex) {
-		List<String> getMountPointNASRegexlines = SUtils.linesFromTo(lines, 
+		List<String> regexLines = SUtils.linesFromTo(lines, 
 				Pattern.compile(".*" + regex + ".*"), 
 				emptyLinePattern);
 		
-		Matcher matcher = getJsonPattern.matcher(SUtils.join(getMountPointNASRegexlines, '\n'));
+		Matcher matcher = getJsonPattern.matcher(SUtils.join(regexLines, '\n'));
 		
 		if(matcher.matches())
 			return matcher.group(1);
@@ -174,5 +149,47 @@ public class RManagerFile {
 
 	public String getVolInfoBackuptoDiskFinalResult() {
 		return getJSONString("RunTime\\.GetVolInfoBackuptoDisk : final result \\$VAR1");
+	}
+
+	public String getValuesOfFilesystems() {
+		return getJSONString("values of filesystems \\$filesystems");
+	}
+
+	public String getCreateFilesBackupset() {
+		return getJSONString("CreateFiles: begin: array of backupset \\$VAR1");
+	}
+	
+	public List<String> getRecoveryManagerOutputs(){
+		List<String> recoveryManagerOutputs = new LinkedList<String>();
+		
+		@SuppressWarnings("unchecked")
+		List<String> linesClone = (LinkedList<String>) ((LinkedList<String>) lines).clone();
+		
+		List<String> regexLines = SUtils.linesFromTo(linesClone, 
+				resourceManagerStartsPattern , 
+				resourceManagerEndsPattern);
+		
+		while(regexLines.size() > 0){
+			recoveryManagerOutputs.add(SUtils.join(regexLines, '\n'));
+			
+			linesClone = SUtils.linesFrom(linesClone, resourceManagerEndsPattern);
+			
+			regexLines = SUtils.linesFromTo(linesClone, 
+					resourceManagerStartsPattern, 
+					resourceManagerEndsPattern);
+		}
+		
+		return recoveryManagerOutputs;
+	}
+
+	public List<RecoveryManagerReport> getRecoveryManagerReports() {
+		List<String> recoveryManagerOutputs = getRecoveryManagerOutputs();
+	
+		List<RecoveryManagerReport> reports = new LinkedList<>();
+		
+		for (String recoveryManagerOutput : recoveryManagerOutputs)
+			reports.add(new RecoveryManagerReport(recoveryManagerOutput));
+		
+		return reports;
 	}
 }
