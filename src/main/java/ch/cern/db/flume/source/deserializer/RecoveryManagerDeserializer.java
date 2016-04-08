@@ -32,7 +32,7 @@ import ch.cern.db.utils.Pair;
  */
 @InterfaceAudience.Private
 @InterfaceStability.Evolving
-public class RManDeserializer implements EventDeserializer {
+public class RecoveryManagerDeserializer implements EventDeserializer {
 
 	private final ResettableInputStream in;
 	private final int maxLineLength;
@@ -44,7 +44,7 @@ public class RManDeserializer implements EventDeserializer {
 	public static final String MAXLINE_KEY = "maxLineLength";
 	public static final int MAXLINE_DFLT = 2048;
 	
-	RManDeserializer(Context context, ResettableInputStream in) {
+	RecoveryManagerDeserializer(Context context, ResettableInputStream in) {
 		this.in = in;
 		this.maxLineLength = context.getInteger(MAXLINE_KEY, MAXLINE_DFLT);
 		this.isOpen = true;
@@ -60,7 +60,7 @@ public class RManDeserializer implements EventDeserializer {
 	public Event readEvent() throws IOException {
 		ensureOpen();
 		
-		RManagerFile rman_log = new RManagerFile(in, maxLineLength);
+		RecoveryManagerLogFile rman_log = new RecoveryManagerLogFile(in, maxLineLength);
 		
 		JSONEvent event = new JSONEvent();
 
@@ -100,6 +100,9 @@ public class RManDeserializer implements EventDeserializer {
 			List<Pair<Integer, String>> rmans = recoveryManagerReport.getRMANs();
 			element.add("RMAN-", toJSON(rmans));
 			element.add("ORA-", toJSON(recoveryManagerReport.getORAs())); 
+			
+			element.addProperty("finishTime", JSONUtils.to(recoveryManagerReport.getFinishTime()));
+			element.addProperty("returnCode", recoveryManagerReport.getReturnCode());
 			element.addProperty("status", rmans.size() == 0 ? "Successful" : "Failed");
 			
 			array.add(element);
@@ -174,7 +177,7 @@ public class RManDeserializer implements EventDeserializer {
 
 		@Override
 		public EventDeserializer build(Context context, ResettableInputStream in) {
-			return new RManDeserializer(context, in);
+			return new RecoveryManagerDeserializer(context, in);
 		}
 
 	}

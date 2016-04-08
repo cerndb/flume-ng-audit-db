@@ -98,5 +98,22 @@ public class SUtils {
 	public static List<String> toLines(String in) {
 		return Arrays.asList(in.split("\n"));
 	}
+
+	public static List<String> linesBefore(List<String> lines, Pattern pattern, int number) {
+		LimitedQueue<String> returnLines = new LimitedQueue<String>(number);
+		
+		Iterator<String> it = lines.iterator();
+		
+		while (it.hasNext()){
+			String line = it.next();
+			
+			if(pattern.matcher(line).matches())
+				break;
+			
+			returnLines.add(line);
+		}
+		
+		return returnLines;	
+	}
 	
 }

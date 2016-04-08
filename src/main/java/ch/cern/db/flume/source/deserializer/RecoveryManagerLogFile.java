@@ -16,9 +16,9 @@ import org.slf4j.LoggerFactory;
 import ch.cern.db.utils.Pair;
 import ch.cern.db.utils.SUtils;
 
-public class RManagerFile {
+public class RecoveryManagerLogFile {
 
-	private static final Logger logger = LoggerFactory.getLogger(RManagerFile.class);
+	private static final Logger logger = LoggerFactory.getLogger(RecoveryManagerLogFile.class);
 	
 	private List<String> lines;
 
@@ -32,7 +32,7 @@ public class RManagerFile {
 	private static final Pattern resourceManagerStartsPattern = Pattern.compile(".*Recovery Manager: Release.*");
 	private static final Pattern resourceManagerEndsPattern = Pattern.compile(".*Recovery Manager complete.*");
 	
-	public RManagerFile(ResettableInputStream in, int maxLineLength) throws IOException {
+	public RecoveryManagerLogFile(ResettableInputStream in, int maxLineLength) throws IOException {
 		this.maxLineLength = maxLineLength;
 		
 		lines = readAllLines(in);
@@ -166,11 +166,14 @@ public class RManagerFile {
 		List<String> linesClone = (LinkedList<String>) ((LinkedList<String>) lines).clone();
 		
 		List<String> regexLines = SUtils.linesFromTo(linesClone, 
-				resourceManagerStartsPattern , 
+				resourceManagerStartsPattern, 
 				resourceManagerEndsPattern);
 		
 		while(regexLines.size() > 0){
-			recoveryManagerOutputs.add(SUtils.join(regexLines, '\n'));
+			List<String> prevLines = SUtils.linesBefore(linesClone, resourceManagerStartsPattern, 3);
+			prevLines.addAll(regexLines);
+			
+			recoveryManagerOutputs.add(SUtils.join(prevLines, '\n'));
 			
 			linesClone = SUtils.linesFrom(linesClone, resourceManagerEndsPattern);
 			

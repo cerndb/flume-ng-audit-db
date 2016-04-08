@@ -53,7 +53,7 @@ public class RManDeserializerTest {
 		PositionTracker tracker = DurablePositionTracker.getInstance(metaFile, file.getAbsolutePath());
 		ResettableInputStream in = new ResettableFileInputStream(file, tracker);
 		
-		RManDeserializer des = (RManDeserializer) new RManDeserializer.Builder().build(new Context(), in);
+		RecoveryManagerDeserializer des = (RecoveryManagerDeserializer) new RecoveryManagerDeserializer.Builder().build(new Context(), in);
 	
 		Event event = des.readEvent();
 		JSONObject json = null;
@@ -93,7 +93,7 @@ public class RManDeserializerTest {
 		PositionTracker tracker = DurablePositionTracker.getInstance(metaFile, file.getAbsolutePath());
 		ResettableInputStream in = new ResettableFileInputStream(file, tracker);
 		
-		RManDeserializer des = (RManDeserializer) new RManDeserializer.Builder().build(new Context(), in);
+		RecoveryManagerDeserializer des = (RecoveryManagerDeserializer) new RecoveryManagerDeserializer.Builder().build(new Context(), in);
 	
 		Event event = des.readEvent();
 		JSONObject json = null;
@@ -127,7 +127,7 @@ public class RManDeserializerTest {
 		PositionTracker tracker = DurablePositionTracker.getInstance(metaFile, file.getAbsolutePath());
 		ResettableInputStream in = new ResettableFileInputStream(file, tracker);
 		
-		RManDeserializer des = (RManDeserializer) new RManDeserializer.Builder().build(new Context(), in);
+		RecoveryManagerDeserializer des = (RecoveryManagerDeserializer) new RecoveryManagerDeserializer.Builder().build(new Context(), in);
 	
 		Event event = des.readEvent();
 		JSONObject json = null;
