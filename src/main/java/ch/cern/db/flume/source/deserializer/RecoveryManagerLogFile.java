@@ -17,6 +17,19 @@ import ch.cern.db.utils.Pair;
 import ch.cern.db.utils.SUtils;
 
 public class RecoveryManagerLogFile {
+	
+	public enum BackDestination{
+		DISK,
+//		level_1D_newdisk_noarch
+//		level_arch_newdisk
+		
+		TAPE,
+//		level_EXEC_BACKUPSET_A
+//		level_EXEC_BACKUPSET_F
+		
+		SNAPSHOT
+//		level_EXEC_SNAP
+	}
 
 	private static final Logger logger = LoggerFactory.getLogger(RecoveryManagerLogFile.class);
 	
@@ -194,5 +207,20 @@ public class RecoveryManagerLogFile {
 			reports.add(new RecoveryManagerReport(recoveryManagerOutput));
 		
 		return reports;
+	}
+
+	public BackDestination getBackupDestination() {
+		String backupType = getBackupType(); 
+
+		if(backupType.contains("newdisk"))
+			return BackDestination.DISK;
+		
+		if(backupType.contains("BACKUPSET"))
+			return BackDestination.TAPE;
+		
+		if(backupType.contains("SNAP"))
+			return BackDestination.SNAPSHOT;
+		
+		return null;
 	}
 }

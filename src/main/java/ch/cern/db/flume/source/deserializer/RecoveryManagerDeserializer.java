@@ -66,6 +66,7 @@ public class RecoveryManagerDeserializer implements EventDeserializer {
 
 		event.addProperty("startTimestamp", rman_log.getStartTimestamp());
 		event.addProperty("backupType", rman_log.getBackupType());
+		event.addProperty("destiantion", rman_log.getBackupDestination());
 		event.addProperty("entityName", rman_log.getEntityName());
 		
 		//Process properties like (name = value)
