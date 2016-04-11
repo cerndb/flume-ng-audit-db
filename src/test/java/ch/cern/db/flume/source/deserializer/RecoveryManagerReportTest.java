@@ -8,144 +8,76 @@
  */
 package ch.cern.db.flume.source.deserializer;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-
-import org.apache.flume.Context;
-import org.apache.flume.Event;
-import org.apache.flume.serialization.DurablePositionTracker;
-import org.apache.flume.serialization.PositionTracker;
-import org.apache.flume.serialization.ResettableFileInputStream;
-import org.apache.flume.serialization.ResettableInputStream;
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
 import org.junit.Assert;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.List;
+
 import org.junit.Test;
 
-public class RecoveryManagerReportTest {
+import ch.cern.db.utils.Pair;
+
+public class RecoveryManagerReportTest extends Assert {
 
 	@Test
-	public void parse() throws IOException{
+	public void successfulReport() throws IOException{
+		String input = readFile("src/test/resources/rman-reports/successful.out");
+		RecoveryManagerReport report = new RecoveryManagerReport(input);
 		
-		File file = new File("src/test/resources/RManDeserializerTest.tmp");
+		assertEquals("Tue Apr 05 05:31:54 CEST 2016", report.getStartingTime().toString());
+		assertEquals(0, report.getORAs().size());
+		assertEquals(0, report.getRMANs().size());
+		assertNull(report.getReturnCode());
+		assertEquals("Tue Apr 05 05:32:16 CEST 2016", report.getFinishTime().toString());
 		
-		PrintWriter writer = new PrintWriter(file, "UTF-8");
-		writer.println("[Wed Jan 27 18:29:03 CET 2016] level_EXEC_BACKUPSET_A edhp_rac51 itrac5105 EDHP1");
-		writer.println("find: `/ORA/dbs01/syscontrol/local/logs/rman/level_arch0_newdisk.timtst_rac13.21012016_1827': No such file or dire");
-		writer.println("[Wed Jan 27 18:29:03 CET 2016] level_EXEC_BACKUPSET_A edhp_rac51 itrac5105 EDHP1 removing logs : ");
-		writer.println("rmanHost                = itrac5105");
-		writer.println("parallelConfFile        = /ORA/dbs01/syscontrol/projects/rman/etc/rmanActionsArch01.conf");
-		writer.println("rmanHost                = itracABCD");
-		writer.println("tabxmlTsmServer         = TSM514_ORA");
-		writer.println("remoteTsmServer         = TSM514_ORA");
-		writer.println("tabxmlTDPONode          = edhp");
-		writer.println("remoteTDPONode          = edhp_ora");
-		writer.println(" RMAN-03009: failure of backup command on ORA_SBT_TAPE_1 channel at 01/27/2016 18:56:50");
-		writer.println(" ORA-27028: skgfqcre: sbtbackup returned error");
-		writer.println("ORA-19511: Error received from media manager layer, error text:");
-		writer.println("    ANS1017E (RC-50)  Session rejected: TCP/IP connection failure.");
-		writer.println("RMAN-00569: =============== ERROR MESSAGE STACK FOLLOWS ===============");
-		writer.close();
-	    
-		File metaFile = new File("src/test/resources/RManDeserializerTest.metafile");
-		
-		PositionTracker tracker = DurablePositionTracker.getInstance(metaFile, file.getAbsolutePath());
-		ResettableInputStream in = new ResettableFileInputStream(file, tracker);
-		
-		RecoveryManagerDeserializer des = (RecoveryManagerDeserializer) new RecoveryManagerDeserializer.Builder().build(new Context(), in);
-	
-		Event event = des.readEvent();
-		JSONObject json = null;
-		try {
-			json = new JSONObject(new String(event.getBody()));
-			
-			Assert.assertEquals("2016-01-27T18:29:00+0100", json.get("startTimestamp"));
-			Assert.assertEquals("level_EXEC_BACKUPSET_A", json.get("backupType"));
-			Assert.assertEquals("edhp_rac51", json.get("entityName"));
-			Assert.assertEquals("itracABCD", json.get("rmanHost"));
-			Assert.assertEquals("/ORA/dbs01/syscontrol/projects/rman/etc/rmanActionsArch01.conf", 
-					json.get("parallelConfFile"));
-			Assert.assertEquals("TSM514_ORA", json.get("tabxmlTsmServer"));
-			Assert.assertEquals("TSM514_ORA", json.get("remoteTsmServer"));
-			Assert.assertEquals("edhp", json.get("tabxmlTDPONode"));
-			Assert.assertEquals("edhp_ora", json.get("remoteTDPONode"));
-		
-		} catch (JSONException e) {
-			e.printStackTrace();
-			Assert.fail();
-		}
-
-		file.delete();
-		metaFile.delete();
 	}
-	
+
 	@Test
-	public void parseFromSuccesfulFile() throws IOException{
+	public void failedReport() throws IOException{
+		String input = readFile("src/test/resources/rman-reports/failed.out");
+		RecoveryManagerReport report = new RecoveryManagerReport(input);
 		
-		File file = new File("src/test/resources/rman-logs/level_arch_newdisk.edhp_rac51.05042016_0531");
+		assertEquals("Wed Jan 27 18:45:27 CET 2016", report.getStartingTime().toString());
 		
-		if(!file.exists())
-			return;
+		List<Pair<Integer, String>> oras = report.getORAs();
+		assertEquals(3, oras.size());
+		assertEquals(27028, oras.get(0).getFirst(), 0);
+		assertEquals("skgfqcre: sbtbackup returned error", oras.get(0).getSecond());
+		assertEquals(19511, oras.get(1).getFirst(), 0);
+		assertEquals("Error received from media manager layer, error text:", oras.get(1).getSecond());
+		assertEquals(19600, oras.get(2).getFirst(), 0);
+		assertEquals("input file is backup piece  (/backup/dbs01/EDHP/EDHP_20160127_scqsd839_1_1_arch)", oras.get(2).getSecond());
 		
-		File metaFile = new File("src/test/resources/RManDeserializerTest.metafile");
+		List<Pair<Integer, String>> rmans = report.getRMANs();
+		assertEquals(2, rmans.size());
+		assertEquals(3009, rmans.get(0).getFirst(), 0);
+		assertEquals("failure of backup command on ORA_SBT_TAPE_1 channel at 01/27/2016 18:51:08", rmans.get(0).getSecond());
+		assertEquals(569, rmans.get(1).getFirst(), 0);
+		assertEquals("=============== ERROR MESSAGE STACK FOLLOWS ===============", rmans.get(1).getSecond());
 		
-		PositionTracker tracker = DurablePositionTracker.getInstance(metaFile, file.getAbsolutePath());
-		ResettableInputStream in = new ResettableFileInputStream(file, tracker);
-		
-		RecoveryManagerDeserializer des = (RecoveryManagerDeserializer) new RecoveryManagerDeserializer.Builder().build(new Context(), in);
-	
-		Event event = des.readEvent();
-		JSONObject json = null;
-		try {
-			json = new JSONObject(new String(event.getBody()));
-			
-			Assert.assertEquals("2016-04-05T05:31:00+0200", json.get("startTimestamp"));
-			Assert.assertEquals("level_arch_newdisk", json.get("backupType"));
-			Assert.assertEquals("edhp_rac51", json.get("entityName"));
-			
-		} catch (JSONException e) {
-			e.printStackTrace();
-			Assert.fail();
-		}
-		
-		System.out.println(json);
-
-		metaFile.delete();
+		assertEquals(256, report.getReturnCode(), 0);
+		assertEquals("Wed Jan 27 18:51:10 CET 2016", report.getFinishTime().toString());
 	}
 	
-	@Test
-	public void parseFromFailedFile() throws IOException{
+	private String readFile(String input_file) throws IOException {
+		BufferedReader br = new BufferedReader(new FileReader(input_file));
 		
-		File file = new File("src/test/resources/rman-logs/level_EXEC_BACKUPSET_A.edhp_rac51.27012016_1829");
-		
-		if(!file.exists())
-			return;
-		
-		File metaFile = new File("src/test/resources/RManDeserializerTest.metafile");
-		
-		PositionTracker tracker = DurablePositionTracker.getInstance(metaFile, file.getAbsolutePath());
-		ResettableInputStream in = new ResettableFileInputStream(file, tracker);
-		
-		RecoveryManagerDeserializer des = (RecoveryManagerDeserializer) new RecoveryManagerDeserializer.Builder().build(new Context(), in);
-	
-		Event event = des.readEvent();
-		JSONObject json = null;
 		try {
-			json = new JSONObject(new String(event.getBody()));
-			
-			Assert.assertEquals("2016-01-27T18:29:00+0100", json.get("startTimestamp"));
-			Assert.assertEquals("level_EXEC_BACKUPSET_A", json.get("backupType"));
-			Assert.assertEquals("edhp_rac51", json.get("entityName"));
-			
-		} catch (JSONException e) {
-			e.printStackTrace();
-			Assert.fail();
+		    StringBuilder sb = new StringBuilder();
+		    String line = br.readLine();
+
+		    while (line != null) {
+		        sb.append(line);
+		        sb.append(System.lineSeparator());
+		        line = br.readLine();
+		    }
+		    
+		    return sb.toString();
+		} finally {
+		    br.close();
 		}
-		
-		System.out.println(json);
-
-		metaFile.delete();
 	}
-
+	
 }

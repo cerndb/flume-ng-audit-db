@@ -2,6 +2,7 @@ package ch.cern.db.utils;
 
 import java.util.LinkedList;
 
+@SuppressWarnings("serial")
 public class LimitedQueue<E> extends LinkedList<E> {
 
     private int limit;

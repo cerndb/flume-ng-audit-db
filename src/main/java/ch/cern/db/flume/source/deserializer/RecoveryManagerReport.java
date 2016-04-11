@@ -44,7 +44,7 @@ public class RecoveryManagerReport {
 		for (String line : SUtils.grep(lines, RMANPattern)) {
 			String[] splitted = line.trim().split(":", 2);
 				
-			list.add(new Pair<Integer, String>(Integer.valueOf(splitted[0].split("-")[1]), splitted[1]));
+			list.add(new Pair<Integer, String>(Integer.valueOf(splitted[0].split("-")[1]), splitted[1].trim()));
 		}
 		
 		return list;
@@ -56,7 +56,7 @@ public class RecoveryManagerReport {
 		for (String line : SUtils.grep(lines, ORAPattern)) {
 			String[] splitted = line.trim().split(":", 2);
 				
-			list.add(new Pair<Integer, String>(Integer.valueOf(splitted[0].split("-")[1]), splitted[1]));
+			list.add(new Pair<Integer, String>(Integer.valueOf(splitted[0].split("-")[1]), splitted[1].trim()));
 		}
 		
 		return list;
