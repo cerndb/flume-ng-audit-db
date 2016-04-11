@@ -20,12 +20,19 @@ import java.util.regex.Pattern;
  *
  */
 public class SUtils {
-
-	public static List<String> grep(List<String> lines, String regex) {
-		return grep(lines, Pattern.compile(regex));
+	
+	public static final Pattern EMPTY_LINE_PATTERN = Pattern.compile("^\\s*$");
+	public static final Pattern PROPERTY_PATTERN = Pattern.compile("^([A-z,0-9]+)[ ]+=[ ]+(.+)");
+	
+	public static List<String> toLines(String in) {
+		return Arrays.asList(in.split("\n"));
 	}
 
-	public static List<String>  grep(List<String> lines, Pattern pattern) {
+	public static List<String> grep(List<String> lines, String regex) {
+		return grep(lines, Pattern.compile(".*" + regex + ".*"));
+	}
+
+	public static List<String> grep(List<String> lines, Pattern pattern) {
 		List<String> returnLines = new LinkedList<>();
 		
 		for (String line : lines)
@@ -82,6 +89,7 @@ public class SUtils {
 			String line = it.next();
 			
 			if(pattern.matcher(line).matches()){
+				returnLines.add(line);
 				break;
 			}
 		}
@@ -93,10 +101,6 @@ public class SUtils {
 		}
 		
 		return returnLines;	
-	}
-
-	public static List<String> toLines(String in) {
-		return Arrays.asList(in.split("\n"));
 	}
 
 	public static List<String> linesBefore(List<String> lines, Pattern pattern, int number) {

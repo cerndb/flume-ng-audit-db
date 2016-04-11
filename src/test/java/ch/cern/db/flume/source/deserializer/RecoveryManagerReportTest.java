@@ -23,7 +23,7 @@ import org.codehaus.jettison.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class RManDeserializerTest {
+public class RecoveryManagerReportTest {
 
 	@Test
 	public void parse() throws IOException{
@@ -36,7 +36,7 @@ public class RManDeserializerTest {
 		writer.println("[Wed Jan 27 18:29:03 CET 2016] level_EXEC_BACKUPSET_A edhp_rac51 itrac5105 EDHP1 removing logs : ");
 		writer.println("rmanHost                = itrac5105");
 		writer.println("parallelConfFile        = /ORA/dbs01/syscontrol/projects/rman/etc/rmanActionsArch01.conf");
-		writer.println("rmanHost                = itrac5105");
+		writer.println("rmanHost                = itracABCD");
 		writer.println("tabxmlTsmServer         = TSM514_ORA");
 		writer.println("remoteTsmServer         = TSM514_ORA");
 		writer.println("tabxmlTDPONode          = edhp");
@@ -63,7 +63,7 @@ public class RManDeserializerTest {
 			Assert.assertEquals("2016-01-27T18:29:00+0100", json.get("startTimestamp"));
 			Assert.assertEquals("level_EXEC_BACKUPSET_A", json.get("backupType"));
 			Assert.assertEquals("edhp_rac51", json.get("entityName"));
-			Assert.assertEquals("itrac5105", json.get("rmanHost"));
+			Assert.assertEquals("itracABCD", json.get("rmanHost"));
 			Assert.assertEquals("/ORA/dbs01/syscontrol/projects/rman/etc/rmanActionsArch01.conf", 
 					json.get("parallelConfFile"));
 			Assert.assertEquals("TSM514_ORA", json.get("tabxmlTsmServer"));

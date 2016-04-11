@@ -39,9 +39,7 @@ public class RecoveryManagerLogFile {
 	
 	private static final DateFormat dateFormatter = new SimpleDateFormat("'['EEE MMM dd HH:mm:ss z yyyy']'");
 	
-	private static final Pattern propertyPattern = Pattern.compile("^([A-z,0-9]+)[ ]+=[ ]+(.+)");
 	private static final Pattern getJsonPattern = Pattern.compile("(?s)[^\\{]*(\\{.*\\})[^\\}]*");
-	private static final Pattern emptyLinePattern = Pattern.compile("^\\s*$");
 	private static final Pattern resourceManagerStartsPattern = Pattern.compile(".*Recovery Manager: Release.*");
 	private static final Pattern resourceManagerEndsPattern = Pattern.compile(".*Recovery Manager complete.*");
 	
@@ -130,7 +128,7 @@ public class RecoveryManagerLogFile {
 		List<Pair<String, String>> properties = new LinkedList<>();
 
 		for (String line : lines) {
-			Matcher m = propertyPattern.matcher(line);
+			Matcher m = SUtils.PROPERTY_PATTERN.matcher(line);
 			
 			if(m.find())
 				properties.add(new Pair<String, String>(m.group(1), m.group(2)));
@@ -142,7 +140,7 @@ public class RecoveryManagerLogFile {
 	public String getJSONString(String regex) {
 		List<String> regexLines = SUtils.linesFromTo(lines, 
 				Pattern.compile(".*" + regex + ".*"), 
-				emptyLinePattern);
+				SUtils.EMPTY_LINE_PATTERN);
 		
 		Matcher matcher = getJsonPattern.matcher(SUtils.join(regexLines, '\n'));
 		
@@ -189,6 +187,7 @@ public class RecoveryManagerLogFile {
 			recoveryManagerOutputs.add(SUtils.join(prevLines, '\n'));
 			
 			linesClone = SUtils.linesFrom(linesClone, resourceManagerEndsPattern);
+			linesClone.remove(0);
 			
 			regexLines = SUtils.linesFromTo(linesClone, 
 					resourceManagerStartsPattern, 
