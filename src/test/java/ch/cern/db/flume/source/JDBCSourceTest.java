@@ -37,7 +37,7 @@ import org.junit.Test;
 import ch.cern.db.flume.source.JDBCSource;
 import ch.cern.db.flume.source.reader.ReliableJdbcEventReader;
 
-public class JDBCSourceTest{
+public class JDBCSourceTest extends Assert{
 
 	String connection_url = "jdbc:hsqldb:mem:aname";
 	Connection connection = null;
@@ -164,17 +164,23 @@ public class JDBCSourceTest{
 	    event = channel.take();
 	    Assert.assertNull(event);
 	    
+	    assertEquals(2, source.getCounters().getEventReceivedCount());
+	    assertEquals(2, source.getCounters().getEventAcceptedCount());
+	    
 	    channel.getTransaction().commit();
 	    channel.getTransaction().close();
 	    
 	    statement = connection.createStatement();
-		statement.execute("INSERT INTO audit_data_table VALUES 1, 48, 'should not loaded';");
+		statement.execute("INSERT INTO audit_data_table VALUES 1, 48, 'should not be loaded';");
 		statement.execute("INSERT INTO audit_data_table VALUES 2, 48, 'same delta, anyway it should be loaded';");
 		statement.execute("INSERT INTO audit_data_table VALUES 3, 48, 'greater delta, it should be loaded';");
 		statement.close();
 	    
 		Thread.sleep(500);
 		
+		assertEquals(4, source.getCounters().getEventReceivedCount());
+	    assertEquals(4, source.getCounters().getEventAcceptedCount());
+	    
 	    channel.getTransaction().begin();
 	    
 	    event = channel.take();

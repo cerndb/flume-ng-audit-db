@@ -17,9 +17,12 @@ import org.apache.flume.EventDeliveryException;
 import org.apache.flume.FlumeException;
 import org.apache.flume.PollableSource;
 import org.apache.flume.conf.Configurable;
+import org.apache.flume.instrumentation.SourceCounter;
 import org.apache.flume.source.AbstractSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.annotations.VisibleForTesting;
 
 import ch.cern.db.flume.source.reader.ReliableJdbcEventReader;
 
@@ -38,6 +41,8 @@ public class JDBCSource extends AbstractSource implements Configurable, Pollable
 	private ReliableJdbcEventReader reader;
 
 	private DropDuplicatedEventsProcessor duplicatedEventsProccesor;
+	
+	private SourceCounter sourceCounter;
 	
 	public JDBCSource() {
 		super();
@@ -75,6 +80,11 @@ public class JDBCSource extends AbstractSource implements Configurable, Pollable
 				duplicatedEventsProccesor = null;
 			}
 		}
+		
+		if (sourceCounter == null) {
+			sourceCounter = new SourceCounter(getName());
+			sourceCounter.start();
+		}
 	}
 	
 	@Override
@@ -89,6 +99,9 @@ public class JDBCSource extends AbstractSource implements Configurable, Pollable
 			if(duplicatedEventsProccesor != null)
 				events = duplicatedEventsProccesor.process(events);
 			
+			sourceCounter.addToEventReceivedCount(events.size());
+			sourceCounter.incrementAppendBatchReceivedCount();
+			
 			getChannelProcessor().processEventBatch(events);
 			
 			reader.commit();
@@ -97,6 +110,9 @@ public class JDBCSource extends AbstractSource implements Configurable, Pollable
 				duplicatedEventsProccesor.commit();
 			
 			LOG.info("Number of events produced: " + events.size());
+			
+			sourceCounter.addToEventAcceptedCount(events.size());
+			sourceCounter.incrementAppendBatchAcceptedCount();
 			
 			status = Status.READY;
 		}catch(Throwable e){
@@ -132,7 +148,12 @@ public class JDBCSource extends AbstractSource implements Configurable, Pollable
 			
 			if(duplicatedEventsProccesor != null)
 				duplicatedEventsProccesor.close();
-		} catch (IOException e){}
+			
+			sourceCounter.stop();
+		} catch (IOException e){
+		}
+		
+		LOG.info("JDBCSource {} stopped. Metrics: {}", getName(), sourceCounter);
 	}
 
 	@Override
@@ -145,4 +166,8 @@ public class JDBCSource extends AbstractSource implements Configurable, Pollable
 		return 0;
 	}
 
+	@VisibleForTesting
+	public SourceCounter getCounters(){
+		return sourceCounter;
+	}
 }
