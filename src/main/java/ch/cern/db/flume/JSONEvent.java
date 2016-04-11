@@ -9,6 +9,7 @@
 
 package ch.cern.db.flume;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,6 +18,8 @@ import org.apache.flume.Event;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+
+import ch.cern.db.utils.JSONUtils;
 
 public class JSONEvent implements Event{
 	
@@ -39,14 +42,18 @@ public class JSONEvent implements Event{
 	}
 	
 	public void addProperty(String name, Object value){
-		if(value instanceof Number){
+		if(value instanceof Date){
+			json.addProperty(name, JSONUtils.to((Date) value));
+		}else if(value instanceof Number){
 			json.addProperty(name, (Number) value);
 		}else if(value instanceof Boolean){
 			json.addProperty(name, (Boolean) value);
 		}else if(value instanceof JsonElement){
 			json.add(name, (JsonElement) value);
+		}else if(value == null){
+			json.add(name, null);
 		}else{
-			json.addProperty(name, (String) value);
+			json.addProperty(name, value.toString());
 		}
 	}
 	

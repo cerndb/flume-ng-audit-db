@@ -1,0 +1,53 @@
+';
+
+
+Recovery Manager: Release 11.2.0.4.0 - Production on Tue Apr 5 05:31:52 2016
+
+Copyright (c) 1982, 2011, Oracle and/or its affiliates.  All rights reserved.
+
+connected to target database: EDHP (DBID=3404790697)
+recovery catalog database Password:
+connected to recovery catalog database
+
+RMAN> run {
+2> allocate channel d1 device type disk maxopenfiles 4 format '/backup/dbs02/EDHP/%d_%T_%U_arch' maxpiecesize 100g;
+3> allocate channel d2 device type disk maxopenfiles 4 format '/backup/dbs01/EDHP/%d_%T_%U_arch' maxpiecesize 100g;
+4> backup tag 'edhp_rac51_20160405T053125_A' archivelog all
+5> ; delete noprompt force archivelog all backed up 1 times to DEVICE TYPE SBT completed before "trunc(SYSDATE-2,'DD')";
+6> }
+7>
+allocated channel: d1
+channel d1: SID=3271 instance=EDHP1 device type=DISK
+
+allocated channel: d2
+channel d2: SID=3552 instance=EDHP1 device type=DISK
+
+Starting backup at 05-APR-2016 05:31:54
+current log archived
+skipping archived logs of thread 1 from sequence 301477 to 301694; already backed up
+skipping archived logs of thread 2 from sequence 303771 to 303984; already backed up
+channel d1: starting archived log backup set
+channel d1: specifying archived log(s) in backup set
+input archived log thread=1 sequence=301695 RECID=256404 STAMP=908343115
+channel d1: starting piece 1 at 05-APR-2016 05:32:09
+channel d2: starting archived log backup set
+channel d2: specifying archived log(s) in backup set
+input archived log thread=2 sequence=303985 RECID=256406 STAMP=908343119
+channel d2: starting piece 1 at 05-APR-2016 05:32:09
+channel d1: finished piece 1 at 05-APR-2016 05:32:10
+piece handle=/backup/dbs02/EDHP/EDHP_20160405_her28dqp_1_1_arch tag=EDHP_RAC51_20160405T053125_A comment=NONE
+channel d1: backup set complete, elapsed time: 00:00:01
+channel d2: finished piece 1 at 05-APR-2016 05:32:16
+piece handle=/backup/dbs01/EDHP/EDHP_20160405_hfr28dqp_1_1_arch tag=EDHP_RAC51_20160405T053125_A comment=NONE
+channel d2: backup set complete, elapsed time: 00:00:07
+Finished backup at 05-APR-2016 05:32:16
+
+Starting Control File and SPFILE Autobackup at 05-APR-2016 05:32:16
+piece handle=/backup/dbs01/EDHP/EDHP_c-3404790697-20160405-1d comment=NONE
+Finished Control File and SPFILE Autobackup at 05-APR-2016 05:32:23
+
+released channel: d1
+released channel: d2
+
+Recovery Manager complete.
+[Tue Apr  5 05:32:42 CEST 2016] level_arch_newdisk edhp_rac51 itrac5105 EDHP1 Finished Backup
