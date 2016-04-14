@@ -89,7 +89,12 @@ public class RecoveryManagerLogFile {
 	}
 
 	private String[] getFieldsFirstLine() {
-		return SUtils.grep(lines, "^\\[.*").get(0).split("\\s+(?![^\\[]*\\])");
+		List<String> grep = SUtils.grep(lines, "^\\[.*");
+		
+		if(grep.size() == 0)
+			return new String[0];
+		
+		return grep.get(0).split("\\s+(?![^\\[]*\\])");
 	}
 	
 	public Object getStartTimestamp() {
@@ -98,7 +103,7 @@ public class RecoveryManagerLogFile {
 		try {
 			return (Date) dateFormatter.parse(fieldsFirstLine[0]);
 		} catch (Exception e) {
-			logger.error("When parsing: ", e);
+			logger.trace("Error when parsing: " + e.getMessage());
 		}
 		
 		return null;
@@ -108,7 +113,7 @@ public class RecoveryManagerLogFile {
 		try{
 			return getFieldsFirstLine()[1];
 		} catch (Exception e) {
-			logger.error("When parsing: ", e);
+			logger.trace("Error when parsing: " + e.getMessage());
 		}
 		
 		return null;
@@ -118,7 +123,7 @@ public class RecoveryManagerLogFile {
 		try{
 			return getFieldsFirstLine()[2];
 		} catch (Exception e) {
-			logger.error("When parsing: ", e);
+			logger.trace("Error when parsing: " + e.getMessage());
 		}
 		
 		return null;
@@ -211,6 +216,9 @@ public class RecoveryManagerLogFile {
 	public BackDestination getBackupDestination() {
 		String backupType = getBackupType(); 
 
+		if(backupType == null)
+			return null;
+		
 		if(backupType.contains("newdisk"))
 			return BackDestination.DISK;
 		

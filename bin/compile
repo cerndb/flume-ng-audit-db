@@ -43,6 +43,7 @@ else
 		$HOME/src/main/java/ch/cern/db/flume/sink/elasticsearch/serializer/*.java \
 		$HOME/src/main/java/ch/cern/db/flume/source/*.java \
 		$HOME/src/main/java/ch/cern/db/flume/source/reader/*.java \
+		$HOME/src/main/java/ch/cern/db/flume/source/deserializer/*.java \
 		$HOME/src/main/java/ch/cern/db/utils/*.java
 	
 	mkdir -p $HOME/target

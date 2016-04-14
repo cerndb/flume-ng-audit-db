@@ -442,7 +442,7 @@ public class ReliableSpoolingFileEventReader implements ReliableEventReader {
 	 */
 	private Optional<FileInfo> getNextFile() {
 		List<File> candidateFiles = Collections.emptyList();
-
+		
 		if (consumeOrder != ConsumeOrder.RANDOM || candidateFileIter == null || !candidateFileIter.hasNext()) {
 			/* Filter to exclude finished or hidden files */
 			FileFilter filter = new FileFilter() {
@@ -452,6 +452,8 @@ public class ReliableSpoolingFileEventReader implements ReliableEventReader {
 							|| (fileName.endsWith(completedSuffix)) 
 							|| (fileName.startsWith("."))
 							|| ignorePattern.matcher(fileName).matches()) {
+						logger.debug("Skipped file: " + candidate.getAbsolutePath());
+						
 						return false;
 					}
 					

@@ -60,6 +60,11 @@ public class RecoveryManagerDeserializer implements EventDeserializer {
 	public Event readEvent() throws IOException {
 		ensureOpen();
 		
+		in.mark();
+		if(in.read() == -1)
+			return null;
+		in.reset();
+		
 		RecoveryManagerLogFile rman_log = new RecoveryManagerLogFile(in, maxLineLength);
 		
 		JSONEvent event = new JSONEvent();
@@ -77,11 +82,11 @@ public class RecoveryManagerDeserializer implements EventDeserializer {
 		event.addProperty("v_params", v_params != null ? new JsonParser().parse(v_params).getAsJsonObject() : null);
 		
 		String mountPointNASRegexResult = rman_log.getMountPointNASRegexResult();
-		event.addProperty("mountPointNASRegex.result", mountPointNASRegexResult != null ?
+		event.addProperty("mountPointNASRegexResult", mountPointNASRegexResult != null ?
 				new JsonParser().parse(mountPointNASRegexResult).getAsJsonObject() : null);
 		
 		String volInfoBackuptoDiskFinalResult = rman_log.getVolInfoBackuptoDiskFinalResult();
-		event.addProperty("volInfoBackuptoDisk.finalResult", volInfoBackuptoDiskFinalResult != null ?
+		event.addProperty("volInfoBackuptoDiskFinalResult", volInfoBackuptoDiskFinalResult != null ?
 				new JsonParser().parse(volInfoBackuptoDiskFinalResult).getAsJsonObject() : null);
 		
 		List<RecoveryManagerReport> recoveryManagerReports = rman_log.getRecoveryManagerReports();
