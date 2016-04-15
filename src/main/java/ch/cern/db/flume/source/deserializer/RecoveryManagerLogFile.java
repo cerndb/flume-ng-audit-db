@@ -6,12 +6,18 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.flume.serialization.ResettableInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import ch.cern.db.utils.Pair;
 import ch.cern.db.utils.SUtils;
@@ -159,16 +165,89 @@ public class RecoveryManagerLogFile {
 		return getJSONString("Main: params passed: \\$v_params");
 	}
 
-	public String getMountPointNASRegexResult() {
-		return getJSONString("RunTime\\.GetMountPointNASRegex : result: \\$VAR1");
+	public JsonArray getMountPointNASRegexResult() {
+		String jsonString = getJSONString("RunTime\\.GetMountPointNASRegex : result: \\$VAR1");
+		
+		JsonArray newArray = new JsonArray();
+		
+		if(jsonString == null)
+			return newArray;
+		
+		JsonParser parser = new JsonParser();
+		
+		JsonObject o;
+		try{
+			o = parser.parse(jsonString).getAsJsonObject();
+		}catch(Exception e){
+			return newArray;
+		}
+		
+		for (Entry<String, JsonElement> element : o.entrySet()) {
+			JsonObject newObject = new JsonObject();
+			
+			try{
+				newObject.addProperty("controllerlif", element.getKey());
+			}catch(Exception e){}
+			try{
+				newObject.addProperty("mountondbserver", ((JsonArray) element.getValue()).get(0).getAsString());
+			}catch(Exception e){}
+			
+			newArray.add(newObject);
+		}
+		
+		return newArray;
 	}
 
-	public String getVolInfoBackuptoDiskFinalResult() {
-		return getJSONString("RunTime\\.GetVolInfoBackuptoDisk : final result \\$VAR1");
+	public JsonArray getVolInfoBackuptoDiskFinalResult() {
+		String jsonString = getJSONString("RunTime\\.GetVolInfoBackuptoDisk : final result \\$VAR1");
+		
+		JsonArray newArray = new JsonArray();
+		
+		if(jsonString == null)
+			return newArray;
+		
+		JsonParser parser = new JsonParser();
+		
+		JsonObject o;
+		try{
+			o = parser.parse(jsonString).getAsJsonObject();
+		}catch(Exception e){
+			return newArray;
+		}
+		
+		for (Entry<String, JsonElement> element : o.entrySet()) {
+			try{
+				newArray.add((JsonObject) element.getValue());
+			}catch(Exception e){}
+		}
+		
+		return newArray;
 	}
 
-	public String getValuesOfFilesystems() {
-		return getJSONString("values of filesystems \\$filesystems");
+	public JsonArray getValuesOfFilesystems() {
+		String jsonString = getJSONString("values of filesystems \\$filesystems");
+		
+		JsonArray newArray = new JsonArray();
+		
+		if(jsonString == null)
+			return newArray;
+		
+		JsonParser parser = new JsonParser();
+		
+		JsonObject o;
+		try{
+			o = parser.parse(jsonString).getAsJsonObject();
+		}catch(Exception e){
+			return newArray;
+		}
+		
+		for (Entry<String, JsonElement> element : o.entrySet()) {
+			try{
+				newArray.add((JsonObject) element.getValue());
+			}catch(Exception e){}
+		}
+		
+		return newArray;
 	}
 
 	public String getCreateFilesBackupset() {
@@ -192,7 +271,8 @@ public class RecoveryManagerLogFile {
 			recoveryManagerOutputs.add(SUtils.join(prevLines, '\n'));
 			
 			linesClone = SUtils.linesFrom(linesClone, resourceManagerEndsPattern);
-			linesClone.remove(0);
+			if(linesClone.size() > 0)
+				linesClone.remove(0);
 			
 			regexLines = SUtils.linesFromTo(linesClone, 
 					resourceManagerStartsPattern, 

@@ -71,7 +71,7 @@ public class RecoveryManagerDeserializer implements EventDeserializer {
 
 		event.addProperty("startTimestamp", rman_log.getStartTimestamp());
 		event.addProperty("backupType", rman_log.getBackupType());
-		event.addProperty("destiantion", rman_log.getBackupDestination());
+		event.addProperty("destination", rman_log.getBackupDestination());
 		event.addProperty("entityName", rman_log.getEntityName());
 		
 		//Process properties like (name = value)
@@ -81,16 +81,29 @@ public class RecoveryManagerDeserializer implements EventDeserializer {
 		String v_params = rman_log.getVParams();
 		event.addProperty("v_params", v_params != null ? new JsonParser().parse(v_params).getAsJsonObject() : null);
 		
-		String mountPointNASRegexResult = rman_log.getMountPointNASRegexResult();
-		event.addProperty("mountPointNASRegexResult", mountPointNASRegexResult != null ?
-				new JsonParser().parse(mountPointNASRegexResult).getAsJsonObject() : null);
+		JsonArray mountPointNASRegexResult = rman_log.getMountPointNASRegexResult();
+		event.addProperty("mountPointNASRegexResult", mountPointNASRegexResult);
 		
-		String volInfoBackuptoDiskFinalResult = rman_log.getVolInfoBackuptoDiskFinalResult();
-		event.addProperty("volInfoBackuptoDiskFinalResult", volInfoBackuptoDiskFinalResult != null ?
-				new JsonParser().parse(volInfoBackuptoDiskFinalResult).getAsJsonObject() : null);
+		JsonArray volInfoBackuptoDiskFinalResult = rman_log.getVolInfoBackuptoDiskFinalResult();
+		event.addProperty("volInfoBackuptoDiskFinalResult", volInfoBackuptoDiskFinalResult);
+		
+		JsonArray valuesOfFilesystems = rman_log.getValuesOfFilesystems();
+		event.addProperty("valuesOfFilesystems", valuesOfFilesystems);
 		
 		List<RecoveryManagerReport> recoveryManagerReports = rman_log.getRecoveryManagerReports();
-		event.addProperty("recoveryManagerReports", recoveryManagerReportsToJSON(recoveryManagerReports));
+		JsonArray recoveryManagerReportsJson = recoveryManagerReportsToJSON(recoveryManagerReports);
+		event.addProperty("recoveryManagerReports", recoveryManagerReportsJson);
+		
+		int recoveryManagerReportsSize = recoveryManagerReportsJson.size();
+		if(recoveryManagerReportsSize > 0){
+			JsonObject lastReport = (JsonObject) recoveryManagerReportsJson.get(recoveryManagerReportsSize - 1);
+			
+			event.addProperty("finishTime", lastReport.get("finishTime"));
+			event.addProperty("finalStatus", lastReport.get("status"));
+		}else{
+			event.addProperty("finishTime", null);
+			event.addProperty("finalStatus", null);
+		}
 
 		return event;
 	}
