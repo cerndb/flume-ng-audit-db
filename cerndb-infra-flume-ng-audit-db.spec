@@ -8,7 +8,7 @@
 Summary:	Flume customisations for gathering audit ang log data from databases
 Name:		cerndb-infra-flume-ng-audit-db
 Version:	0.0.2
-Release:	1%{?dist}
+Release:	2%{?dist}
 License:	GPL
 BuildArch:	noarch
 Group:		Development/Tools
@@ -27,7 +27,8 @@ Flume customisations for gathering audit data and log from databases
 %install
 %{__rm} -rf %{buildroot}
 mkdir -p $RPM_BUILD_ROOT/%{install_path}
-cp -a ./flume-ng-audit-db/ $RPM_BUILD_ROOT/%{install_path}
+mkdir -p $RPM_BUILD_ROOT/%{install_path}/flume-ng-audit-db/
+cp -a ./dist/* $RPM_BUILD_ROOT/%{install_path}/flume-ng-audit-db/
 
 %clean
 rm -rf ${RPM_BUILD_ROOT}
