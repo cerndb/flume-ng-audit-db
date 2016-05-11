@@ -26,7 +26,7 @@ HOME=$SCRIPT_DIR/..
 if `command -v "mvn" &> /dev/null` && ! [ "$FORCE_JAVAC" == "true" ] ;
 then
 	mvn install:install-file \
-		-Dfile=$HOME/lib/elasticsearch-sink2-assembly-1.0.jar \
+		-Dfile=$HOME/flume-ng-audit-db/lib/elasticsearch-sink2-assembly-1.0.jar \
 		-DgroupId=com.github.lucidfrontier45.ElasticsearchSink2 \
 		-DartifactId=elasticsearch-sink2 \
 		-Dversion=1.0 \
@@ -37,7 +37,7 @@ else
 	: ${JAVA_BIN_PATH:="/usr/bin/"}
 	
 	$JAVA_BIN_PATH/javac \
-		-cp /usr/lib/aimon-flume-ng/lib/*:$HOME/lib/* \
+		-cp /usr/lib/aimon-flume-ng/lib/*:$HOME/flume-ng-audit-db/lib/elasticsearch-sink2-assembly-1.0.jar \
 		$HOME/src/main/java/ch/cern/db/flume/*.java \
 		$HOME/src/main/java/ch/cern/db/flume/interceptor/*.java \
 		$HOME/src/main/java/ch/cern/db/flume/sink/elasticsearch/serializer/*.java \

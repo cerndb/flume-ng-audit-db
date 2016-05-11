@@ -38,3 +38,7 @@ scratch:
 build:
 	koji build db6 --nowait ${REPOURL}${REPOPREFIX}/${PKGNAME}.git#master
 	koji build db7 --nowait ${REPOURL}${REPOPREFIX}/${PKGNAME}.git#master
+	
+tag-qa:
+	koji tag-build db6-qa $(PKGID)-$(PKGRELEASE).el6
+	koji tag-build db7-qa $(PKGID)-$(PKGRELEASE).el7.cern

@@ -18,9 +18,11 @@ SCRIPT_DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
 HOME=$SCRIPT_DIR/..
 
-DEFAULT_ORACLE_HOME=/ORA/dbs01/oracle/product/rdbms/
-: ${ORACLE_HOME:=$DEFAULT_ORACLE_HOME} 
-
+FLUME_BIN_DIR=/usr/lib/aimon-flume-ng/bin/
 : ${JDBC_DRIVER:=$ORACLE_HOME/jdbc/lib/*}
 
-java -cp $HOME/conf/target/:$HOME/target/*:$HOME/flume-ng-audit-db/lib/*:$JDBC_DRIVER ch.cern.db.flume.sink.kite.util.InferSchemaFromTable "$@"
+$FLUME_BIN_DIR/flume-ng agent \
+	--classpath $JDBC_DRIVER:$HOME/lib/* \
+	-n audit_agent \
+	-f $HOME/conf/agent.conf \
+	-c $HOME/conf/

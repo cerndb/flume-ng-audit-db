@@ -27,7 +27,7 @@ Flume customisations for gathering audit data and log from databases
 %install
 %{__rm} -rf %{buildroot}
 mkdir -p $RPM_BUILD_ROOT/%{install_path}
-find . -maxdepth 1 -type d -not -name '\.*' -not -name 'src' -exec cp -a {} $RPM_BUILD_ROOT/%{install_path} \;
+cp -a ./flume-ng-audit-db/ $RPM_BUILD_ROOT/%{install_path}
 
 %clean
 rm -rf ${RPM_BUILD_ROOT}
