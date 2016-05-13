@@ -22,4 +22,4 @@ flume-ng agent \
 	--classpath $HOME/target/flume-ng-customizations*.jar \
 	-n audit_agent \
 	-f $HOME/conf/target/agent.conf \
-	-c $HOME/conf/target/:$HOME/dist/lib/elasticsearch-sink2-assembly-1.0.jar
+	-c $HOME/conf/target/:$HOME/lib/elasticsearch-sink2-assembly-1.0.jar

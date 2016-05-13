@@ -26,7 +26,8 @@ Flume customisations for gathering audit data and log from databases
 
 %install
 %{__rm} -rf %{buildroot}
-mkdir -p $RPM_BUILD_ROOT/%{install_path}
+mkdir -p $RPM_BUILD_ROOT/var/log/flume-ng-audit-db/
+mkdir -p $RPM_BUILD_ROOT/var/lib/flume-ng-audit-db/ 
 mkdir -p $RPM_BUILD_ROOT/%{install_path}/flume-ng-audit-db/
 cp -a ./dist/* $RPM_BUILD_ROOT/%{install_path}/flume-ng-audit-db/
 
@@ -36,9 +37,14 @@ rm -rf ${RPM_BUILD_ROOT}
 %files
 %defattr(-,root,root,-)
 %{install_path}/*
-
+%dir /var/log/flume-ng-audit-db/
+%attr(755, oracle, ci) /var/log/flume-ng-audit-db/
+%dir /var/lib/flume-ng-audit-db/
+%attr(755, oracle, ci) /var/lib/flume-ng-audit-db/
 
 # Please keep a meaningful changelog
 %changelog
 * Tue May 10 2016 Daniel Lanza <daniel.lanza@cern.ch> - 0.0.2-1
 - Initial creation of the RPM.
+* Tue May 11 2016 Daniel Lanza <daniel.lanza@cern.ch> - 0.0.2-2
+- Installation directory properly configured

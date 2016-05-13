@@ -19,10 +19,12 @@ SCRIPT_DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 HOME=$SCRIPT_DIR/..
 
 FLUME_BIN_DIR=/usr/lib/aimon-flume-ng/bin/
+
+ORACLE_HOME=/ORA/dbs01/oracle/product/rdbms
 : ${JDBC_DRIVER:=$ORACLE_HOME/jdbc/lib/*}
 
 $FLUME_BIN_DIR/flume-ng agent \
-	--classpath $JDBC_DRIVER:$HOME/lib/* \
+	--classpath $JDBC_DRIVER:$HOME/lib/*:$ORACLE_HOME/oc4j/lib/dms.jar \
 	-n audit_agent \
 	-f $HOME/conf/agent.conf \
 	-c $HOME/conf/

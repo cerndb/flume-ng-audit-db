@@ -5,7 +5,7 @@ REPOPREFIX=/db
 
 # Get all the package infos from the spec file
 PKGVERSION=$(shell awk '/Version:/ { print $$2 }' ${SPECFILE})
-PKGRELEASE=$(shell awk '/Release:/ { print $$2 }' ${SPECFILE})
+PKGRELEASE=$(shell awk '/Release:/ { print $$2 }' ${SPECFILE} | sed -e 's/\%{?dist}//')
 PKGNAME=$(shell awk '/Name:/ { print $$2 }' ${SPECFILE})
 PKGID=$(PKGNAME)-$(PKGVERSION)
 TARFILE=$(PKGID).tar.gz
@@ -42,3 +42,4 @@ build:
 tag-qa:
 	koji tag-build db6-qa $(PKGID)-$(PKGRELEASE).el6
 	koji tag-build db7-qa $(PKGID)-$(PKGRELEASE).el7.cern
+	
