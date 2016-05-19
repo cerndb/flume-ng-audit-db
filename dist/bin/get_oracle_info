@@ -15,12 +15,12 @@ function from_syscontrol {
 
 	for ENTITY in $(/etc/init.d/syscontrol list | awk '{print $1}'); 
 	do 
-		/ORA/dbs01/syscontrol/bin/oracletab.sh sc_entity=$ENTITY sc_host_name=$HOSTNAME  sc_subcategory=$SUBCATEGORY db_sids sc_installation_directory; 
+		/ORA/dbs01/syscontrol/bin/oracletab.sh sc_entity=$ENTITY sc_host_name=$HOSTNAME  sc_subcategory=$SUBCATEGORY db_sids; 
 	done;
 }
 
 function from_oratab {
-	awk '!/^ *#/ && NF' /etc/oratab | grep '/ORA/dbs01/oracle/product/rdbms' | cut -d':' -f 1,2 --output-delimiter=$'\t'
+	awk '!/^ *#/ && NF' /etc/oratab | grep '/ORA/dbs01/oracle/product/rdbms' | cut -d':' -f 1 --output-delimiter=$'\t'
 }
 
 ### MAIN ###

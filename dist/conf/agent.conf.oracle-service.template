@@ -1,0 +1,79 @@
+# DO NOT MODIFY (TEMPLATE)
+
+## Sources for Oracle instance with SID: <ORACLE_SID>
+
+# Describe/configure the source
+audit_agent.sources.audit_source_<ORACLE_SID>.type = ch.cern.db.flume.source.JDBCSource
+audit_agent.sources.audit_source_<ORACLE_SID>.channels = mem_channel
+audit_agent.sources.audit_source_<ORACLE_SID>.batch.size = 1000
+audit_agent.sources.audit_source_<ORACLE_SID>.batch.minimumTime = 60000
+audit_agent.sources.audit_source_<ORACLE_SID>.reader.connectionUrl = jdbc:oracle:thin:@localhost:10121:<ORACLE_SID>
+audit_agent.sources.audit_source_<ORACLE_SID>.reader.username = <ORACLE_USER>
+audit_agent.sources.audit_source_<ORACLE_SID>.reader.password = <ORACLE_PASSWORD>
+audit_agent.sources.audit_source_<ORACLE_SID>.reader.table = UNIFIED_AUDIT_TRAIL
+audit_agent.sources.audit_source_<ORACLE_SID>.reader.table.columnToCommit = EVENT_TIMESTAMP
+audit_agent.sources.audit_source_<ORACLE_SID>.reader.committingFile = /var/lib/flume-ng-audit-db/committed_value_audit.backup
+audit_agent.sources.audit_source_<ORACLE_SID>.duplicatedEventsProcessor.path = /var/lib/flume-ng-audit-db/last_events_audit.hash_list
+audit_agent.sources.audit_source_<ORACLE_SID>.interceptors = addhostgroup  addproducer
+audit_agent.sources.audit_source_<ORACLE_SID>.interceptors.addhostgroup.type = static
+audit_agent.sources.audit_source_<ORACLE_SID>.interceptors.addhostgroup.key = toplevel_hostgroup
+audit_agent.sources.audit_source_<ORACLE_SID>.interceptors.addhostgroup.value = audit
+audit_agent.sources.audit_source_<ORACLE_SID>.interceptors.addproducer.type = static
+audit_agent.sources.audit_source_<ORACLE_SID>.interceptors.addproducer.key = producer
+audit_agent.sources.audit_source_<ORACLE_SID>.interceptors.addproducer.value = it-db   
+
+audit_agent.sources.metric_source_<ORACLE_SID>.type = ch.cern.db.flume.source.JDBCSource
+audit_agent.sources.metric_source_<ORACLE_SID>.channels = mem_channel
+audit_agent.sources.metric_source_<ORACLE_SID>.batch.size = 1000
+audit_agent.sources.metric_source_<ORACLE_SID>.batch.minimumTime = 60000
+audit_agent.sources.metric_source_<ORACLE_SID>.reader.connectionUrl = jdbc:oracle:thin:@localhost:10121:<ORACLE_SID>
+audit_agent.sources.metric_source_<ORACLE_SID>.reader.username = <ORACLE_USER>
+audit_agent.sources.metric_source_<ORACLE_SID>.reader.password = <ORACLE_PASSWORD>
+audit_agent.sources.metric_source_<ORACLE_SID>.reader.query = select begin_time, end_time, metric_name, value from v$sysmetric_history where metric_id in (2092,2093,2100,2124) and group_id=2
+audit_agent.sources.metric_source_<ORACLE_SID>.reader.committingFile = /var/lib/flume-ng-audit-db/committed_value_metric.backup
+audit_agent.sources.metric_source_<ORACLE_SID>.duplicatedEventsProcessor.path = /var/lib/flume-ng-audit-db/last_events_metric.hash_list 
+audit_agent.sources.metric_source_<ORACLE_SID>.interceptors = addhostgroup  addproducer
+audit_agent.sources.metric_source_<ORACLE_SID>.interceptors.addhostgroup.type = static
+audit_agent.sources.metric_source_<ORACLE_SID>.interceptors.addhostgroup.key = toplevel_hostgroup
+audit_agent.sources.metric_source_<ORACLE_SID>.interceptors.addhostgroup.value = metrics
+audit_agent.sources.metric_source_<ORACLE_SID>.interceptors.addproducer.type = static
+audit_agent.sources.metric_source_<ORACLE_SID>.interceptors.addproducer.key = producer
+audit_agent.sources.metric_source_<ORACLE_SID>.interceptors.addproducer.value = it-db   
+
+audit_agent.sources.alert_source_<ORACLE_SID>.type = ch.cern.db.flume.source.JDBCSource
+audit_agent.sources.alert_source_<ORACLE_SID>.channels = mem_channel
+audit_agent.sources.alert_source_<ORACLE_SID>.batch.size = 1000
+audit_agent.sources.alert_source_<ORACLE_SID>.batch.minimumTime = 300000
+audit_agent.sources.alert_source_<ORACLE_SID>.reader.connectionUrl = jdbc:oracle:thin:@localhost:10121:<ORACLE_SID>
+audit_agent.sources.alert_source_<ORACLE_SID>.reader.username = <ORACLE_USER>
+audit_agent.sources.alert_source_<ORACLE_SID>.reader.password = <ORACLE_PASSWORD>
+audit_agent.sources.alert_source_<ORACLE_SID>.reader.table = X$DBGALERTEXT
+audit_agent.sources.alert_source_<ORACLE_SID>.reader.table.columnToCommit = ORIGINATING_TIMESTAMP
+audit_agent.sources.alert_source_<ORACLE_SID>.reader.committingFile = /var/lib/flume-ng-audit-db/committed_value_alert.backup
+audit_agent.sources.alert_source_<ORACLE_SID>.duplicatedEventsProcessor.path = /var/lib/flume-ng-audit-db/last_events_alert.hash_list
+audit_agent.sources.alert_source_<ORACLE_SID>.interceptors = addhostgroup  addproducer
+audit_agent.sources.alert_source_<ORACLE_SID>.interceptors.addhostgroup.type = static
+audit_agent.sources.alert_source_<ORACLE_SID>.interceptors.addhostgroup.key = toplevel_hostgroup
+audit_agent.sources.alert_source_<ORACLE_SID>.interceptors.addhostgroup.value = alert
+audit_agent.sources.alert_source_<ORACLE_SID>.interceptors.addproducer.type = static
+audit_agent.sources.alert_source_<ORACLE_SID>.interceptors.addproducer.key = producer
+audit_agent.sources.alert_source_<ORACLE_SID>.interceptors.addproducer.value = it-db   
+
+audit_agent.sources.listener_source_<ORACLE_SID>.type = ch.cern.db.flume.source.JDBCSource
+audit_agent.sources.listener_source_<ORACLE_SID>.channels = mem_channel
+audit_agent.sources.listener_source_<ORACLE_SID>.batch.size = 1000
+audit_agent.sources.listener_source_<ORACLE_SID>.batch.minimumTime = 60000
+audit_agent.sources.listener_source_<ORACLE_SID>.reader.connectionUrl = jdbc:oracle:thin:@localhost:10121:<ORACLE_SID>
+audit_agent.sources.listener_source_<ORACLE_SID>.reader.username = <ORACLE_USER>
+audit_agent.sources.listener_source_<ORACLE_SID>.reader.password = <ORACLE_PASSWORD>
+audit_agent.sources.listener_source_<ORACLE_SID>.reader.query = select * from X$DBGDIREXT where logical_file like 'listener%' [and MODIFY_TIME >= TIMESTAMP ':committed_value'] order by MODIFY_TIME
+audit_agent.sources.listener_source_<ORACLE_SID>.reader.table.columnToCommit = MODIFY_TIME
+audit_agent.sources.listener_source_<ORACLE_SID>.reader.committingFile = /var/lib/flume-ng-audit-db/committed_value_listener.backup
+audit_agent.sources.listener_source_<ORACLE_SID>.duplicatedEventsProcessor.path = /var/lib/flume-ng-audit-db/last_events_listener.hash_list
+audit_agent.sources.listener_source_<ORACLE_SID>.interceptors = addhostgroup  addproducer
+audit_agent.sources.listener_source_<ORACLE_SID>.interceptors.addhostgroup.type = static
+audit_agent.sources.listener_source_<ORACLE_SID>.interceptors.addhostgroup.key = toplevel_hostgroup
+audit_agent.sources.listener_source_<ORACLE_SID>.interceptors.addhostgroup.value = tnslsnr
+audit_agent.sources.listener_source_<ORACLE_SID>.interceptors.addproducer.type = static
+audit_agent.sources.listener_source_<ORACLE_SID>.interceptors.addproducer.key = producer
+audit_agent.sources.listener_source_<ORACLE_SID>.interceptors.addproducer.value = it-db 
