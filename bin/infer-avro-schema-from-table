@@ -23,4 +23,4 @@ DEFAULT_ORACLE_HOME=/ORA/dbs01/oracle/product/rdbms/
 
 : ${JDBC_DRIVER:=$ORACLE_HOME/jdbc/lib/*}
 
-java -cp $HOME/conf/target/:$HOME/target/*:$HOME/flume-ng-audit-db/lib/*:$JDBC_DRIVER ch.cern.db.flume.sink.kite.util.InferSchemaFromTable "$@"
+java -cp $HOME/conf/target/:$HOME/target/*:$JDBC_DRIVER ch.cern.db.flume.sink.kite.util.InferSchemaFromTable "$@"
