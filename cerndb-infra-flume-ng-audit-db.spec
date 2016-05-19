@@ -48,3 +48,5 @@ rm -rf ${RPM_BUILD_ROOT}
 - Initial creation of the RPM.
 * Tue May 11 2016 Daniel Lanza <daniel.lanza@cern.ch> - 0.0.2-2
 - Installation directory properly configured
+* Tue May 19 2016 Daniel Lanza <daniel.lanza@cern.ch> - 0.0.3-1
+- New features added and bug fixes
