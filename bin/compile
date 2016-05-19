@@ -37,7 +37,7 @@ else
 	: ${JAVA_BIN_PATH:="/usr/bin/"}
 	
 	$JAVA_BIN_PATH/javac \
-		-cp /usr/lib/aimon-flume-ng/lib/*:$HOME/dist/lib/elasticsearch-sink2-assembly-1.0.jar \
+		-cp /usr/lib/aimon-flume-ng/lib/*:$HOME/lib/elasticsearch-sink2-assembly-1.0.jar \
 		$HOME/src/main/java/ch/cern/db/flume/*.java \
 		$HOME/src/main/java/ch/cern/db/flume/interceptor/*.java \
 		$HOME/src/main/java/ch/cern/db/flume/sink/elasticsearch/serializer/*.java \
