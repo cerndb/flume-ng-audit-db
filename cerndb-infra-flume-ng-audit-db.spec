@@ -1,5 +1,6 @@
 # Standard install path for infra stuff
 %define install_path /ORA/dbs01/syscontrol/projects
+%define install_dir_name flume-ng-audit-db
 %define debug_package %{nil}
 %define __jar_repack %{nil}
 %define __arch_install_post %{nil}
@@ -26,10 +27,10 @@ Flume customisations for gathering audit data and log from databases
 
 %install
 %{__rm} -rf %{buildroot}
-mkdir -p $RPM_BUILD_ROOT/var/log/flume-ng-audit-db/
-mkdir -p $RPM_BUILD_ROOT/var/lib/flume-ng-audit-db/ 
-mkdir -p $RPM_BUILD_ROOT/%{install_path}/flume-ng-audit-db/
-cp -a ./dist/* $RPM_BUILD_ROOT/%{install_path}/flume-ng-audit-db/
+mkdir -p $RPM_BUILD_ROOT/var/log/%{install_dir_name}/
+mkdir -p $RPM_BUILD_ROOT/var/lib/%{install_dir_name}/ 
+mkdir -p $RPM_BUILD_ROOT/%{install_path}/%{install_dir_name}/
+cp -a ./dist/* $RPM_BUILD_ROOT/%{install_path}/%{install_dir_name}/
 
 %clean
 rm -rf ${RPM_BUILD_ROOT}
@@ -37,13 +38,19 @@ rm -rf ${RPM_BUILD_ROOT}
 %files
 %defattr(-,root,root,-)
 %{install_path}/*
-%dir /var/log/flume-ng-audit-db/
-%attr(755, oracle, ci) /var/log/flume-ng-audit-db/
-%dir /var/lib/flume-ng-audit-db/
-%attr(755, oracle, ci) /var/lib/flume-ng-audit-db/
+%dir /var/log/%{install_dir_name}/
+%attr(755, oracle, ci) /var/log/%{install_dir_name}/
+%dir /var/lib/%{install_dir_name}/
+%attr(755, oracle, ci) /var/lib/%{install_dir_name}/
+
+%post
+%{install_path}/%{install_dir_name}/bin/generate_agent_conf
 
 # Please keep a meaningful changelog
 %changelog
+* Tue May 20 2016 Daniel Lanza <daniel.lanza@cern.ch> - 0.0.3-2
+- Run generate_agent_conf after deployment
+
 * Tue May 19 2016 Daniel Lanza <daniel.lanza@cern.ch> - 0.0.3-1
 - New features added and bug fixes
 
