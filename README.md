@@ -81,6 +81,7 @@ Find below all available configuration parameters:
 <agent_name>.sources.<source_name>.reader.connectionUrl = jdbc:oracle:oci:@
 <agent_name>.sources.<source_name>.reader.username = sys as sysdba
 <agent_name>.sources.<source_name>.reader.password = sys
+<agent_name>.sources.<source_name>.reader.password.cmd = NULL
 <agent_name>.sources.<source_name>.reader.table = NULL
 <agent_name>.sources.<source_name>.reader.table.columnToCommit = NULL
 <agent_name>.sources.<source_name>.reader.table.columnToCommit.type = [TIMESTAMP (default)|NUMERIC|STRING]
@@ -96,6 +97,8 @@ Find below all available configuration parameters:
 ```
 
 Default values are written, parameters with NULL have no default value. Most configuration parameters do not require any further explanation. However, some of them are explained below.
+
+You can configure the password by specifying a command with ".reader.password.cmd" parameter. If this parameter is configured, ".reader.password" is ignored. Password is extracted as the first line of the output that the command produces (EOL is removed).
 
 ".table", ".query" or ".query.path" parameter must be configured. If ".columnToCommit" is not configured, same query will be always run and comittingFile and committtedValue parameters will be ignored.
 

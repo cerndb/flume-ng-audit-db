@@ -34,6 +34,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ch.cern.db.flume.JSONEvent;
+import ch.cern.db.utils.SUtils;
+import ch.cern.db.utils.Utils;
 
 public class ReliableJdbcEventReader implements Configurable{
 
@@ -55,6 +57,7 @@ public class ReliableJdbcEventReader implements Configurable{
 	private String connection_user = USERNAME_DEFAULT;;
 
 	public static final String PASSWORD_PARAM = "reader.password";
+	public static final String PASSWORD_CMD_PARAM = "reader.password.cmd";
 	public static final String PASSWORD_DEFAULT = "sys";
 	private String connection_password = PASSWORD_DEFAULT;
 
@@ -130,7 +133,17 @@ public class ReliableJdbcEventReader implements Configurable{
 		}
 
 		connection_user = context.getString(USERNAME_PARAM, USERNAME_DEFAULT);
-		connection_password = context.getString(PASSWORD_PARAM, PASSWORD_DEFAULT);
+		String password_cmd = context.getString(PASSWORD_CMD_PARAM);
+		if(password_cmd != null){
+			try {
+				connection_password = SUtils.toLines(Utils.runCommand(password_cmd)).get(0);
+			} catch (Exception e) {
+				throw new ConfigurationException("Configured command ("
+						+ ") for getting the password could not be executed", e);
+			}
+		}else{
+			connection_password = context.getString(PASSWORD_PARAM, PASSWORD_DEFAULT);
+		}
 		connection_url = context.getString(CONNECTION_URL_PARAM, CONNECTION_URL_DEFAULT);
 
 		committing_file_path = context.getString(COMMITTING_FILE_PATH_PARAM, COMMITTING_FILE_PATH_DEFAULT);

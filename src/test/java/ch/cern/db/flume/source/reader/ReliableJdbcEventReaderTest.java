@@ -76,6 +76,37 @@ public class ReliableJdbcEventReaderTest {
 	}
 
 	@Test
+	public void passwordByCommand(){
+
+		Context context = new Context();
+		context.put(ReliableJdbcEventReader.CONNECTION_DRIVER_PARAM, "org.hsqldb.jdbc.JDBCDriver");
+		context.put(ReliableJdbcEventReader.CONNECTION_URL_PARAM, connection_url);
+		context.put(ReliableJdbcEventReader.USERNAME_PARAM, "SA");
+		context.put(ReliableJdbcEventReader.PASSWORD_PARAM, "");
+		context.put(ReliableJdbcEventReader.TABLE_NAME_PARAM, " audit_data_table");
+		context.put(ReliableJdbcEventReader.COLUMN_TO_COMMIT_PARAM, "ID");
+		context.put(ReliableJdbcEventReader.TYPE_COLUMN_TO_COMMIT_PARAM, "numeric");
+		ReliableJdbcEventReader reader = new ReliableJdbcEventReader();
+		reader.configure(context);
+		
+		try {
+			reader.readEvent();
+		} catch (IOException e) {
+			Assert.fail();
+		}
+		
+		context.put(ReliableJdbcEventReader.PASSWORD_CMD_PARAM, "echo password");
+		reader.configure(context);
+		try {
+			reader.readEvent();
+			
+			Assert.fail();
+		} catch (IOException e) {
+		}
+		
+	}
+		
+	@Test
 	public void eventsFromDatabase(){
 
 		Context context = new Context();
