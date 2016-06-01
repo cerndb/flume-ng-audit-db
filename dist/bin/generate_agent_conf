@@ -18,8 +18,8 @@ SCRIPT_DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
 HOME=$SCRIPT_DIR/..
 
-ORACLE_USER=test_user
-ORACLE_PASSWORD=test_password
+ORACLE_USER="pdbmon"
+ORACLE_PASSWORD="/ORA/dbs01/syscontrol/projects/systools/bin/get_passwd_new pdbmon"
 
 ORACLE_SIDS=$($HOME/bin/get_oracle_info)
 
@@ -39,7 +39,7 @@ for ORACLE_SID in $ORACLE_SIDS
 do
 	tail -n +2 $HOME/conf/agent.conf.oracle-service.template | \
 		sed -e "s/<ORACLE_USER>/$ORACLE_USER/g" | \
-		sed -e "s/<ORACLE_PASSWORD>/$ORACLE_PASSWORD/g" | \
+		sed -e "s=<ORACLE_PASSWORD>=$ORACLE_PASSWORD=g" | \
 		sed -e "s/<ORACLE_SID>/$ORACLE_SID/g" \
 		>> $HOME/conf/agent.conf
 done

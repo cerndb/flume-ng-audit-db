@@ -139,6 +139,7 @@ public class ReliableJdbcEventReader implements Configurable{
 				connection_password = SUtils.toLines(Utils.runCommand(password_cmd)).get(0);
 			} catch (Exception e) {
 				throw new ConfigurationException("Configured command ("
+						+ password_cmd
 						+ ") for getting the password could not be executed", e);
 			}
 		}else{
