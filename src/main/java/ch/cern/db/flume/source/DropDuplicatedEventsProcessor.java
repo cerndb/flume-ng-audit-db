@@ -51,17 +51,12 @@ public class DropDuplicatedEventsProcessor implements Configurable{
 	public static final Boolean CHECK_BODY_DEFAULT = true;
 	private boolean checkBody;
 
-	public static final String ALGORITHM_PARAM = PARAM + ".algorithm";
-	private HashingAlgorithm algorithm = HashingAlgorithm.JAVA_HASHCODE;
-	private MessageDigest messageDigest = null;
+	private final MessageDigest messageDigest;
 
 	private SizeLimitedHashSet<BigInteger> previous_hashes;
 
 	private SizeLimitedHashSet<BigInteger> hashes_current_batch;
 
-	private enum HashingAlgorithm {
-		JAVA_HASHCODE, MD5
-	}
 
 	public DropDuplicatedEventsProcessor(){
 		Integer size = SIZE_DEFAULT;
@@ -70,8 +65,14 @@ public class DropDuplicatedEventsProcessor implements Configurable{
 
 		this.checkHeaders = CHECK_HEADER_DEFAULT;
 		this.checkBody = CHECK_BODY_DEFAULT;
-		LOG.info("Initializated with defaults size="+size+", algorithm="+algorithm.name().toLowerCase()+
-				", headers="+checkHeaders+", body="+checkBody);
+
+		try {
+			messageDigest = MessageDigest.getInstance("MD5");
+		} catch (NoSuchAlgorithmException e) {
+			throw new FlumeException("MD5 hashing not supported! ", e);
+		}
+
+		LOG.info("Initializated with defaults size="+size+", headers="+checkHeaders+", body="+checkBody);
 	}
 
 	@Override
@@ -95,29 +96,8 @@ public class DropDuplicatedEventsProcessor implements Configurable{
 		this.committing_file = new File(context.getString(PATH_PARAM, PATH_DEFAULT));
 		loadLastHashesFromFile();
 
-		// Decision based on collision rates
-		// hashcode is faster but has a much higher collision probability compared to MD5
-		if (size <= 1000) {
-			this.algorithm = HashingAlgorithm.JAVA_HASHCODE;
-		} else {
-			this.algorithm = HashingAlgorithm.MD5;
-		}
-		// Override with the one from config, if provided
-		String algorithmName = context.getString(ALGORITHM_PARAM, algorithm.name());
-		if ("md5".equals(algorithmName) || HashingAlgorithm.MD5.name().equals(algorithmName)) {
-			algorithm = HashingAlgorithm.MD5;
-			try {
-				messageDigest = MessageDigest.getInstance("MD5");
-			} catch (NoSuchAlgorithmException e) {
-				throw new FlumeException("MD5 hashing not supported! ", e);
-			}
-		} else {
-			algorithm = HashingAlgorithm.JAVA_HASHCODE;
-			messageDigest = null;
-		}
-
-		LOG.info("Configured with size="+size+", algorithm="+algorithm.name().toLowerCase()+
-				", headers="+checkHeaders+", body="+checkBody+", path="+this.committing_file.getPath());
+		LOG.info("Configured with size="+size+", headers="+checkHeaders+
+				", body="+checkBody+", path="+this.committing_file.getPath());
 	}
 
 	private void loadLastHashesFromFile() {
@@ -186,8 +166,6 @@ public class DropDuplicatedEventsProcessor implements Configurable{
 		BigInteger body_hash = BigInteger.ZERO;
 		if(checkHeaders)
 			headers_hash = hashMap(event.getHeaders());
-
-
 		if(checkBody)
 			body_hash = hashString(new String(event.getBody()));
 
@@ -229,12 +207,8 @@ public class DropDuplicatedEventsProcessor implements Configurable{
      * @return An MD5 or Java hash based on which algorithm has been configured
      */
     private BigInteger hashString(String input) {
-		if (algorithm == HashingAlgorithm.JAVA_HASHCODE) {
-			return BigInteger.valueOf(input.hashCode());
-		} else {
-			messageDigest.reset();
-			return new BigInteger(1, messageDigest.digest(input.getBytes()));
-		}
+		messageDigest.reset();
+		return new BigInteger(1, messageDigest.digest(input.getBytes()));
 	}
 
 	public List<Event> process(List<Event> events) {

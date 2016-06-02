@@ -8,28 +8,20 @@
  */
 package ch.cern.db.flume.source;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.collections.map.HashedMap;
 import org.apache.flume.Context;
 import org.apache.flume.Event;
 import org.apache.flume.event.EventBuilder;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.experimental.theories.DataPoints;
-import org.junit.experimental.theories.Theories;
-import org.junit.experimental.theories.Theory;
-import org.junit.runner.RunWith;
 
-@RunWith(Theories.class)
+import java.io.File;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
 public class DropDuplicatedEventsProcessorTest {
-
-	public static @DataPoints int[] sizes = {10, 1001};
 	
 	@Test
 	public void reconfigure(){
@@ -264,15 +256,12 @@ public class DropDuplicatedEventsProcessorTest {
 	}
 
 	/**
-	 * This test runs parametrized, so first with a size of 2, then with a size of 1001.
-	 * This results in using two different algorithms, first the Java hashcode, then MD5.
-	 * Results should be the same.
-	 * @param size The preferred size of the processor.
-     */
-	@Theory
-	public void testHeaderHashing(int size) {
+	 * Checks if hashing of the headers works correctly.
+	 */
+	@Test
+	public void testHeaderHashing() {
 		Context context = new Context();
-		context.put(DropDuplicatedEventsProcessor.SIZE_PARAM, String.valueOf(size));
+		context.put(DropDuplicatedEventsProcessor.SIZE_PARAM, "10");
 		context.put(DropDuplicatedEventsProcessor.CHECK_HEADER_PARAM, Boolean.TRUE.toString());
 		context.put(DropDuplicatedEventsProcessor.CHECK_BODY_PARAM, Boolean.FALSE.toString());
 		DropDuplicatedEventsProcessor interceptor = new DropDuplicatedEventsProcessor();
@@ -314,15 +303,12 @@ public class DropDuplicatedEventsProcessorTest {
 	}
 
 	/**
-	 * This test runs parametrized, so first with a size of 2, then with a size of 1001.
-	 * This results in using two different algorithms, first the Java hashcode, then MD5.
-	 * Results should be the same.
-	 * @param size The preferred size of the processor.
+	 * Checks if hashing of the event bodies work correctly.
 	 */
-	@Theory
-	public void testBodyHashing(int size) {
+	@Test
+	public void testBodyHashing() {
 		Context context = new Context();
-		context.put(DropDuplicatedEventsProcessor.SIZE_PARAM, String.valueOf(size));
+		context.put(DropDuplicatedEventsProcessor.SIZE_PARAM, "10");
 		context.put(DropDuplicatedEventsProcessor.CHECK_HEADER_PARAM, Boolean.FALSE.toString());
 		context.put(DropDuplicatedEventsProcessor.CHECK_BODY_PARAM, Boolean.TRUE.toString());
 		DropDuplicatedEventsProcessor interceptor = new DropDuplicatedEventsProcessor();
