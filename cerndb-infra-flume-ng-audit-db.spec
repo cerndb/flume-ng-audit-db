@@ -8,8 +8,8 @@
 
 Summary:	Flume customisations for gathering audit ang log data from databases
 Name:		cerndb-infra-flume-ng-audit-db
-Version:	0.0.3
-Release:	3%{?dist}
+Version:	0.1.0
+Release:	1%{?dist}
 License:	GPL
 BuildArch:	noarch
 Group:		Development/Tools
@@ -48,6 +48,9 @@ rm -rf ${RPM_BUILD_ROOT}
 
 # Please keep a meaningful changelog
 %changelog
+* Mon Jun 6 2016 Daniel Lanza <daniel.lanza@cern.ch> - 0.1.0-1
+- Run generate_agent_conf, allow configuration of password by specifying a command and use MD5 for hashing
+
 * Tue May 20 2016 Daniel Lanza <daniel.lanza@cern.ch> - 0.0.3-2
 - Run generate_agent_conf after deployment
 

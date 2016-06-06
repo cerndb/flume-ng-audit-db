@@ -104,7 +104,7 @@ public class SpoolDirectorySourceTest{
 	    file2.close();
 	    file2.flush();
 	    
-	    Thread.sleep(2000);
+	    Thread.sleep(3000);
 	    
 	    channel.getTransaction().begin();
 	    
