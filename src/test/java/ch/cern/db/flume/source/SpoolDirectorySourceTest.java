@@ -102,6 +102,7 @@ public class SpoolDirectorySourceTest{
 	    
 	    //Once file is closed, it must be processed
 	    file2.close();
+	    file2.flush();
 	    
 	    Thread.sleep(2000);
 	    
