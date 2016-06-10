@@ -13,5 +13,5 @@ audit_agent.channels.mem_channel.transactionCapacity = 1000
 # Describe the sink
 audit_agent.sinks.avro_sink.type = avro
 audit_agent.sinks.avro_sink.channel = mem_channel
-audit_agent.sinks.avro_sink.hostname = flume-gw-dev.cern.ch
-audit_agent.sinks.avro_sink.port = 11000
+audit_agent.sinks.avro_sink.hostname = db-log-gateway.cern.ch
+audit_agent.sinks.avro_sink.port = 4545
