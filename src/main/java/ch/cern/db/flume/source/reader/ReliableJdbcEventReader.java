@@ -97,7 +97,7 @@ public class ReliableJdbcEventReader implements Configurable{
 
 	protected String last_value = null;
 
-	private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:SSZ");
+	private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 
 	public ReliableJdbcEventReader() {
 		initialize();

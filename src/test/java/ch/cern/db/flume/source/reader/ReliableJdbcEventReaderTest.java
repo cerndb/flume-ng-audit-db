@@ -435,7 +435,7 @@ public class ReliableJdbcEventReaderTest {
 			Assert.assertEquals("{\"ID\":1,\"TEST_SMALLINT\":2992,\"TEST_TINYINT\":124,\"TEST_INTEGER\":2147483640," +
 					"\"TEST_BIGINT\":214748364000,\"TEST_BOOLEAN\":true,\"TEST_NUMERIC_INT\":1234.0," +
 					"\"TEST_NUMERIC_FLOAT\":1234.56,\"TEST_DOUBLE\":100.1,\"TEST_FLOAT\":2.245245222222E9," +
-					"\"TEST_TIMESTAMP\":\"2014-02-14T08:52:00+0100\",\"TEST_VARCHAR\":\"CERN\"}",
+					"\"TEST_TIMESTAMP\":\"2014-02-14T08:52:44+0100\",\"TEST_VARCHAR\":\"CERN\"}",
 					new String(event.getBody()));
 			// Now with scale-aware numeric formats:
 			context.put(ReliableJdbcEventReader.SCALE_AWARE_NUMERIC_PARAM, Boolean.TRUE.toString());
@@ -445,7 +445,7 @@ public class ReliableJdbcEventReaderTest {
 			Assert.assertEquals("{\"ID\":1,\"TEST_SMALLINT\":2992,\"TEST_TINYINT\":124,\"TEST_INTEGER\":2147483640," +
 					"\"TEST_BIGINT\":214748364000,\"TEST_BOOLEAN\":true,\"TEST_NUMERIC_INT\":1234," +
 					"\"TEST_NUMERIC_FLOAT\":1234.56,\"TEST_DOUBLE\":100.1,\"TEST_FLOAT\":2.245245222222E9," +
-					"\"TEST_TIMESTAMP\":\"2014-02-14T08:52:00+0100\",\"TEST_VARCHAR\":\"CERN\"}",
+					"\"TEST_TIMESTAMP\":\"2014-02-14T08:52:44+0100\",\"TEST_VARCHAR\":\"CERN\"}",
 					new String(event.getBody()));
 			// Test if expanding the floats work
 			context.put(ReliableJdbcEventReader.EXPAND_BIG_FLOATS_PARAM, Boolean.TRUE.toString());
@@ -455,7 +455,7 @@ public class ReliableJdbcEventReaderTest {
 			Assert.assertEquals("{\"ID\":1,\"TEST_SMALLINT\":2992,\"TEST_TINYINT\":124,\"TEST_INTEGER\":2147483640," +
 							"\"TEST_BIGINT\":214748364000,\"TEST_BOOLEAN\":true,\"TEST_NUMERIC_INT\":1234," +
 							"\"TEST_NUMERIC_FLOAT\":1234.56,\"TEST_DOUBLE\":100.1,\"TEST_FLOAT\":2245245222.222," +
-							"\"TEST_TIMESTAMP\":\"2014-02-14T08:52:00+0100\",\"TEST_VARCHAR\":\"CERN\"}",
+							"\"TEST_TIMESTAMP\":\"2014-02-14T08:52:44+0100\",\"TEST_VARCHAR\":\"CERN\"}",
 					new String(event.getBody()));
 			event = reader.readEvent(); // The one with the null values
 			Assert.assertNotNull(event);
