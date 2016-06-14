@@ -9,15 +9,16 @@
 package ch.cern.db.flume.sink.elasticsearch.serializer;
 
 import java.io.IOException;
+import java.util.Map;
 
 import org.apache.flume.Context;
 import org.apache.flume.Event;
 import org.apache.flume.conf.ComponentConfiguration;
 import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.elasticsearch.common.xcontent.XContentFactory;
-import org.elasticsearch.common.xcontent.XContentParser;
-import org.elasticsearch.common.xcontent.XContentType;
 
+import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
+
+import com.frontier45.flume.sink.elasticsearch2.ContentBuilderUtil;
 import com.frontier45.flume.sink.elasticsearch2.ElasticSearchEventSerializer;
 
 public class JSONtoElasticSearchEventSerializer implements ElasticSearchEventSerializer {
@@ -32,9 +33,23 @@ public class JSONtoElasticSearchEventSerializer implements ElasticSearchEventSer
 
 	@Override
 	public XContentBuilder getContentBuilder(Event event) throws IOException {
-		XContentParser parser = XContentFactory.xContent(XContentType.JSON).createParser(event.getBody());
-		parser.close();
-		return XContentFactory.jsonBuilder().copyCurrentStructure(parser);
+		XContentBuilder builder = jsonBuilder().startObject();
+		
+		appendHeaders(builder, event);
+		appendBody(builder, event);
+		
+		return builder;
 	}
 
+	private void appendHeaders(XContentBuilder builder, Event event) throws IOException {
+		Map<String, String> headers = event.getHeaders();
+		
+		for (String key : headers.keySet()) {
+			ContentBuilderUtil.appendField(builder, key, headers.get(key).getBytes(charset));
+		}
+	}
+	
+	private void appendBody(XContentBuilder builder, Event event) throws IOException {
+		ContentBuilderUtil.appendField(builder, "body", event.getBody());
+	}
 }

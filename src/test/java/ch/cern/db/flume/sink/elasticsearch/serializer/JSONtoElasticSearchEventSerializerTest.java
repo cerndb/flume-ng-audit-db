@@ -9,6 +9,8 @@
 package ch.cern.db.flume.sink.elasticsearch.serializer;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.flume.Event;
 import org.apache.flume.event.EventBuilder;
@@ -30,7 +32,24 @@ public class JSONtoElasticSearchEventSerializerTest{
 		JSONtoElasticSearchEventSerializer serializer = new JSONtoElasticSearchEventSerializer();
 		
 		XContentBuilder content = serializer.getContentBuilder(event);
-		Assert.assertEquals(json, content.string());
+		Assert.assertEquals("{\"body\":" + json + "}", content.string());
+	}
+	
+	@Test
+	public void serializeWithHeaders() throws IOException{
+		String json = "{\"menu\":{\"id\":\"file\",\"value\":\"File\",\"popup\""
+				+ ":{\"menuitem\":[{\"value\":\"New\",\"onclick\":\"CreateNewDoc()\"}]}}}";
+		Event event = EventBuilder.withBody(json.getBytes());
+		
+		Map<String, String> headers = new HashMap<>();
+		headers.put("head1", "value1");
+		headers.put("head2", "value2");
+		event.setHeaders(headers );
+		
+		JSONtoElasticSearchEventSerializer serializer = new JSONtoElasticSearchEventSerializer();
+		
+		XContentBuilder content = serializer.getContentBuilder(event);
+		Assert.assertEquals("{\"head1\":\"value1\",\"head2\":\"value2\",\"body\":" + json + "}", content.string());
 	}
 	
 }
