@@ -9,7 +9,7 @@
 Summary:	Flume customisations for gathering audit ang log data from databases
 Name:		cerndb-infra-flume-ng-audit-db
 Version:	0.1.0
-Release:	1%{?dist}
+Release:	2%{?dist}
 License:	GPL
 BuildArch:	noarch
 Group:		Development/Tools
