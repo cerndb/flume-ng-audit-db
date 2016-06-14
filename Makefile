@@ -42,4 +42,9 @@ build:
 tag-qa:
 	koji tag-build db6-qa $(PKGID)-$(PKGRELEASE).el6
 	koji tag-build db7-qa $(PKGID)-$(PKGRELEASE).el7.cern
-	
+
+tag-stable:
+	koji tag-build db6-stable $(PKGID)-$(PKGRELEASE).el6
+	koji tag-build db7-stable $(PKGID)-$(PKGRELEASE).el7.cern	
+
+
