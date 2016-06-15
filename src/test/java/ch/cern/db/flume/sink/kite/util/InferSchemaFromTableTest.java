@@ -61,10 +61,10 @@ public class InferSchemaFromTableTest {
 		Schema schema = generator.getSchema();
 		
 		Assert.assertEquals("{\"type\":\"record\",\"name\":\"log\",\"fields\":["
-				+ "{\"name\":\"ID\",\"type\":[\"int\",\"null\"]},"
-				+ "{\"name\":\"RETURN_CODE\",\"type\":[\"int\",\"null\"]},"
-				+ "{\"name\":\"NAME\",\"type\":\"string\"},"
-				+ "{\"name\":\"LASTNAME\",\"type\":[\"string\",\"null\"]}"
+				+ "{\"name\":\"ID\",\"type\":[\"int\",\"null\"],\"doc\":\"SQL type: 4\"},"
+				+ "{\"name\":\"RETURN_CODE\",\"type\":[\"int\",\"null\"],\"doc\":\"SQL type: -5\"},"
+				+ "{\"name\":\"NAME\",\"type\":\"string\",\"doc\":\"SQL type: 12\"},"
+				+ "{\"name\":\"LASTNAME\",\"type\":[\"string\",\"null\"],\"doc\":\"SQL type: 12\"}"
 				+ "]}", 
 				schema.toString(false));
 	}
