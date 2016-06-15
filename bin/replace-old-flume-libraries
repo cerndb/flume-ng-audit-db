@@ -18,11 +18,23 @@ SCRIPT_DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
 HOME=$SCRIPT_DIR/..
 
-sh $HOME/bin/replace-old-flume-libraries
+FLUME_HOME=/usr/lib/aimon-flume-ng/
 
-/usr/lib/aimon-flume-ng/bin/flume-ng agent \
-        --classpath $HOME/target/flume-ng-customizations-0.1.1-SNAPSHOT.jar:$HOME/lib/* \
-        -n audit_agent \
-        -f $HOME/conf/target/agent.conf \
-        -c $HOME/conf/target
-        
+if [ -f $FLUME_HOME/lib/guava-11.0.2.jar ] 
+then
+	rm -f $FLUME_HOME/lib/guava-11.0.2.jar
+	cp $HOME/lib/guava-19.0.jar $FLUME_HOME/lib/
+fi
+
+if [ -f $FLUME_HOME/lib/jackson-core-2.3.1.jar ] 
+then
+	rm -f $FLUME_HOME/lib/jackson-core-2.3.1.jar
+	cp $HOME/lib/jackson-core-2.8.0.rc1.jar $FLUME_HOME/lib/
+fi
+
+if [ -f $FLUME_HOME/lib/jackson-core-asl-1.8.8.jar ] 
+then
+	rm -f $FLUME_HOME/lib/jackson-core-asl-1.8.8.jar
+	cp $HOME/lib/jackson-core-asl-1.9.13.jar $FLUME_HOME/lib/
+fi
+
