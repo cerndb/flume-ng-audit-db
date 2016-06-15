@@ -153,7 +153,8 @@ public class InferSchemaFromTable {
 		    int    columnType = metadata.getColumnType(i);
 		    boolean nullable  = metadata.isNullable(i) == ResultSetMetaData.columnNullable;
 			
-		    FieldTypeBuilder<Schema> field = builder.name(columnName).type();
+		    FieldTypeBuilder<Schema> field = builder.name(columnName)
+		    		.doc("SQL type: " + columnType).type();
 		    
 		    switch (columnType) {
 			case java.sql.Types.SMALLINT:
@@ -180,6 +181,7 @@ public class InferSchemaFromTable {
 					field.nullable().doubleType().noDefault();
 				break;
 			case java.sql.Types.TIMESTAMP:
+			case -101: //TIMESTAMP(3) WITH TIME ZONE
 			case -102: //TIMESTAMP(6) WITH LOCAL TIME ZONE
 			default:
 				if(nullable)

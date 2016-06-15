@@ -328,6 +328,7 @@ public class ReliableJdbcEventReader implements Configurable{
 							}
 							break;
 						case Types.TIMESTAMP:
+						case -101: //TIMESTAMP(3) WITH TIME ZONE
 						case -102: //TIMESTAMP(6) WITH LOCAL TIME ZONE
 							Timestamp timestamp = resultSet.getTimestamp(i);
 							if (!resultSet.wasNull()) {
