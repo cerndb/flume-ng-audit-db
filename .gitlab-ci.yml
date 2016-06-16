@@ -20,7 +20,7 @@ avro_schema_utility:
     - bin/compile
     - bin/infer-avro-schema-from-table -dc org.mariadb.jdbc.Driver -c jdbc:mariadb://localhost/testdb -t customers -u testuser -p password > out
     - cat out
-    - \[ `cat out | grep -v INFO | wc -l` -eq 14 \]   
+    - \[ `cat out | grep -v INFO | wc -l` -eq 17 \]   
     
 jdbc_source:
   stage: test
