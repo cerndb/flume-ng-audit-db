@@ -11,6 +11,7 @@ compile:
     - bin/compile
     
 before_script:
+  - mkdir -p lib
   - wget -O $JDBC_DRIVER http://central.maven.org/maven2/org/mariadb/jdbc/mariadb-java-client/1.1.9/mariadb-java-client-1.1.9.jar
   - cat src/test/resources/prepare-test.sql | mysql -u root --password=
 
@@ -25,7 +26,6 @@ avro_schema_utility:
 jdbc_source:
   stage: test
   script:  
-    - export FORCE_JAVAC=true
     - bin/compile
     - timeout 10s /usr/lib/aimon-flume-ng/bin/flume-ng agent --classpath $JDBC_DRIVER:target/* -n test_agent -f src/test/ci/source-agent/agent.conf -c src/test/ci/source-agent/ > out &
     - sleep 10
