@@ -1,6 +1,6 @@
-# Standard install path for infra stuff
-%define install_path /ORA/dbs01/syscontrol/projects
-%define install_dir_name flume-ng-audit-db
+# Standard install path for infra 
+%define install_path /usr/lib/
+%define install_dir_name db-flume-agent
 %define debug_package %{nil}
 %define __jar_repack %{nil}
 %define __arch_install_post %{nil}
@@ -18,7 +18,7 @@ BuildRoot:	%{_builddir}/%{name}-root
 AutoReqProv:	no
 
 %description
-Flume customisations for gathering audit data and log from databases
+Flume agent for gathering audit and log data from databases
 
 %prep
 %setup -q
@@ -27,21 +27,48 @@ Flume customisations for gathering audit data and log from databases
 
 %install
 %{__rm} -rf %{buildroot}
-mkdir -p $RPM_BUILD_ROOT/var/log/%{install_dir_name}/
-mkdir -p $RPM_BUILD_ROOT/var/lib/%{install_dir_name}/ 
+
 mkdir -p $RPM_BUILD_ROOT/%{install_path}/%{install_dir_name}/
-cp -a ./dist/* $RPM_BUILD_ROOT/%{install_path}/%{install_dir_name}/
+cp -a ./dist/db-agents/LICENSE $RPM_BUILD_ROOT/%{install_path}/%{install_dir_name}/
+
+mkdir -p $RPM_BUILD_ROOT/%{install_path}/%{install_dir_name}/bin/
+cp -a ./dist/db-agents/bin/* $RPM_BUILD_ROOT/%{install_path}/%{install_dir_name}/bin/
+
+mkdir -p $RPM_BUILD_ROOT/%{install_path}/%{install_dir_name}/lib/
+cp -a ./dist/db-agents/lib/* $RPM_BUILD_ROOT/%{install_path}/%{install_dir_name}/lib/
+
+mkdir -p $RPM_BUILD_ROOT/etc/flume-ng/%{install_dir_name}/conf/
+cp -a ./dist/db-agents/conf/* $RPM_BUILD_ROOT/etc/flume-ng/%{install_dir_name}/conf/
+ln -sf /etc/flume-ng/%{install_dir_name}/conf $RPM_BUILD_ROOT/%{install_path}/%{install_dir_name}/conf
+
+mkdir -p $RPM_BUILD_ROOT/var/lib/%{install_dir_name}/ 
+
+mkdir -p $RPM_BUILD_ROOT/var/run/%{install_dir_name}/ 
+
+mkdir -p $RPM_BUILD_ROOT/var/log/%{install_dir_name}/
+
 
 %clean
 rm -rf ${RPM_BUILD_ROOT}
 
 %files
-%defattr(-,root,root,-)
+%defattr(-,flume,flume,-)
+
 %{install_path}/*
-%dir /var/log/%{install_dir_name}/
-%attr(755, oracle, ci) /var/log/%{install_dir_name}/
+
+%dir /etc/flume-ng/%{install_dir_name}/conf/
+%attr(755, flume, flume) /etc/flume-ng/%{install_dir_name}/conf/
+%attr(644, flume, flume) /etc/flume-ng/%{install_dir_name}/conf/*
+
 %dir /var/lib/%{install_dir_name}/
-%attr(755, oracle, ci) /var/lib/%{install_dir_name}/
+%attr(755, flume, flume) /var/lib/%{install_dir_name}/
+
+%dir /var/run/%{install_dir_name}/
+%attr(755, flume, flume) /var/run/%{install_dir_name}/
+
+%dir /var/log/%{install_dir_name}/
+%attr(755, flume, flume) /var/log/%{install_dir_name}/
+
 
 %post
 %{install_path}/%{install_dir_name}/bin/generate_agent_conf
