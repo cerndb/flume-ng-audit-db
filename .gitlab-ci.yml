@@ -59,12 +59,10 @@ make_rpm:
     - sleep 10
     - sudo service db-flume-agent status
     
-remove_rpm:
-  stage: clean
-  script:
-    - sudo service db-flume-agent stop
-    - sudo yum remove -y cerndb-infra-flume-ng-audit-db
-    - sudo rm -rf /etc/flume-ng/db-flume-agent/
-    - sudo rm -rf /var/log/db-flume-agent/
+after_script:
+  - sudo service db-flume-agent stop
+  - sudo yum remove -y cerndb-infra-flume-ng-audit-db
+  - sudo rm -rf /etc/flume-ng/db-flume-agent/
+  - sudo rm -rf /var/log/db-flume-agent/
     
           
