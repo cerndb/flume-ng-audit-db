@@ -2,6 +2,7 @@ stages:
   - build
   - test
   - package
+  - clean
 
 variables:
   JDBC_DRIVER: 'lib/mariadb-java-client.jar'
@@ -47,7 +48,23 @@ make_rpm:
     - make rpm > make_rpm_out
     - rpm_path=`cat make_rpm_out | grep rpmbuild/RPMS/ | cut -d' ' -f2`
     - echo $rpm_path 
+    - sudo rpm -i $rpm_path
+    - \[ -f /usr/lib/db-flume-agent/bin/db-flume-agent \]
+    - \[ -f /etc/init.d/db-flume-agent \]
+    - \[ -d /var/log/db-flume-agent/ \]
+    - \[ -d /var/lib/db-flume-agent/ \]
+    - \[ -d /var/run/db-flume-agent/ \]
+    - \[ -d /etc/flume-ng/db-flume-agent/ \]
+    - sudo service db-flume-agent start
+    - sleep 10
+    - sudo service db-flume-agent status
     
-    
+remove_rpm:
+  stage: clean
+  script:
+    - sudo service db-flume-agent stop
+    - sudo yum remove -y cerndb-infra-flume-ng-audit-db
+    - sudo rm -rf /etc/flume-ng/db-flume-agent/
+    - sudo rm -rf /var/log/db-flume-agent/
     
           
