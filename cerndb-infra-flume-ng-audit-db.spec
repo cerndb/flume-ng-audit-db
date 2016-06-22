@@ -47,6 +47,24 @@ mkdir -p $RPM_BUILD_ROOT/var/run/%{install_dir_name}/
 
 mkdir -p $RPM_BUILD_ROOT/var/log/%{install_dir_name}/
 
+# Install service
+mkdir -p $RPM_BUILD_ROOT/etc/init.d/
+ln -sf %{install_path}/%{install_dir_name}/bin/db-flume-agent $RPM_BUILD_ROOT/etc/init.d/db-flume-agent
+mkdir -p $RPM_BUILD_ROOT/etc/rc0.d/
+ln -sf /etc/init.d/db-flume-agent $RPM_BUILD_ROOT/etc/rc0.d/K99db-flume-agent
+mkdir -p $RPM_BUILD_ROOT/etc/rc1.d/
+ln -sf /etc/init.d/db-flume-agent $RPM_BUILD_ROOT/etc/rc1.d/K99db-flume-agent
+mkdir -p $RPM_BUILD_ROOT/etc/rc2.d/
+ln -sf /etc/init.d/db-flume-agent $RPM_BUILD_ROOT/etc/rc2.d/K99db-flume-agent
+mkdir -p $RPM_BUILD_ROOT/etc/rc3.d/
+ln -sf /etc/init.d/db-flume-agent $RPM_BUILD_ROOT/etc/rc3.d/S99db-flume-agent
+mkdir -p $RPM_BUILD_ROOT/etc/rc4.d/
+ln -sf /etc/init.d/db-flume-agent $RPM_BUILD_ROOT/etc/rc4.d/S99db-flume-agent
+mkdir -p $RPM_BUILD_ROOT/etc/rc5.d/
+ln -sf /etc/init.d/db-flume-agent $RPM_BUILD_ROOT/etc/rc5.d/S99db-flume-agent
+mkdir -p $RPM_BUILD_ROOT/etc/rc6.d/
+ln -sf /etc/init.d/db-flume-agent $RPM_BUILD_ROOT/etc/rc6.d/K99db-flume-agent
+
 
 %clean
 rm -rf ${RPM_BUILD_ROOT}
@@ -56,18 +74,24 @@ rm -rf ${RPM_BUILD_ROOT}
 
 %{install_path}/*
 
+/etc/init.d/*
+/etc/rc?.d/*
+
+%attr(744, flume, flume) %{install_path}/%{install_dir_name}/bin/*
+
 %dir /etc/flume-ng/%{install_dir_name}/conf/
 %attr(755, flume, flume) /etc/flume-ng/%{install_dir_name}/conf/
 %attr(644, flume, flume) /etc/flume-ng/%{install_dir_name}/conf/*
 
 %dir /var/lib/%{install_dir_name}/
-%attr(755, flume, flume) /var/lib/%{install_dir_name}/
+
+%attr(744, flume, flume) /var/lib/%{install_dir_name}/
 
 %dir /var/run/%{install_dir_name}/
-%attr(755, flume, flume) /var/run/%{install_dir_name}/
+%attr(744, flume, flume) /var/run/%{install_dir_name}/
 
 %dir /var/log/%{install_dir_name}/
-%attr(755, flume, flume) /var/log/%{install_dir_name}/
+%attr(744, flume, flume) /var/log/%{install_dir_name}/
 
 
 %post

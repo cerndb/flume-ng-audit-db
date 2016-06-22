@@ -1,17 +1,17 @@
 # DO NOT MODIFY (TEMPLATE)
 
 # Name the components on this agent
-audit_agent.sources = <FLUME_SOURCES>
-audit_agent.channels = mem_channel
-audit_agent.sinks = avro_sink
+db-flume-agent.sources = <FLUME_SOURCES>
+db-flume-agent.channels = mem_channel
+db-flume-agent.sinks = avro_sink
 
 # Use a channel which buffers events in memory
-audit_agent.channels.mem_channel.type = memory
-audit_agent.channels.mem_channel.capacity = 10000
-audit_agent.channels.mem_channel.transactionCapacity = 1000
+db-flume-agent.channels.mem_channel.type = memory
+db-flume-agent.channels.mem_channel.capacity = 10000
+db-flume-agent.channels.mem_channel.transactionCapacity = 1000
 
 # Describe the sink
-audit_agent.sinks.avro_sink.type = avro
-audit_agent.sinks.avro_sink.channel = mem_channel
-audit_agent.sinks.avro_sink.hostname = db-log-gateway.cern.ch
-audit_agent.sinks.avro_sink.port = 4545
+db-flume-agent.sinks.avro_sink.type = avro
+db-flume-agent.sinks.avro_sink.channel = mem_channel
+db-flume-agent.sinks.avro_sink.hostname = db-log-gateway.cern.ch
+db-flume-agent.sinks.avro_sink.port = 4545

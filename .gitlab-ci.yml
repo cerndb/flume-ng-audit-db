@@ -6,7 +6,7 @@ variables:
   JDBC_DRIVER: 'lib/mariadb-java-client.jar'
     
 before_script:
-  - cat src/test/resources/prepare-test.sql | mysql -u root --password=
+  - cat src/test/resources/prepare-test.sql | /usr/bin/mysql -u root --password=
     
 compile:
   stage: build

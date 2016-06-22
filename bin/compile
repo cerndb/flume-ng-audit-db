@@ -33,4 +33,3 @@ HOME=$SCRIPT_DIR/..
 
 export MAVEN_OPTS="-Djava.security.egd=file:///dev/urandom"
 /usr/bin/mvn -f $HOME/pom.xml install
-
