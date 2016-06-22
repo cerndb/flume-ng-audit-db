@@ -32,7 +32,13 @@
 
 . /lib/lsb/init-functions
 
+ORACLE_HOME=/ORA/dbs01/oracle/product/rdbms/
+
 # Autodetect JAVA_HOME if not defined
+# For Oracle machines
+if [ -d $ORACLE_HOME/jdk/jre/ ]; then
+  export JAVA_HOME=$ORACLE_HOME/jdk/jre/
+fi
 if [ -e /usr/libexec/bigtop-detect-javahome ]; then
   . /usr/libexec/bigtop-detect-javahome
 elif [ -e /usr/lib/bigtop-utils/bigtop-detect-javahome ]; then
@@ -54,7 +60,6 @@ FLUME_USER_GROUP=flume
 FLUME_AGENT_NAME="db-flume-agent"
 FLUME_MONITORING=""
 
-ORACLE_HOME=/ORA/dbs01/oracle/product/rdbms
 : ${JDBC_DRIVER:=$ORACLE_HOME/jdbc/lib/*}
 
 FLUME_RUN_DIR=/var/run/db-flume-agent
