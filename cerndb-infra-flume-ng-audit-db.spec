@@ -85,13 +85,13 @@ rm -rf ${RPM_BUILD_ROOT}
 
 %dir /var/lib/%{install_dir_name}/
 
-%attr(744, flume, flume) /var/lib/%{install_dir_name}/
+%attr(755, flume, flume) /var/lib/%{install_dir_name}/
 
 %dir /var/run/%{install_dir_name}/
-%attr(744, flume, flume) /var/run/%{install_dir_name}/
+%attr(755, flume, flume) /var/run/%{install_dir_name}/
 
 %dir /var/log/%{install_dir_name}/
-%attr(744, flume, flume) /var/log/%{install_dir_name}/
+%attr(755, flume, flume) /var/log/%{install_dir_name}/
 
 
 %post
