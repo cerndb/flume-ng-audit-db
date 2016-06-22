@@ -3,9 +3,6 @@
 
 # Enviroment variables can be set here.
 
-ORACLE_HOME=/ORA/dbs01/oracle/product/rdbms
-JAVA_HOME=$ORACLE_HOME/jdk
-
 JAVA_OPTS="-Xms20m -Xmx40m"
 
 FLUME_JAVA_LIBRARY_PATH=/ORA/dbs01/oracle/product/rdbms/lib
