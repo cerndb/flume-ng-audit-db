@@ -1,6 +1,7 @@
 stages:
   - build
   - test
+  - package
 
 variables:
   JDBC_DRIVER: 'lib/mariadb-java-client.jar'
@@ -40,5 +41,14 @@ jdbc_source:
   dependencies:
     - compile
     
-      
-      
+make_rpm:
+  stage: test
+  script:
+    - make rpm > make_rpm_out
+    - rpm_path=`cat make_rpm_out | grep rpmbuild/RPMS/ | cut -d' ' -f2`
+    - echo $rpm_path 
+    
+    
+    
+    
+          
