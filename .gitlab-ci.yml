@@ -59,7 +59,6 @@ make_rpm:
     - sudo service db-flume-agent start
     - sleep 10
     - sudo service db-flume-agent status
-  dependencies:
     
 cleanup_rpm_deployment:
   stage: cleanup
@@ -69,13 +68,13 @@ cleanup_rpm_deployment:
     - sudo rm -rf /etc/flume-ng/db-flume-agent/
     - sudo rm -rf /var/log/db-flume-agent/
   when: always  
-  dependencies:  
           
 deploy_rpm:
   stage: deploy
   script:
-    - \[ -z "`git diff-tree --no-commit-id --name-only -r HEAD | grep .spec`" \] || make build
-    - \[ -z "`git diff-tree --no-commit-id --name-only -r HEAD | grep .spec`" \] || make tag-qa
-  dependencies:
+    - spec_modif = `git diff-tree --no-commit-id --name-only -r HEAD | grep .spec`
+    - \[ -z "$spec_modif" \] || kinit -k -t ~/dblogs.keytab dblogs@CERN.CH
+    - \[ -z "$spec_modif" \] || make build
+    - \[ -z "$spec_modif" \] || make tag-qa
     
     
