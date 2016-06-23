@@ -96,6 +96,7 @@ rm -rf ${RPM_BUILD_ROOT}
 
 %post
 %{install_path}/%{install_dir_name}/bin/generate_agent_conf
+%{install_path}/%{install_dir_name}/bin/db-flume-agent restart
 
 # Please keep a meaningful changelog
 %changelog
