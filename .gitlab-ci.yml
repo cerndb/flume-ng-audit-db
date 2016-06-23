@@ -3,6 +3,7 @@ stages:
   - test
   - package
   - cleanup
+  - deploy
 
 variables:
   JDBC_DRIVER: 'lib/mariadb-java-client.jar'
@@ -68,3 +69,10 @@ cleanup_rpm_deployment:
     - sudo rm -rf /var/log/db-flume-agent/
   when: always    
           
+deploy_rpm:
+  stage: deploy
+  script:
+    - \[ -z "`git diff-tree --no-commit-id --name-only -r HEAD | grep .spec`" \] || make build
+    - \[ -z "`git diff-tree --no-commit-id --name-only -r HEAD | grep .spec`" \] || make tag-qa
+    
+    
