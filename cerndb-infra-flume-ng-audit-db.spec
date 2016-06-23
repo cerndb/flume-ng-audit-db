@@ -9,7 +9,7 @@
 Summary:	Flume customisations for gathering audit ang log data from databases
 Name:		cerndb-infra-flume-ng-audit-db
 Version:	0.1.1
-Release:	2%{?dist}
+Release:	3%{?dist}
 License:	GPL
 BuildArch:	noarch
 Group:		Development/Tools
@@ -100,6 +100,9 @@ rm -rf ${RPM_BUILD_ROOT}
 
 # Please keep a meaningful changelog
 %changelog
+* Thu Jun 23 2016 Daniel Lanza <daniel.lanza@cern.ch> - 0.1.1-3
+- Change directory structure and create Linux service, 
+
 * Mon Jun 14 2016 Daniel Lanza <daniel.lanza@cern.ch> - 0.1.1-1
 - Change configuration for several data flows and solve important issue when parsing timestamps 
 
