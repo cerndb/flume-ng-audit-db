@@ -72,7 +72,7 @@ cleanup_rpm_deployment:
 deploy_rpm:
   stage: deploy
   script:
-    - spec_modif = `git diff-tree --no-commit-id --name-only -r HEAD | grep .spec`
+    - spec_modif=`git diff-tree --no-commit-id --name-only -r HEAD | grep .spec`
     - \[ -z "$spec_modif" \] || kinit -k -t ~/dblogs.keytab dblogs@CERN.CH
     - \[ -z "$spec_modif" \] || make build
     - \[ -z "$spec_modif" \] || make tag-qa
