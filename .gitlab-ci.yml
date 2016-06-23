@@ -59,6 +59,7 @@ make_rpm:
     - sudo service db-flume-agent start
     - sleep 10
     - sudo service db-flume-agent status
+  dependencies:
     
 cleanup_rpm_deployment:
   stage: cleanup
@@ -67,12 +68,14 @@ cleanup_rpm_deployment:
     - sudo yum remove -y cerndb-infra-flume-ng-audit-db
     - sudo rm -rf /etc/flume-ng/db-flume-agent/
     - sudo rm -rf /var/log/db-flume-agent/
-  when: always    
+  when: always  
+  dependencies:  
           
 deploy_rpm:
   stage: deploy
   script:
     - \[ -z "`git diff-tree --no-commit-id --name-only -r HEAD | grep .spec`" \] || make build
     - \[ -z "`git diff-tree --no-commit-id --name-only -r HEAD | grep .spec`" \] || make tag-qa
+  dependencies:
     
     
