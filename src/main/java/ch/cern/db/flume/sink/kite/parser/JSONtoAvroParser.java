@@ -83,7 +83,7 @@ public class JSONtoAvroParser implements EntityParser<GenericRecord> {
 	}
 	
 	private Object getElementAsType(Schema schema, JsonElement element) {
-		if(element == null)
+		if(element == null || element.isJsonNull())
 			return null;
 		
 		switch(schema.getType()){

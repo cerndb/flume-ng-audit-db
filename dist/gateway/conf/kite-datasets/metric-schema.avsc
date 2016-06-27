@@ -1,0 +1,34 @@
+{
+  "type" : "record",
+  "name" : "metric",
+  "fields" : [ 
+  {
+    "name" : "DB_NAME",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: 93"
+  },{
+    "name" : "DB_UNIQUE_NAME",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: 93"
+  },{
+    "name" : "INSTANCE_NAME",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: 93"
+  },{
+    "name" : "BEGIN_TIME",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: 93"
+  }, {
+    "name" : "END_TIME",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: 93"
+  }, {
+    "name" : "METRIC_NAME",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: 12"
+  }, {
+    "name" : "VALUE",
+    "type" : "double",
+    "doc" : "SQL type: 2"
+  } ]
+}

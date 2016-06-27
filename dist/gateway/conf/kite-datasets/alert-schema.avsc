@@ -1,0 +1,153 @@
+{
+  "type" : "record",
+  "name" : "alert",
+  "fields" : [ {
+    "name" : "ADDR",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: -3"
+  }, {
+    "name" : "INDX",
+    "type" : "double",
+    "doc" : "SQL type: 2"
+  }, {
+    "name" : "INST_ID",
+    "type" : "double",
+    "doc" : "SQL type: 2"
+  }, {
+    "name" : "CON_ID",
+    "type" : "double",
+    "doc" : "SQL type: 2"
+  }, {
+    "name" : "ORIGINATING_TIMESTAMP",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: -101"
+  }, {
+    "name" : "NORMALIZED_TIMESTAMP",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: -101"
+  }, {
+    "name" : "ORGANIZATION_ID",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: 12"
+  }, {
+    "name" : "COMPONENT_ID",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: 12"
+  }, {
+    "name" : "HOST_ID",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: 12"
+  }, {
+    "name" : "HOST_ADDRESS",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: 12"
+  }, {
+    "name" : "MESSAGE_TYPE",
+    "type" : "double",
+    "doc" : "SQL type: 2"
+  }, {
+    "name" : "MESSAGE_LEVEL",
+    "type" : "double",
+    "doc" : "SQL type: 2"
+  }, {
+    "name" : "MESSAGE_ID",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: 12"
+  }, {
+    "name" : "MESSAGE_GROUP",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: 12"
+  }, {
+    "name" : "CLIENT_ID",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: 12"
+  }, {
+    "name" : "MODULE_ID",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: 12"
+  }, {
+    "name" : "PROCESS_ID",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: 12"
+  }, {
+    "name" : "THREAD_ID",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: 12"
+  }, {
+    "name" : "USER_ID",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: 12"
+  }, {
+    "name" : "INSTANCE_ID",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: 12"
+  }, {
+    "name" : "DETAILED_LOCATION",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: 12"
+  }, {
+    "name" : "PROBLEM_KEY",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: 12"
+  }, {
+    "name" : "UPSTREAM_COMP_ID",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: 12"
+  }, {
+    "name" : "DOWNSTREAM_COMP_ID",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: 12"
+  }, {
+    "name" : "EXECUTION_CONTEXT_ID",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: 12"
+  }, {
+    "name" : "EXECUTION_CONTEXT_SEQUENCE",
+    "type" : "double",
+    "doc" : "SQL type: 2"
+  }, {
+    "name" : "ERROR_INSTANCE_ID",
+    "type" : "double",
+    "doc" : "SQL type: 2"
+  }, {
+    "name" : "ERROR_INSTANCE_SEQUENCE",
+    "type" : "double",
+    "doc" : "SQL type: 2"
+  }, {
+    "name" : "VERSION",
+    "type" : "double",
+    "doc" : "SQL type: 2"
+  }, {
+    "name" : "MESSAGE_TEXT",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: 12"
+  }, {
+    "name" : "MESSAGE_ARGUMENTS",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: 12"
+  }, {
+    "name" : "SUPPLEMENTAL_ATTRIBUTES",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: 12"
+  }, {
+    "name" : "SUPPLEMENTAL_DETAILS",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: 12"
+  }, {
+    "name" : "PARTITION",
+    "type" : "double",
+    "doc" : "SQL type: 2"
+  }, {
+    "name" : "RECORD_ID",
+    "type" : "double",
+    "doc" : "SQL type: 2"
+  }, {
+    "name" : "CON_UID",
+    "type" : "double",
+    "doc" : "SQL type: 2"
+  }, {
+    "name" : "CONTAINER_NAME",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: 12"
+  } ]
+}

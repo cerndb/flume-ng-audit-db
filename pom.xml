@@ -60,6 +60,7 @@
 			<version>1.0</version>
 			<scope>provided</scope> <!-- remove from jar-with-dependencies -->
 		</dependency>
+
 		<dependency>
 			<!-- build will fail if this is not hadoop-common 2.* because kite uses 
 				hflush. -->
@@ -72,6 +73,13 @@
 				hflush. -->
 			<groupId>org.apache.hadoop</groupId>
 			<artifactId>hadoop-hdfs</artifactId>
+			<version>2.6.0-cdh5.5.1</version>
+		</dependency>
+		<dependency>
+			<!-- build will fail if this is not hadoop-common 2.* because kite uses 
+				hflush. -->
+			<groupId>org.apache.hadoop</groupId>
+			<artifactId>hadoop-client</artifactId>
 			<version>2.6.0-cdh5.5.1</version>
 		</dependency>
 		<dependency>

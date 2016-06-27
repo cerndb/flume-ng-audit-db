@@ -1,0 +1,4 @@
+location=hdfs\://<NAMENODE_HOST>\:8020/<TARGET_DIRECTORY>
+version=1
+compressionType=snappy
+format=parquet
