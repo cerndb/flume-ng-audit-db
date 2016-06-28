@@ -46,7 +46,7 @@ jdbc_source:
 make_agent_rpm:
   stage: test
   script:
-    - make agent_rpm > make_agent_rpm_out
+    - make -f Makefile_agent rpm > make_agent_rpm_out
     - rpm_path=`cat make_agent_rpm_out | grep rpmbuild/RPMS/ | cut -d' ' -f2`
     - echo $rpm_path 
     - sudo rpm -i $rpm_path
@@ -63,7 +63,7 @@ make_agent_rpm:
 make_gateway_rpm:
   stage: test
   script:
-    - make gateway_rpm > make_gateway_rpm_out
+    - make -f Makefile_gateway rpm > make_gateway_rpm_out
     - rpm_path=`cat make_gateway_rpm_out | grep rpmbuild/RPMS/ | cut -d' ' -f2`
     - echo $rpm_path 
     - sudo rpm -i $rpm_path
