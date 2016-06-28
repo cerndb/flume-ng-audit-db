@@ -6,8 +6,8 @@
 %define __arch_install_post %{nil}
 %define __os_install_post %{nil}
 
-Summary:	Flume customisations for gathering audit ang log data from databases
-Name:		cerndb-infra-flume-ng-audit-db
+Summary:	Flume agent for gathering audit and log data from databases
+Name:		cerndb-infra-db-flume-agent
 Version:	0.1.1
 Release:	3%{?dist}
 License:	GPL
