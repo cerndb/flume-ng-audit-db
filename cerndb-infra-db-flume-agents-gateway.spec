@@ -96,7 +96,8 @@ rm -rf ${RPM_BUILD_ROOT}
 
 %post
 %{install_path}/%{install_dir_name}/bin/replace-old-flume-libraries
-%{install_path}/%{install_dir_name}/bin/db-flume-agents-gateway restart
+%{install_path}/%{install_dir_name}/bin/db-flume-agents-gateway stop
+%{install_path}/%{install_dir_name}/bin/db-flume-agents-gateway start
 
 # Please keep a meaningful changelog
 %changelog

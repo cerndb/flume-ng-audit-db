@@ -56,7 +56,6 @@ make_agent_rpm:
     - \[ -d /var/lib/db-flume-agent/ \]
     - \[ -d /var/run/db-flume-agent/ \]
     - \[ -d /etc/flume-ng/db-flume-agent/ \]
-    - sudo service db-flume-agent start
     - sleep 10
     - sudo service db-flume-agent status
     
@@ -73,7 +72,6 @@ make_gateway_rpm:
     - \[ -d /var/lib/db-flume-agents-gateway/ \]
     - \[ -d /var/run/db-flume-agents-gateway/ \]
     - \[ -d /etc/flume-ng/db-flume-agents-gateway/ \]
-    - sudo service db-flume-agents-gateway start
     - sleep 10
     - sudo service db-flume-agents-gateway status
     
