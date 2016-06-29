@@ -49,8 +49,8 @@ make_agent_rpm:
     - make -f Makefile_agent rpm > make_agent_rpm_out
     - rpm_path=`cat make_agent_rpm_out | grep rpmbuild/RPMS/ | cut -d' ' -f2`
     - echo $rpm_path 
-    - rm /var/lib/rpm/.rpm.lock || echo
-    - yum remove -y cerndb-infra-db-flume-agent
+    - sudo rm /var/lib/rpm/.rpm.lock || echo
+    - sudo yum remove -y cerndb-infra-db-flume-agent
     - sudo rpm -i $rpm_path
     - \[ -f /usr/lib/db-flume-agent/bin/db-flume-agent \]
     - \[ -f /etc/init.d/db-flume-agent \]
@@ -67,8 +67,8 @@ make_gateway_rpm:
     - make -f Makefile_gateway rpm > make_gateway_rpm_out
     - rpm_path=`cat make_gateway_rpm_out | grep rpmbuild/RPMS/ | cut -d' ' -f2`
     - echo $rpm_path 
-    - rm /var/lib/rpm/.rpm.lock || echo
-    - yum remove -y cerndb-infra-db-flume-agents-gateway
+    - sudo rm /var/lib/rpm/.rpm.lock || echo
+    - sudo yum remove -y cerndb-infra-db-flume-agents-gateway
     - sudo rpm -i $rpm_path
     - \[ -f /usr/lib/db-flume-agents-gateway/bin/db-flume-agents-gateway \]
     - \[ -f /etc/init.d/db-flume-agents-gateway \]
