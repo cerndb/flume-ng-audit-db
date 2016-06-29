@@ -1,4 +1,4 @@
-SPECFILE=cerndb-infra-db-flume-agent.spec
+SPECFILE=cerndb-infra-db-flume-agent.spec*
 REPOURL=git+ssh://git@gitlab.cern.ch:7999
 # DB gitlab group
 REPOPREFIX=/db
