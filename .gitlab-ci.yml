@@ -83,14 +83,14 @@ cleanup_rpm_deployment:
   # it will do the clean up only on one of the runners
   stage: cleanup
   script:
-    - sudo service db-flume-agent stop || echo
-    - sudo yum remove -y cerndb-infra-db-flume-agent || echo
-    - sudo rm -rf /etc/flume-ng/db-flume-agent/ || echo
-    - sudo rm -rf /var/log/db-flume-agent/ || echo
-    - sudo service db-flume-agents-gateway stop || echo
-    - sudo yum remove -y cerndb-infra-db-flume-agents-gateway || echo
-    - sudo rm -rf /etc/flume-ng/db-flume-agents-gateway/ || echo
-    - sudo rm -rf /var/log/db-flume-agents-gateway/ || echo
+    - sudo service db-flume-agent stop || echo Failed
+    - sudo yum remove -y cerndb-infra-db-flume-agent || echo Failed
+    - sudo rm -rf /etc/flume-ng/db-flume-agent/ || echo Failed
+    - sudo rm -rf /var/log/db-flume-agent/ || echo Failed
+    - sudo service db-flume-agents-gateway stop || echo Failed
+    - sudo yum remove -y cerndb-infra-db-flume-agents-gateway || echo Failed
+    - sudo rm -rf /etc/flume-ng/db-flume-agents-gateway/ || echo Failed
+    - sudo rm -rf /var/log/db-flume-agents-gateway/ || echo Failed
   when: always  
           
 deploy_rpm:
