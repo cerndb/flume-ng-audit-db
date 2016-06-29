@@ -4,49 +4,11 @@ stages:
   - package
   - cleanup
   - deploy
-
-variables:
-  JDBC_DRIVER: 'lib/mariadb-java-client.jar'
     
-before_script:
-  - cat src/test/resources/prepare-test.sql | /usr/bin/mysql -u root --password=
-    
-compile:
-  stage: build
-  script:   
-    - bin/compile
-  artifacts:
-    expire_in: 5 mins
-    paths:
-      - target/
-    
-avro_schema_utility:
+make_rpm:
   stage: test
   script:
-    - mkdir -p lib
-    - wget -O $JDBC_DRIVER http://central.maven.org/maven2/org/mariadb/jdbc/mariadb-java-client/1.1.9/mariadb-java-client-1.1.9.jar
-    - bin/infer-avro-schema-from-table -dc org.mariadb.jdbc.Driver -c jdbc:mariadb://localhost/testdb -t customers -u testuser -p password > out
-    - cat out
-    - \[ `cat out | grep -v INFO | wc -l` -eq 17 \] 
-  dependencies:
-    - compile
-    
-jdbc_source:
-  stage: test
-  script:  
-    - mkdir -p lib
-    - wget -O $JDBC_DRIVER http://central.maven.org/maven2/org/mariadb/jdbc/mariadb-java-client/1.1.9/mariadb-java-client-1.1.9.jar
-    - timeout 10s /usr/lib/aimon-flume-ng/bin/flume-ng agent --classpath $JDBC_DRIVER:target/* -n test_agent -f src/test/ci/source-agent/agent.conf -c src/test/ci/source-agent/ > out &
-    - sleep 10
-    - cat out
-    - \[ `cat out | grep LoggerSink | wc -l` -eq 3 \]
-  dependencies:
-    - compile
-    
-make_agent_rpm:
-  stage: test
-  script:
-    - make -f Makefile_agent rpm > make_agent_rpm_out
+    - make rpm > make_agent_rpm_out
     - rpm_path=`cat make_agent_rpm_out | grep rpmbuild/RPMS/ | cut -d' ' -f2`
     - echo $rpm_path 
     - sudo rm /var/lib/rpm/.rpm.lock || echo
@@ -60,25 +22,7 @@ make_agent_rpm:
     - \[ -d /etc/flume-ng/db-flume-agent/ \]
     - sleep 10
     - sudo service db-flume-agent status
-    
-make_gateway_rpm:
-  stage: test
-  script:
-    - make -f Makefile_gateway rpm > make_gateway_rpm_out
-    - rpm_path=`cat make_gateway_rpm_out | grep rpmbuild/RPMS/ | cut -d' ' -f2`
-    - echo $rpm_path 
-    - sudo rm /var/lib/rpm/.rpm.lock || echo
-    - sudo yum remove -y cerndb-infra-db-flume-agents-gateway
-    - sudo rpm -i $rpm_path
-    - \[ -f /usr/lib/db-flume-agents-gateway/bin/db-flume-agents-gateway \]
-    - \[ -f /etc/init.d/db-flume-agents-gateway \]
-    - \[ -d /var/log/db-flume-agents-gateway/ \]
-    - \[ -d /var/lib/db-flume-agents-gateway/ \]
-    - \[ -d /var/run/db-flume-agents-gateway/ \]
-    - \[ -d /etc/flume-ng/db-flume-agents-gateway/ \]
-    - sleep 10
-    - sudo service db-flume-agents-gateway status
-    
+
 cleanup_rpm_deployment:
   # it will do the clean up only on one of the runners
   stage: cleanup
@@ -96,14 +40,13 @@ cleanup_rpm_deployment:
 deploy_rpm:
   stage: deploy
   script:
-    - spec_modif=`git diff-tree --no-commit-id --name-only -r HEAD | grep .spec` || echo Spec file was not modified
-    - \[ -z "$spec_modif" \] || kinit -k -t ~/dblogs.keytab dblogs@CERN.CH
-    - \[ -z "$spec_modif" \] || make -f Makefile_agent build > make_build_out
-    - \[ -z "$spec_modif" \] || cat make_build_out
-    - \[ -z "$spec_modif" \] || task_id=`cat make_build_out | grep "Created task:" | head -1 | cut -d" " -f3`
-    - \[ -z "$spec_modif" \] || koji watch-task $task_id
-    - \[ -z "$spec_modif" \] || task_id=`cat make_build_out | grep "Created task:" | tail -1 | cut -d" " -f3`
-    - \[ -z "$spec_modif" \] || koji watch-task $task_id
-    - \[ -z "$spec_modif" \] || make tag-qa
+    - kinit -k -t ~/dblogs.keytab dblogs@CERN.CH
+    - make -f Makefile_agent build > make_build_out
+    - cat make_build_out
+    - task_id=`cat make_build_out | grep "Created task:" | head -1 | cut -d" " -f3`
+    - koji watch-task $task_id
+    - task_id=`cat make_build_out | grep "Created task:" | tail -1 | cut -d" " -f3`
+    - koji watch-task $task_id
+    - make tag-qa
     
     

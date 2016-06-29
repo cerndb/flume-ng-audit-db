@@ -1,6 +1,6 @@
-SPECFILE=cerndb-infra-db-flume-agents-gateway.spec
+SPECFILE=$(shell find -maxdepth 1 -name \*.spec -exec basename {} \; )
+
 REPOURL=git+ssh://git@gitlab.cern.ch:7999
-# DB gitlab group
 REPOPREFIX=/db
 REPONAME=cerndb-infra-flume-ng-audit-db
 
@@ -33,18 +33,19 @@ rpm:    all
 	rpmbuild -ba --define '_sourcedir $(PWD)' ${SPECFILE}
 
 scratch:
-	koji build db6 --nowait --scratch  ${REPOURL}${REPOPREFIX}/${REPONAME}.git#master
-	koji build db7 --nowait --scratch  ${REPOURL}${REPOPREFIX}/${REPONAME}.git#master
+	koji build db6 --nowait --scratch  ${REPOURL}${REPOPREFIX}/${REPONAME}.git#origin/build-agents
+	koji build db7 --nowait --scratch  ${REPOURL}${REPOPREFIX}/${REPONAME}.git#origin/build-agents
 
 build:
-	koji build db6 ${REPOURL}${REPOPREFIX}/${REPONAME}.git#origin/rpm-gateway
-	koji build db7 ${REPOURL}${REPOPREFIX}/${REPONAME}.git#origin/rpm-gateway
-
+	koji build db6 ${REPOURL}${REPOPREFIX}/${REPONAME}.git#origin/build-agents
+	koji build db7 ${REPOURL}${REPOPREFIX}/${REPONAME}.git#origin/build-agents
+	
 tag-qa:
 	koji tag-build db6-qa $(PKGID)-$(PKGRELEASE).el6
 	koji tag-build db7-qa $(PKGID)-$(PKGRELEASE).el7.cern
 
 tag-stable:
 	koji tag-build db6-stable $(PKGID)-$(PKGRELEASE).el6
-	koji tag-build db7-stable $(PKGID)-$(PKGRELEASE).el7.cern
+	koji tag-build db7-stable $(PKGID)-$(PKGRELEASE).el7.cern	
+
 
