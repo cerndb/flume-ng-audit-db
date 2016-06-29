@@ -84,7 +84,7 @@ start() {
   fi
 
   log_success_msg "Starting $desc (${FLUME_AGENT_NAME}): "
-  /bin/su -s /bin/bash -c "/bin/bash -c 'echo \$\$ >${FLUME_PID_FILE} && exec ${EXEC_PATH} agent --classpath $FLUME_HOME/lib/* --conf $FLUME_CONF_DIR --conf-file $FLUME_CONF_FILE --name $FLUME_AGENT_NAME $FLUME_MONITORING >>/var/log/db-flume-agents-gateway/db-flume-agents-gateway.out 2>&1' &" $FLUME_USER
+  /bin/su -s /bin/bash -c "/bin/bash -c 'echo \$\$ >${FLUME_PID_FILE} && exec ${EXEC_PATH} agent --classpath $FLUME_HOME/lib/*: --conf $FLUME_CONF_DIR --conf-file $FLUME_CONF_FILE --name $FLUME_AGENT_NAME $FLUME_MONITORING >>/var/log/db-flume-agents-gateway/db-flume-agents-gateway.out 2>&1' &" $FLUME_USER
   RETVAL=$?
   [ $RETVAL -eq 0 ] && touch $LOCKFILE
   return $RETVAL

@@ -9,7 +9,7 @@
 Summary:	Gateway for collecting data from Flume agents that gather audit and log data from databases
 Name:		cerndb-infra-db-flume-agents-gateway
 Version:	0.0.1
-Release:	1%{?dist}
+Release:	2%{?dist}
 License:	GPL
 BuildArch:	noarch
 Group:		Development/Tools
@@ -29,16 +29,16 @@ Gateway for collecting data from Flume agents that gather audit and log data fro
 %{__rm} -rf %{buildroot}
 
 mkdir -p $RPM_BUILD_ROOT/%{install_path}/%{install_dir_name}/
-cp -a ./dist/gateway/LICENSE $RPM_BUILD_ROOT/%{install_path}/%{install_dir_name}/
+cp -a ./LICENSE $RPM_BUILD_ROOT/%{install_path}/%{install_dir_name}/
 
 mkdir -p $RPM_BUILD_ROOT/%{install_path}/%{install_dir_name}/bin/
-cp -a ./dist/gateway/bin/* $RPM_BUILD_ROOT/%{install_path}/%{install_dir_name}/bin/
+cp -a ./bin/* $RPM_BUILD_ROOT/%{install_path}/%{install_dir_name}/bin/
 
 mkdir -p $RPM_BUILD_ROOT/%{install_path}/%{install_dir_name}/lib/
-cp -a ./dist/gateway/lib/* $RPM_BUILD_ROOT/%{install_path}/%{install_dir_name}/lib/
+cp -a ./lib/* $RPM_BUILD_ROOT/%{install_path}/%{install_dir_name}/lib/
 
 mkdir -p $RPM_BUILD_ROOT/etc/flume-ng/%{install_dir_name}/conf/
-cp -a ./dist/gateway/conf/* $RPM_BUILD_ROOT/etc/flume-ng/%{install_dir_name}/conf/
+cp -a ./conf/* $RPM_BUILD_ROOT/etc/flume-ng/%{install_dir_name}/conf/
 ln -sf /etc/flume-ng/%{install_dir_name}/conf $RPM_BUILD_ROOT/%{install_path}/%{install_dir_name}/conf
 
 mkdir -p $RPM_BUILD_ROOT/var/lib/%{install_dir_name}/ 
@@ -102,6 +102,9 @@ rm -rf ${RPM_BUILD_ROOT}
 
 # Please keep a meaningful changelog
 %changelog
+* Wed Jun 29 2016 Daniel Lanza <daniel.lanza@cern.ch> - 0.0.1-2
+- Solve issue with log directory
+
 * Tue Jun 28 2016 Daniel Lanza <daniel.lanza@cern.ch> - 0.0.1-1
 - Initial creation of the RPM.
 
