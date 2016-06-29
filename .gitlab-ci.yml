@@ -41,7 +41,7 @@ deploy_rpm:
   stage: deploy
   script:
     - kinit -k -t ~/dblogs.keytab dblogs@CERN.CH
-    - make -f Makefile_agent build > make_build_out
+    - make build > make_build_out
     - cat make_build_out
     - task_id=`cat make_build_out | grep "Created task:" | head -1 | cut -d" " -f3`
     - koji watch-task $task_id
