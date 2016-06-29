@@ -80,6 +80,7 @@ make_gateway_rpm:
     - sudo service db-flume-agents-gateway status
     
 cleanup_rpm_deployment:
+  # it will do the clean up only on one of the runners
   stage: cleanup
   script:
     - sudo service db-flume-agent stop
@@ -97,7 +98,7 @@ deploy_rpm:
   script:
     - spec_modif=`git diff-tree --no-commit-id --name-only -r HEAD | grep .spec` || echo Spec file was not modified
     - \[ -z "$spec_modif" \] || kinit -k -t ~/dblogs.keytab dblogs@CERN.CH
-    - \[ -z "$spec_modif" \] || make build > make_build_out
+    - \[ -z "$spec_modif" \] || make -f Makefile_agent build > make_build_out
     - \[ -z "$spec_modif" \] || cat make_build_out
     - \[ -z "$spec_modif" \] || task_id=`cat make_build_out | grep "Created task:" | head -1 | cut -d" " -f3`
     - \[ -z "$spec_modif" \] || koji watch-task $task_id

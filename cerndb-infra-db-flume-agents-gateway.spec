@@ -99,6 +99,7 @@ rm -rf ${RPM_BUILD_ROOT}
 %{install_path}/%{install_dir_name}/bin/db-flume-agents-gateway stop
 %{install_path}/%{install_dir_name}/bin/db-flume-agents-gateway start
 
+
 # Please keep a meaningful changelog
 %changelog
 * Tue Jun 28 2016 Daniel Lanza <daniel.lanza@cern.ch> - 0.0.1-1
