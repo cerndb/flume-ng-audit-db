@@ -3,7 +3,7 @@
 
 # Enviroment variables can be set here.
 
-JAVA_OPTS="-Xms20m -Xmx40m"
+JAVA_OPTS="-Xms50m -Xmx100m"
 
 FLUME_JAVA_LIBRARY_PATH=/ORA/dbs01/oracle/product/rdbms/lib
 

@@ -35,14 +35,12 @@
 ORACLE_HOME=/ORA/dbs01/oracle/product/rdbms/
 
 # Autodetect JAVA_HOME if not defined
-# For Oracle machines
-if [ -d $ORACLE_HOME/jdk/jre/ ]; then
-  export JAVA_HOME=$ORACLE_HOME/jdk/jre/
+if [ -f /usr/bin/java ] && [ -z "JAVA_HOME" ]; then
+  export JAVA_HOME=/usr/
 fi
-if [ -e /usr/libexec/bigtop-detect-javahome ]; then
-  . /usr/libexec/bigtop-detect-javahome
-elif [ -e /usr/lib/bigtop-utils/bigtop-detect-javahome ]; then
-  . /usr/lib/bigtop-utils/bigtop-detect-javahome
+# For Oracle machines
+if [ -d $ORACLE_HOME/jdk/jre/ ] && [ -z "JAVA_HOME"  ]; then
+  export JAVA_HOME=$ORACLE_HOME/jdk/jre/
 fi
 
 STATUS_RUNNING=0
@@ -59,8 +57,6 @@ FLUME_USER=flume
 FLUME_USER_GROUP=flume
 FLUME_AGENT_NAME="db-flume-agent"
 FLUME_MONITORING=""
-
-: ${JDBC_DRIVER:=$ORACLE_HOME/jdbc/lib/*}
 
 FLUME_RUN_DIR=/var/run/db-flume-agent
 FLUME_LOCK_DIR="/var/lock/subsys/"
@@ -90,7 +86,7 @@ start() {
   fi
 
   log_success_msg "Starting $desc (${FLUME_AGENT_NAME}): "
-  /bin/su -s /bin/bash -c "/bin/bash -c 'echo \$\$ >${FLUME_PID_FILE} && exec ${EXEC_PATH} agent --classpath $JDBC_DRIVER:$FLUME_HOME/lib/*:$ORACLE_HOME/oc4j/lib/dms.jar --conf $FLUME_CONF_DIR --conf-file $FLUME_CONF_FILE --name $FLUME_AGENT_NAME $FLUME_MONITORING >>/var/log/db-flume-agent/db-flume-agent.out 2>&1' &" $FLUME_USER
+  /bin/su -s /bin/bash -c "/bin/bash -c 'echo \$\$ >${FLUME_PID_FILE} && exec ${EXEC_PATH} agent --classpath $FLUME_HOME/lib/*:$ORACLE_HOME/oc4j/lib/dms.jar --conf $FLUME_CONF_DIR --conf-file $FLUME_CONF_FILE --name $FLUME_AGENT_NAME $FLUME_MONITORING >>/var/log/db-flume-agent/db-flume-agent.out 2>&1' &" $FLUME_USER
   RETVAL=$?
   [ $RETVAL -eq 0 ] && touch $LOCKFILE
   return $RETVAL
