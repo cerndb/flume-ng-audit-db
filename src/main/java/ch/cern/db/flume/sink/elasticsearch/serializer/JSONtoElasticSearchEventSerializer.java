@@ -8,18 +8,23 @@
  */
 package ch.cern.db.flume.sink.elasticsearch.serializer;
 
+import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
+
 import java.io.IOException;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.flume.Context;
 import org.apache.flume.Event;
 import org.apache.flume.conf.ComponentConfiguration;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 
-import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
-
 import com.frontier45.flume.sink.elasticsearch2.ContentBuilderUtil;
 import com.frontier45.flume.sink.elasticsearch2.ElasticSearchEventSerializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
 
 public class JSONtoElasticSearchEventSerializer implements ElasticSearchEventSerializer {
 
@@ -50,6 +55,37 @@ public class JSONtoElasticSearchEventSerializer implements ElasticSearchEventSer
 	}
 	
 	private void appendBody(XContentBuilder builder, Event event) throws IOException {
-		ContentBuilderUtil.appendField(builder, "body", event.getBody());
+		JsonParser parser = new JsonParser();
+		
+		JsonObject json = parser.parse(new String(event.getBody())).getAsJsonObject();
+		
+		for (Entry<String, JsonElement> property : json.entrySet()) {
+		
+			if(!property.getValue().isJsonPrimitive()){
+				builder.field(property.getKey(), property.getValue());
+				
+				continue;
+			}
+			
+			JsonPrimitive primitiveValue = (JsonPrimitive) property.getValue();
+			
+			if(primitiveValue.isBoolean())
+				builder.field(property.getKey(), primitiveValue.getAsBoolean());
+			
+			if(primitiveValue.isNumber()){
+				if (primitiveValue.getAsString().indexOf('.') != -1)
+					builder.field(property.getKey(), primitiveValue.getAsNumber().doubleValue());
+				else
+					builder.field(property.getKey(), primitiveValue.getAsNumber().longValue());
+			}
+			
+			if(primitiveValue.isString())
+				builder.field(property.getKey(), primitiveValue.getAsString());
+		}
 	}
+
 }
+
+
+
+

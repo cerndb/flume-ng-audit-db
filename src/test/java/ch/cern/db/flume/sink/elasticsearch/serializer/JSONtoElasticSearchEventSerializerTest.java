@@ -25,20 +25,37 @@ public class JSONtoElasticSearchEventSerializerTest{
 
 	@Test
 	public void serialize() throws IOException{
-		String json = "{\"menu\":{\"id\":\"file\",\"value\":\"File\",\"popup\""
-				+ ":{\"menuitem\":[{\"value\":\"New\",\"onclick\":\"CreateNewDoc()\"}]}}}";
+		String json = "{" +
+		        "\"data\":\"Click Here\"," +
+		        "\"size\":36," +
+		        "\"style\":\"bold\"," +
+		        "\"name\":\"text1\"," +
+		        "\"hOffset\":250.54," +
+		        "\"vOffset\":100.13," +
+		        "\"alignment\":\"center\"," +
+		        "\"onMouseUp\":\"sun1.opacity = (sun1.opacity / 100) * 90;\"" +
+		    	"}";
 		Event event = EventBuilder.withBody(json.getBytes());
 		
 		JSONtoElasticSearchEventSerializer serializer = new JSONtoElasticSearchEventSerializer();
 		
 		XContentBuilder content = serializer.getContentBuilder(event);
-		Assert.assertEquals("{\"body\":" + json + "}", content.string());
+		Assert.assertEquals(json, content.string());
 	}
 	
 	@Test
 	public void serializeWithHeaders() throws IOException{
-		String json = "{\"menu\":{\"id\":\"file\",\"value\":\"File\",\"popup\""
-				+ ":{\"menuitem\":[{\"value\":\"New\",\"onclick\":\"CreateNewDoc()\"}]}}}";
+		String json = "{" +
+		        "\"data\": \"Click Here\"," +
+		        "\"size\": 36," +
+		        "\"style\": \"bold\"," +
+		        "\"name\": \"text1\"," +
+		        "\"hOffset\": 250.54," +
+		        "\"vOffset\": 100.13," +
+		        "\"alignment\": \"center\"," +
+		        "\"center\": true," +
+		        "\"onMouseUp\": \"sun1.opacity = (sun1.opacity / 100) * 90;\"" +
+		    	"}";
 		Event event = EventBuilder.withBody(json.getBytes());
 		
 		Map<String, String> headers = new HashMap<>();
@@ -49,7 +66,19 @@ public class JSONtoElasticSearchEventSerializerTest{
 		JSONtoElasticSearchEventSerializer serializer = new JSONtoElasticSearchEventSerializer();
 		
 		XContentBuilder content = serializer.getContentBuilder(event);
-		Assert.assertEquals("{\"head1\":\"value1\",\"head2\":\"value2\",\"body\":" + json + "}", content.string());
+		System.out.println(content.string());
+		Assert.assertEquals("{\"head1\":\"value1\","
+				+ "\"head2\":\"value2\","
+				+ "\"data\":\"Click Here\","
+				+ "\"size\":36,"
+				+ "\"style\":\"bold\","
+				+ "\"name\":\"text1\","
+				+ "\"hOffset\":250.54,"
+				+ "\"vOffset\":100.13,"
+				+ "\"alignment\":\"center\","
+				+ "\"center\":true,"
+				+ "\"onMouseUp\":\"sun1.opacity = (sun1.opacity / 100) * 90;\"}", 
+				content.string());
 	}
 	
 }
