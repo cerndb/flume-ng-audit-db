@@ -32,6 +32,8 @@ import com.google.gson.JsonParser;
  */
 public class JSONtoAvroParser implements EntityParser<GenericRecord> {
 
+	public static final String FIELD_AT_HEADER_PROPERTY = "at_header";
+
 	static Configuration conf = new Configuration();
 
 	/**
@@ -41,6 +43,8 @@ public class JSONtoAvroParser implements EntityParser<GenericRecord> {
 	 */
 	private final Schema datasetSchema;
 
+	
+	
 	/**
 	 * Create a new AvroParser given the schema of the destination dataset.
 	 * 
@@ -74,9 +78,15 @@ public class JSONtoAvroParser implements EntityParser<GenericRecord> {
 		
 		GenericRecordBuilder recordBuilder = new GenericRecordBuilder(datasetSchema);
 		for (Field field:datasetSchema.getFields()) {
-			JsonElement element = parser.get(field.name());
-
-			recordBuilder.set(field.name(), getElementAsType(field.schema(), element));
+			String at_header = field.getProp(FIELD_AT_HEADER_PROPERTY);
+			
+			if(at_header != null && at_header.equals(Boolean.TRUE.toString())){
+				recordBuilder.set(field.name(), event.getHeaders().get(field.name()));
+			}else{
+				JsonElement element = parser.get(field.name());
+				
+				recordBuilder.set(field.name(), getElementAsType(field.schema(), element));
+			}
 		}
 
 		return recordBuilder.build();
