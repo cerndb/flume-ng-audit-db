@@ -30,5 +30,21 @@
     "name" : "VALUE",
     "type" : "double",
     "doc" : "SQL type: 2"
-  } ]
+  }, {
+    "name" : "database_type",
+    "type" : [ "string", "null" ],
+    "doc" : "From machine"
+  }, {
+    "name" : "hostname",
+    "type" : [ "string", "null" ],
+    "doc" : "From machine"
+  }, {
+    "name" : "oracle_sid",
+    "type" : [ "string", "null" ],
+    "doc" : "From machine"
+  }, {
+    "name" : "source_type",
+    "type" : [ "string", "null" ],
+    "doc" : "From machine"
+  }  ]
 }
