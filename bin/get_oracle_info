@@ -15,7 +15,7 @@ function from_syscontrol {
 
 	for ENTITY in $(/etc/init.d/syscontrol list | awk '{print $1}'); 
 	do 
-		/ORA/dbs01/syscontrol/bin/oracletab.sh sc_entity=$ENTITY sc_host_name=$HOSTNAME  sc_subcategory=$SUBCATEGORY db_sids; 
+		/ORA/dbs01/syscontrol/bin/oracletab.sh sc_entity=$ENTITY sc_host_name=$HOSTNAME sc_subcategory=$SUBCATEGORY db_sids sc_version; 
 	done;
 }
 
