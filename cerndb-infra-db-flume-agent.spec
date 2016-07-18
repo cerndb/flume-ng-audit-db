@@ -8,8 +8,8 @@
 
 Summary:	Flume agent for gathering audit and log data from databases
 Name:		cerndb-infra-db-flume-agent
-Version:	0.1.1
-Release:	4%{?dist}
+Version:	0.1.2
+Release:	1%{?dist}
 License:	GPL
 BuildArch:	noarch
 Group:		Development/Tools
@@ -101,6 +101,9 @@ rm -rf ${RPM_BUILD_ROOT}
 
 # Please keep a meaningful changelog
 %changelog
+* Mon Jul 18 2016 Daniel Lanza <daniel.lanza@cern.ch> - 0.1.2-1
+- Collect database version
+
 * Thu Jun 23 2016 Daniel Lanza <daniel.lanza@cern.ch> - 0.1.1-4
 - Add ojdbc driver and get Java from /usr/bin/java
 
