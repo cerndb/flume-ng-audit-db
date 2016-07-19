@@ -33,18 +33,22 @@
   }, {
     "name" : "database_type",
     "type" : [ "string", "null" ],
+    "at_header" : "true",
     "doc" : "From machine"
   }, {
     "name" : "hostname",
     "type" : [ "string", "null" ],
+    "at_header" : "true",
     "doc" : "From machine"
   }, {
     "name" : "oracle_sid",
     "type" : [ "string", "null" ],
+    "at_header" : "true",
     "doc" : "From machine"
   }, {
     "name" : "source_type",
     "type" : [ "string", "null" ],
+    "at_header" : "true",
     "doc" : "From machine"
   }  ]
 }
