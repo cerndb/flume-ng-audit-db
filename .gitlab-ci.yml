@@ -1,24 +1,7 @@
 stages:
-  - build
   - deploy
 
-build:
-  stage: build
-  image: docker.cern.ch/cloud-infrastructure/gitbook-ebook
-  except:
-        - master
-  script:
-    - rm -rf $CI_PROJECT_DIR/_book
-    - gitbook build $CI_PROJECT_DIR $CI_PROJECT_DIR/_book
-    - gitbook pdf $CI_PROJECT_DIR $CI_PROJECT_DIR/book.pdf
-  artifacts:
-    paths:
-      - _book
-      - book.pdf
-  tags:
-      - docker
-
-deploy:
+build_and_deploy:
   stage: deploy
   image: fellah/gitbook-ebook
   only:
@@ -27,7 +10,7 @@ deploy:
     - rm -rf $CI_PROJECT_DIR/_book
     - gitbook build $CI_PROJECT_DIR $CI_PROJECT_DIR/_book
     - gitbook pdf $CI_PROJECT_DIR $CI_PROJECT_DIR/book.pdf
-    - apt-get install sshpass
+    - apt-get install -y sshpass
     - SSHPASS=$DBWEBDOC_PASSWORD sshpass -e scp -oStrictHostKeyChecking=no -r $CI_PROJECT_DIR/_book/* dbwebdoc@lxplus.cern.ch:$AFS_DOCS_LOCATION
   tags:
     - docker
