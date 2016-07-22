@@ -14,4 +14,4 @@ db-flume-agent.channels.mem_channel.transactionCapacity = 1000
 db-flume-agent.sinks.avro_sink.type = avro
 db-flume-agent.sinks.avro_sink.channel = mem_channel
 db-flume-agent.sinks.avro_sink.hostname = db-log-gateway.cern.ch
-db-flume-agent.sinks.avro_sink.port = 4545
+db-flume-agent.sinks.avro_sink.port = 10126
