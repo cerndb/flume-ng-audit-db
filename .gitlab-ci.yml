@@ -7,6 +7,8 @@ stages:
     
 make_rpm:
   stage: test
+  tags:
+    - custom
   script:
     - make rpm > make_agent_rpm_out
     - rpm_path=`cat make_agent_rpm_out | grep rpmbuild/RPMS/ | cut -d' ' -f2`
@@ -26,6 +28,8 @@ make_rpm:
 cleanup_rpm_deployment:
   # it will do the clean up only on one of the runners
   stage: cleanup
+  tags:
+    - custom
   script:
     - sudo service db-flume-agent stop || echo Failed
     - sudo yum remove -y cerndb-infra-db-flume-agent || echo Failed
@@ -39,6 +43,8 @@ cleanup_rpm_deployment:
           
 deploy_rpm:
   stage: deploy
+  tags:
+    - custom
   script:
     - kinit -k -t ~/dblogs.keytab dblogs@CERN.CH
     - make build > make_build_out
