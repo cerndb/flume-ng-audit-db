@@ -37,16 +37,29 @@ done
 tail -n +2 $HOME/conf/agent.conf.main.template | sed -e "s/<FLUME_SOURCES>/$FLUME_SOURCES/g" >> $HOME/conf/agent.conf
 )
 
-# Generate FLume sources
+# Generate Flume sources
 cat $HOME/conf/oracle_info | while read ORACLE_INST_INFO
 do
 	ORACLE_SID=`echo $ORACLE_INST_INFO | cut -d' ' -f1`
 	ORACLE_VER=`echo $ORACLE_INST_INFO | cut -d' ' -f2 | cut -d'-' -f3 | cut -d'.' -f 1-5`
+	ORACLE_MAIN_VER=`echo $ORACLE_VER | cut -d'.' -f1`
+	
+	if [ "$ORACLE_MAIN_VER" == "12" ]
+	then
+		ORACLE_AUDIT_TABLE=UNIFIED_AUDIT_TRAIL 	
+		ORACLE_AUDIT_TABLE_DELTA_COLUMN=EVENT_TIMESTAMP
+	else
+		ORACLE_AUDIT_TABLE=DBA_AUDIT_TRAIL 		
+		ORACLE_AUDIT_TABLE_DELTA_COLUMN=TIMESTAMP
+	fi
 	
 	tail -n +2 $HOME/conf/agent.conf.oracle-service.template | \
 		sed -e "s/<ORACLE_USER>/$ORACLE_USER/g" | \
 		sed -e "s=<ORACLE_PASSWORD>=$ORACLE_PASSWORD=g" | \
+		sed -e "s/<ORACLE_AUDIT_TABLE>/$ORACLE_AUDIT_TABLE/g" | \
+		sed -e "s/<ORACLE_AUDIT_TABLE_DELTA_COLUMN>/$ORACLE_AUDIT_TABLE_DELTA_COLUMN/g" | \
 		sed -e "s/<ORACLE_SID>/$ORACLE_SID/g" | \
+		sed -e "s/<ORACLE_MAIN_VER>/$ORACLE_MAIN_VER/g" | \
 		sed -e "s/<ORACLE_VER>/$ORACLE_VER/g" \
 		>> $HOME/conf/agent.conf
 done
