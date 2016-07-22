@@ -9,7 +9,7 @@
 Summary:	Flume agent for gathering audit and log data from databases
 Name:		cerndb-infra-db-flume-agent
 Version:	0.1.2
-Release:	1%{?dist}
+Release:	2%{?dist}
 License:	GPL
 BuildArch:	noarch
 Group:		Development/Tools
@@ -101,6 +101,9 @@ rm -rf ${RPM_BUILD_ROOT}
 
 # Please keep a meaningful changelog
 %changelog
+* Fri Jul 22 2016 Daniel Lanza <daniel.lanza@cern.ch> - 0.1.2-2
+- Update JAR, differentiate between version 11 and 12 for audit and collect all metrics
+
 * Mon Jul 18 2016 Daniel Lanza <daniel.lanza@cern.ch> - 0.1.2-1
 - Collect database version
 
