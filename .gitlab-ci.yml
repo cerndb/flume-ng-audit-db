@@ -22,7 +22,7 @@ deploy:
   stage: deploy
   image: fellah/gitbook-ebook
   only:
-    - master
+    - gitbook
   script:
     - rm -rf $CI_PROJECT_DIR/_book
     - gitbook build $CI_PROJECT_DIR $CI_PROJECT_DIR/_book
