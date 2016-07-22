@@ -13,6 +13,8 @@ before_script:
     
 compile:
   stage: build
+  tags:
+    - custom
   script:   
     - bin/compile
   artifacts:
@@ -22,6 +24,8 @@ compile:
     
 avro_schema_utility:
   stage: test
+  tags:
+    - custom
   script:
     - mkdir -p lib
     - wget -O $JDBC_DRIVER http://central.maven.org/maven2/org/mariadb/jdbc/mariadb-java-client/1.1.9/mariadb-java-client-1.1.9.jar
@@ -33,6 +37,8 @@ avro_schema_utility:
     
 jdbc_source:
   stage: test
+  tags:
+    - custom
   script:  
     - mkdir -p lib
     - wget -O $JDBC_DRIVER http://central.maven.org/maven2/org/mariadb/jdbc/mariadb-java-client/1.1.9/mariadb-java-client-1.1.9.jar
