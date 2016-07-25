@@ -205,7 +205,6 @@ public class DropDuplicatedEventsProcessorTest {
 
 		Context context = new Context();
 		context.put(DropDuplicatedEventsProcessor.SIZE_PARAM, "2");
-		context.put(DropDuplicatedEventsProcessor.PATH_PARAM, "src/test/resources/last.hashes");
 		DropDuplicatedEventsProcessor interceptor = new DropDuplicatedEventsProcessor();
 		interceptor.configure(context);
 
