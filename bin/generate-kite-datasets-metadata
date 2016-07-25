@@ -45,7 +45,8 @@ NAMENODE_HOST=p01001532067275.cern.ch
 USER_DIR=/user/dblogs/
 
 generate_dataset_metadata $NAMENODE_HOST $USER_DIR/alert/ $HOME/conf/kite-datasets/alert-schema.avsc
-generate_dataset_metadata $NAMENODE_HOST $USER_DIR/audit/ $HOME/conf/kite-datasets/audit-schema.avsc
+generate_dataset_metadata $NAMENODE_HOST $USER_DIR/audit-11/ $HOME/conf/kite-datasets/audit-11-schema.avsc
+generate_dataset_metadata $NAMENODE_HOST $USER_DIR/audit-12/ $HOME/conf/kite-datasets/audit-12-schema.avsc
 generate_dataset_metadata $NAMENODE_HOST $USER_DIR/metric/ $HOME/conf/kite-datasets/metric-schema.avsc
 
 

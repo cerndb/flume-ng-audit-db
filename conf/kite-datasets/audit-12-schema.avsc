@@ -1,0 +1,201 @@
+{
+  "type" : "record",
+  "name" : "log",
+  "fields" : [ {
+    "name" : "OS_USERNAME",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: 12"
+  }, {
+    "name" : "USERNAME",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: 12"
+  }, {
+    "name" : "USERHOST",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: 12"
+  }, {
+    "name" : "TERMINAL",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: 12"
+  }, {
+    "name" : "TIMESTAMP",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: 93"
+  }, {
+    "name" : "OWNER",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: 12"
+  }, {
+    "name" : "OBJ_NAME",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: 12"
+  }, {
+    "name" : "ACTION",
+    "type" : [ "double", "null" ],
+    "doc" : "SQL type: 2"
+  }, {
+    "name" : "ACTION_NAME",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: 12"
+  }, {
+    "name" : "NEW_OWNER",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: 12"
+  }, {
+    "name" : "NEW_NAME",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: 12"
+  }, {
+    "name" : "OBJ_PRIVILEGE",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: 12"
+  }, {
+    "name" : "SYS_PRIVILEGE",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: 12"
+  }, {
+    "name" : "ADMIN_OPTION",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: 12"
+  }, {
+    "name" : "GRANTEE",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: 12"
+  }, {
+    "name" : "AUDIT_OPTION",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: 12"
+  }, {
+    "name" : "SES_ACTIONS",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: 12"
+  }, {
+    "name" : "LOGOFF_TIME",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: 93"
+  }, {
+    "name" : "LOGOFF_LREAD",
+    "type" : "double",
+    "doc" : "SQL type: 2"
+  }, {
+    "name" : "LOGOFF_PREAD",
+    "type" : "double",
+    "doc" : "SQL type: 2"
+  }, {
+    "name" : "LOGOFF_LWRITE",
+    "type" : "double",
+    "doc" : "SQL type: 2"
+  }, {
+    "name" : "LOGOFF_DLOCK",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: 12"
+  }, {
+    "name" : "COMMENT_TEXT",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: 12"
+  }, {
+    "name" : "SESSIONID",
+    "type" : [ "double", "null" ],
+    "doc" : "SQL type: 2"
+  }, {
+    "name" : "ENTRYID",
+    "type" : [ "double", "null" ],
+    "doc" : "SQL type: 2"
+  }, {
+    "name" : "STATEMENTID",
+    "type" : [ "double", "null" ],
+    "doc" : "SQL type: 2"
+  }, {
+    "name" : "RETURNCODE",
+    "type" : [ "double", "null" ],
+    "doc" : "SQL type: 2"
+  }, {
+    "name" : "PRIV_USED",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: 12"
+  }, {
+    "name" : "CLIENT_ID",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: 12"
+  }, {
+    "name" : "ECONTEXT_ID",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: 12"
+  }, {
+    "name" : "SESSION_CPU",
+    "type" : "double",
+    "doc" : "SQL type: 2"
+  }, {
+    "name" : "EXTENDED_TIMESTAMP",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: -101"
+  }, {
+    "name" : "PROXY_SESSIONID",
+    "type" : "double",
+    "doc" : "SQL type: 2"
+  }, {
+    "name" : "GLOBAL_UID",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: 12"
+  }, {
+    "name" : "INSTANCE_NUMBER",
+    "type" : "double",
+    "doc" : "SQL type: 2"
+  }, {
+    "name" : "OS_PROCESS",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: 12"
+  }, {
+    "name" : "TRANSACTIONID",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: -3"
+  }, {
+    "name" : "SCN",
+    "type" : "double",
+    "doc" : "SQL type: 2"
+  }, {
+    "name" : "SQL_BIND",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: -9"
+  }, {
+    "name" : "SQL_TEXT",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: -9"
+  }, {
+    "name" : "OBJ_EDITION_NAME",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: 12"
+  }, {
+    "name" : "DBID",
+    "type" : "double",
+    "doc" : "SQL type: 2"
+  }, {
+    "name" : "RLS_INFO",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: 2005"
+  }, {
+    "name" : "CURRENT_USER",
+    "type" : [ "string", "null" ],
+    "doc" : "SQL type: 12"
+  }, {
+    "name" : "database_type",
+    "type" : [ "string", "null" ],
+    "at_header" : "true",
+    "doc" : "From machine"
+  }, {
+    "name" : "hostname",
+    "type" : [ "string", "null" ],
+    "at_header" : "true",
+    "doc" : "From machine"
+  }, {
+    "name" : "oracle_sid",
+    "type" : [ "string", "null" ],
+    "at_header" : "true",
+    "doc" : "From machine"
+  }, {
+    "name" : "source_type",
+    "type" : [ "string", "null" ],
+    "at_header" : "true",
+    "doc" : "From machine"
+  } ]
+}
