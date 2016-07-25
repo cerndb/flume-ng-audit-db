@@ -151,7 +151,10 @@ public class InferSchemaFromTable {
 		for (int i = 1; i <= columnCount; i++) {
 			String columnName = metadata.getColumnName(i);
 		    int    columnType = metadata.getColumnType(i);
-		    boolean nullable  = metadata.isNullable(i) == ResultSetMetaData.columnNullable;
+		    
+		    int isNullable = metadata.isNullable(i);
+		    boolean nullable  = isNullable == ResultSetMetaData.columnNullable ||
+		    						isNullable == ResultSetMetaData.columnNullableUnknown;
 			
 		    FieldTypeBuilder<Schema> field = builder.name(columnName)
 		    		.doc("SQL type: " + columnType).type();
