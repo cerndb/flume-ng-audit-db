@@ -31,7 +31,7 @@
     "doc" : "SQL type: 12"
   }, {
     "name" : "ACTION",
-    "type" : [ "double", "null" ],
+    "type" : "double",
     "doc" : "SQL type: 2"
   }, {
     "name" : "ACTION_NAME",
@@ -75,15 +75,15 @@
     "doc" : "SQL type: 93"
   }, {
     "name" : "LOGOFF_LREAD",
-    "type" : "double",
+    "type" : [ "double", "null" ],
     "doc" : "SQL type: 2"
   }, {
     "name" : "LOGOFF_PREAD",
-    "type" : "double",
+    "type" : [ "double", "null" ],
     "doc" : "SQL type: 2"
   }, {
     "name" : "LOGOFF_LWRITE",
-    "type" : "double",
+    "type" : [ "double", "null" ],
     "doc" : "SQL type: 2"
   }, {
     "name" : "LOGOFF_DLOCK",
@@ -95,19 +95,19 @@
     "doc" : "SQL type: 12"
   }, {
     "name" : "SESSIONID",
-    "type" : [ "double", "null" ],
+    "type" : "double",
     "doc" : "SQL type: 2"
   }, {
     "name" : "ENTRYID",
-    "type" : [ "double", "null" ],
+    "type" : "double",
     "doc" : "SQL type: 2"
   }, {
     "name" : "STATEMENTID",
-    "type" : [ "double", "null" ],
+    "type" : "double",
     "doc" : "SQL type: 2"
   }, {
     "name" : "RETURNCODE",
-    "type" : [ "double", "null" ],
+    "type" : "double",
     "doc" : "SQL type: 2"
   }, {
     "name" : "PRIV_USED",
@@ -123,7 +123,7 @@
     "doc" : "SQL type: 12"
   }, {
     "name" : "SESSION_CPU",
-    "type" : "double",
+    "type" : [ "double", "null" ],
     "doc" : "SQL type: 2"
   }, {
     "name" : "EXTENDED_TIMESTAMP",
@@ -131,7 +131,7 @@
     "doc" : "SQL type: -101"
   }, {
     "name" : "PROXY_SESSIONID",
-    "type" : "double",
+    "type" : [ "double", "null" ],
     "doc" : "SQL type: 2"
   }, {
     "name" : "GLOBAL_UID",
@@ -139,7 +139,7 @@
     "doc" : "SQL type: 12"
   }, {
     "name" : "INSTANCE_NUMBER",
-    "type" : "double",
+    "type" : [ "double", "null" ],
     "doc" : "SQL type: 2"
   }, {
     "name" : "OS_PROCESS",
@@ -151,7 +151,7 @@
     "doc" : "SQL type: -3"
   }, {
     "name" : "SCN",
-    "type" : "double",
+    "type" : [ "double", "null" ],
     "doc" : "SQL type: 2"
   }, {
     "name" : "SQL_BIND",
@@ -167,7 +167,7 @@
     "doc" : "SQL type: 12"
   }, {
     "name" : "DBID",
-    "type" : "double",
+    "type" : [ "double", "null" ],
     "doc" : "SQL type: 2"
   }, {
     "name" : "database_type",
