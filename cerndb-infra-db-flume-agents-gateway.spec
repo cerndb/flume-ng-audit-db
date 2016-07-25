@@ -9,7 +9,7 @@
 Summary:	Gateway for collecting data from Flume agents that gather audit and log data from databases
 Name:		cerndb-infra-db-flume-agents-gateway
 Version:	0.0.2
-Release:	1%{?dist}
+Release:	2%{?dist}
 License:	GPL
 BuildArch:	noarch
 Group:		Development/Tools
@@ -102,6 +102,9 @@ rm -rf ${RPM_BUILD_ROOT}
 
 # Please keep a meaningful changelog
 %changelog
+* Mon Jul 25 2016 Daniel Lanza <daniel.lanza@cern.ch> - 0.0.2-2
+- Point out to proper keytab in conf
+
 * Tue Jul 12 2016 Daniel Lanza <daniel.lanza@cern.ch> - 0.0.2-1
 - Update package to 0.1.2 and remove some sinks from configuration
 
