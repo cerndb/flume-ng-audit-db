@@ -169,7 +169,7 @@
     "name" : "DBID",
     "type" : [ "double", "null" ],
     "doc" : "SQL type: 2"
-  œ}, {
+  }, {
     "name" : "RLS_INFO",
     "type" : [ "string", "null" ],
     "doc" : "SQL type: 2005"
