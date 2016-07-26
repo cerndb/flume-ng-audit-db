@@ -1,21 +1,17 @@
 {
   "type" : "record",
-  "name" : "alert",
+  "name" : "log",
   "fields" : [ {
     "name" : "ADDR",
     "type" : [ "string", "null" ],
     "doc" : "SQL type: -3"
   }, {
     "name" : "INDX",
-    "type" : "double",
+    "type" : [ "double", "null" ],
     "doc" : "SQL type: 2"
   }, {
     "name" : "INST_ID",
-    "type" : "double",
-    "doc" : "SQL type: 2"
-  }, {
-    "name" : "CON_ID",
-    "type" : "double",
+    "type" : [ "double", "null" ],
     "doc" : "SQL type: 2"
   }, {
     "name" : "ORIGINATING_TIMESTAMP",
@@ -43,11 +39,11 @@
     "doc" : "SQL type: 12"
   }, {
     "name" : "MESSAGE_TYPE",
-    "type" : "double",
+    "type" : [ "double", "null" ],
     "doc" : "SQL type: 2"
   }, {
     "name" : "MESSAGE_LEVEL",
-    "type" : "double",
+    "type" : [ "double", "null" ],
     "doc" : "SQL type: 2"
   }, {
     "name" : "MESSAGE_ID",
@@ -103,19 +99,19 @@
     "doc" : "SQL type: 12"
   }, {
     "name" : "EXECUTION_CONTEXT_SEQUENCE",
-    "type" : "double",
+    "type" : [ "double", "null" ],
     "doc" : "SQL type: 2"
   }, {
     "name" : "ERROR_INSTANCE_ID",
-    "type" : "double",
+    "type" : [ "double", "null" ],
     "doc" : "SQL type: 2"
   }, {
     "name" : "ERROR_INSTANCE_SEQUENCE",
-    "type" : "double",
+    "type" : [ "double", "null" ],
     "doc" : "SQL type: 2"
   }, {
     "name" : "VERSION",
-    "type" : "double",
+    "type" : [ "double", "null" ],
     "doc" : "SQL type: 2"
   }, {
     "name" : "MESSAGE_TEXT",
@@ -135,19 +131,31 @@
     "doc" : "SQL type: 12"
   }, {
     "name" : "PARTITION",
-    "type" : "double",
+    "type" : [ "double", "null" ],
     "doc" : "SQL type: 2"
   }, {
     "name" : "RECORD_ID",
-    "type" : "double",
+    "type" : [ "double", "null" ],
     "doc" : "SQL type: 2"
   }, {
-    "name" : "CON_UID",
-    "type" : "double",
-    "doc" : "SQL type: 2"
-  }, {
-    "name" : "CONTAINER_NAME",
+    "name" : "database_type",
     "type" : [ "string", "null" ],
-    "doc" : "SQL type: 12"
+    "at_header" : "true",
+    "doc" : "From machine"
+  }, {
+    "name" : "hostname",
+    "type" : [ "string", "null" ],
+    "at_header" : "true",
+    "doc" : "From machine"
+  }, {
+    "name" : "oracle_sid",
+    "type" : [ "string", "null" ],
+    "at_header" : "true",
+    "doc" : "From machine"
+  }, {
+    "name" : "source_type",
+    "type" : [ "string", "null" ],
+    "at_header" : "true",
+    "doc" : "From machine"
   } ]
 }
