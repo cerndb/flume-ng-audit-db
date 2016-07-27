@@ -7,8 +7,8 @@ db-flume-agent.sinks = avro_sink
 
 # Use a channel which buffers events in memory
 db-flume-agent.channels.mem_channel.type = memory
-db-flume-agent.channels.mem_channel.capacity = 10000
-db-flume-agent.channels.mem_channel.transactionCapacity = 1000
+db-flume-agent.channels.mem_channel.capacity = 2000
+db-flume-agent.channels.mem_channel.transactionCapacity = 2000
 
 # Describe the sink
 db-flume-agent.sinks.avro_sink.type = avro
