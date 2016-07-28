@@ -33,6 +33,7 @@ cp -a ./LICENSE $RPM_BUILD_ROOT/%{install_path}/%{install_dir_name}/
 
 mkdir -p $RPM_BUILD_ROOT/%{install_path}/%{install_dir_name}/bin/
 cp -a ./bin/* $RPM_BUILD_ROOT/%{install_path}/%{install_dir_name}/bin/
+sed -i 's/rpm_version/%{name}-%{version}-%{release}/g' $RPM_BUILD_ROOT/%{install_path}/%{install_dir_name}/bin/version
 
 mkdir -p $RPM_BUILD_ROOT/%{install_path}/%{install_dir_name}/lib/
 cp -a ./lib/* $RPM_BUILD_ROOT/%{install_path}/%{install_dir_name}/lib/
@@ -77,7 +78,7 @@ rm -rf ${RPM_BUILD_ROOT}
 /etc/init.d/*
 /etc/rc?.d/*
 
-%attr(744, flume, flume) %{install_path}/%{install_dir_name}/bin/*
+%attr(755, flume, flume) %{install_path}/%{install_dir_name}/bin/*
 
 %dir /etc/flume-ng/%{install_dir_name}/conf/
 %attr(755, flume, flume) /etc/flume-ng/%{install_dir_name}/conf/
