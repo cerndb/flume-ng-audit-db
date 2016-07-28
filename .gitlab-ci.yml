@@ -39,17 +39,18 @@ cleanup_rpm_deployment:
   when: always  
           
 deploy_rpm:
+  # Run only if spec file was modified
   stage: deploy
   tags:
     - custom
   script:
-    - kinit -k -t ~/dblogs.keytab dblogs@CERN.CH
-    - make build > make_build_out
-    - cat make_build_out
-    - task_id=`cat make_build_out | grep "Created task:" | head -1 | cut -d" " -f3`
-    - koji watch-task $task_id
-    - task_id=`cat make_build_out | grep "Created task:" | tail -1 | cut -d" " -f3`
-    - koji watch-task $task_id
-    - make tag-qa
-    
+    - spec_modif=`git diff-tree --no-commit-id --name-only -r HEAD | grep .spec` || echo Spec file was not modified, so deployment will not take place
+    - \[ -z "$spec_modif" \] || kinit -k -t ~/dblogs.keytab dblogs@CERN.CH
+    - \[ -z "$spec_modif" \] || make build > make_build_out
+    - \[ -z "$spec_modif" \] || cat make_build_out
+    - \[ -z "$spec_modif" \] || task_id=`cat make_build_out | grep "Created task:" | head -1 | cut -d" " -f3`
+    - \[ -z "$spec_modif" \] || koji watch-task $task_id
+    - \[ -z "$spec_modif" \] || task_id=`cat make_build_out | grep "Created task:" | tail -1 | cut -d" " -f3`
+    - \[ -z "$spec_modif" \] || koji watch-task $task_id
+    - \[ -z "$spec_modif" \] || make tag-qa
     
