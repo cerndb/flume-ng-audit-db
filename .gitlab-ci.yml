@@ -43,11 +43,11 @@ cleanup_rpm_deployment:
   when: always  
           
 deploy_rpm:
+  # Run only if spec file was modified
   stage: deploy
   tags:
     - custom
   script:
-  	# Run only if spec file was modified
     - spec_modif=`git diff-tree --no-commit-id --name-only -r HEAD | grep .spec` || echo Spec file was not modified
     - \[ -z "$spec_modif" \] || kinit -k -t ~/dblogs.keytab dblogs@CERN.CH
     - \[ -z "$spec_modif" \] || make build > make_build_out
