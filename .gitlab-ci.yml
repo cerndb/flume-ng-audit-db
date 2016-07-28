@@ -48,7 +48,7 @@ deploy_rpm:
   tags:
     - custom
   script:
-    - spec_modif=`git diff-tree --no-commit-id --name-only -r HEAD | grep .spec` || echo Spec file was not modified
+    - spec_modif=`git diff-tree --no-commit-id --name-only -r HEAD | grep .spec` || echo Spec file was not modified, so deployment will not take place
     - \[ -z "$spec_modif" \] || kinit -k -t ~/dblogs.keytab dblogs@CERN.CH
     - \[ -z "$spec_modif" \] || make build > make_build_out
     - \[ -z "$spec_modif" \] || cat make_build_out
