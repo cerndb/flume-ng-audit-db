@@ -1,6 +1,16 @@
 # Users manual
 
-Several components have been made for adapting Flume, both in the source and sink side.
+Find in this section all the documentation users may require.
+
+## Version control system
+
+A Git repository is used for the project. 
+
+Find it at: https://gitlab.cern.ch/db/cerndb-infra-flume-ng-audit-db/ 
+
+## Developed components
+
+Several components have been developed for adapting Flume, both in the source and sink side.
 
 * JDBCSource: a custom source which is able to collect data from database tables. It makes use of a ReliableJdbcEventReader which uses a JDBC driver for connecting to a database, so many types of databases are compatible. It provides a reliable way to read data from tables in order to avoid data loss and replicated events. This source produces JSONEvents (implements Flume Event interface), this events are deserialized as a JSON string.
 * SpoolDirectorySource: customised version of SpoolDirectorySource which only consume closed files. It uses "lsof" command to check if file is open.
