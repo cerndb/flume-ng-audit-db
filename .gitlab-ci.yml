@@ -10,6 +10,7 @@ build_and_deploy:
     - rm -rf $CI_PROJECT_DIR/_book
     - gitbook build $CI_PROJECT_DIR $CI_PROJECT_DIR/_book
     - gitbook pdf $CI_PROJECT_DIR $CI_PROJECT_DIR/book.pdf
+    - apt-get update
     - apt-get install -y sshpass
     - SSHPASS=$DBWEBDOC_PASSWORD sshpass -e scp -oStrictHostKeyChecking=no -r $CI_PROJECT_DIR/_book/* dbwebdoc@lxplus.cern.ch:$AFS_DOCS_LOCATION
   tags:
