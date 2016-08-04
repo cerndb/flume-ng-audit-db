@@ -116,12 +116,15 @@ public class JDBCSource extends AbstractSource implements Configurable, Pollable
 			
 			status = Status.READY;
 		}catch(Throwable e){
+			LOG.error(e.getMessage(), e);
+			
 			status = Status.BACKOFF;
+			
+			reader.rollback();
 			
 			if(duplicatedEventsProccesor != null)
 				duplicatedEventsProccesor.rollback();
 			
-			LOG.error(e.getMessage(), e);
 			sleep(batchStartTime);
 			throw new EventDeliveryException(e);
 		}

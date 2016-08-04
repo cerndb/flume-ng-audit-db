@@ -488,6 +488,16 @@ public class ReliableJdbcEventReader implements Configurable{
 		last_value = null;
 	}
 
+	public void rollback() {
+		LOG.warn("Rolling back...");
+		
+		if(resultSet != null)
+			try {
+				resultSet.close();
+			} catch (SQLException e) {}
+		resultSet = null;
+	}
+	
 	public void close() throws IOException {
 		try {
 			if(statement != null)
