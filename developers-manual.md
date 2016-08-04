@@ -50,11 +50,11 @@ service db-flume-agent restart
 To open the port temporally in order to monitor it remotely:
 
 `
+# machine: to be replaced with the machine where the agent is running
+# user: to be replaced with an user that is able to ssh the machine
+
 ssh -D 7700 <user>@<machine>.cern.ch
 `
-
-* \<machine\>: machine where the agent is running
-* \<user\>: user that is able to ssh the machine
 
 Finally using jconsole you can monitor the process with:
 
