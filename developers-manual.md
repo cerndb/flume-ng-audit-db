@@ -35,20 +35,26 @@ A few machines have been prepare for running CI tests. These machines need to in
 
 ## Monitor agent with JMX metrics
 
-In the script which set the environment variables of the agent, it need to be addded:
+In the script which sets the environment variables of the agent (/etc/flume-ng/db-flume-agent/conf/flume-env.sh), the following line need to be added:
 
 `
 export JAVA_OPTS=$JAVA_OPTS"-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=7778 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false"
 `
 
-To open the port temporally in order to monitor remotelly:
+Once added, agent needs to be restated (as root):
+
+`
+service db-flume-agent restart
+`
+
+To open the port temporally in order to monitor it remotely:
 
 `
 ssh -D 7700 <user>@<machine>.cern.ch
 `
 
-* <machine>: machine where the agent is running
-* <user>: ser that is able to ssh the machine
+* \<machine\>: machine where the agent is running
+* \<user\>: user that is able to ssh the machine
 
 Finally using jconsole you can monitor the process with:
 
