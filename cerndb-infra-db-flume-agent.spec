@@ -9,7 +9,7 @@
 Summary:	Flume agent for gathering audit and log data from databases
 Name:		cerndb-infra-db-flume-agent
 Version:	0.1.2
-Release:	3%{?dist}
+Release:	4%{?dist}
 License:	GPL
 BuildArch:	noarch
 Group:		Development/Tools
@@ -102,6 +102,9 @@ rm -rf ${RPM_BUILD_ROOT}
 
 # Please keep a meaningful changelog
 %changelog
+* Fri Aug 5 2016 Daniel Lanza <daniel.lanza@cern.ch> - 0.1.2-4
+- Change gateway port to 10440
+
 * Fri Jul 27 2016 Daniel Lanza <daniel.lanza@cern.ch> - 0.1.2-3
 - Change logic for collecting metrics and reduce agent memory consumption
 
