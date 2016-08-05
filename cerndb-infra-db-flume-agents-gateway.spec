@@ -9,7 +9,7 @@
 Summary:	Gateway for collecting data from Flume agents that gather audit and log data from databases
 Name:		cerndb-infra-db-flume-agents-gateway
 Version:	0.0.3
-Release:	1%{?dist}
+Release:	2%{?dist}
 License:	GPL
 BuildArch:	noarch
 Group:		Development/Tools
@@ -103,6 +103,9 @@ rm -rf ${RPM_BUILD_ROOT}
 
 # Please keep a meaningful changelog
 %changelog
+* Mon Aug 5 2016 Daniel Lanza <daniel.lanza@cern.ch> - 0.0.3-2
+- Change source port to 10440
+
 * Mon Jul 26 2016 Daniel Lanza <daniel.lanza@cern.ch> - 0.0.3-1
 - Update jar package to 0.1.3, new schemas and all data sink to HDFS
 
