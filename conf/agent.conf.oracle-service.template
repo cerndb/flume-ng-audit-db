@@ -14,7 +14,7 @@ db-flume-agent.sources.audit_source_<ORACLE_SID>.reader.table = <ORACLE_AUDIT_TA
 db-flume-agent.sources.audit_source_<ORACLE_SID>.reader.table.columnToCommit = <ORACLE_AUDIT_TABLE_DELTA_COLUMN>
 db-flume-agent.sources.audit_source_<ORACLE_SID>.reader.committingFile = /var/lib/db-flume-agent/committed_value_audit_<ORACLE_SID>.backup
 db-flume-agent.sources.audit_source_<ORACLE_SID>.duplicatedEventsProcessor.path = /var/lib/db-flume-agent/last_events_audit_<ORACLE_SID>.hash_list
-db-flume-agent.sources.audit_source_<ORACLE_SID>.interceptors = addhostname adddatabasetype addoraclesid addsourcetype adddatabasetype
+db-flume-agent.sources.audit_source_<ORACLE_SID>.interceptors = addhostname adddatabasetype addoraclesid addsourcetype adddatabaseversion
 db-flume-agent.sources.audit_source_<ORACLE_SID>.interceptors.addhostname.type = host
 db-flume-agent.sources.audit_source_<ORACLE_SID>.interceptors.addhostname.hostHeader = hostname
 db-flume-agent.sources.audit_source_<ORACLE_SID>.interceptors.addhostname.useIP = false
@@ -27,9 +27,9 @@ db-flume-agent.sources.audit_source_<ORACLE_SID>.interceptors.addoraclesid.value
 db-flume-agent.sources.audit_source_<ORACLE_SID>.interceptors.addsourcetype.type = static
 db-flume-agent.sources.audit_source_<ORACLE_SID>.interceptors.addsourcetype.key = source_type
 db-flume-agent.sources.audit_source_<ORACLE_SID>.interceptors.addsourcetype.value = audit-<ORACLE_MAIN_VER>
-db-flume-agent.sources.audit_source_<ORACLE_SID>.interceptors.adddatabasetype.type = static
-db-flume-agent.sources.audit_source_<ORACLE_SID>.interceptors.adddatabasetype.key = database_version
-db-flume-agent.sources.audit_source_<ORACLE_SID>.interceptors.adddatabasetype.value = <ORACLE_VER>
+db-flume-agent.sources.audit_source_<ORACLE_SID>.interceptors.adddatabaseversion.type = static
+db-flume-agent.sources.audit_source_<ORACLE_SID>.interceptors.adddatabaseversion.key = database_version
+db-flume-agent.sources.audit_source_<ORACLE_SID>.interceptors.adddatabaseversion.value = <ORACLE_VER>
 
 db-flume-agent.sources.metric_source_<ORACLE_SID>.type = ch.cern.db.flume.source.JDBCSource
 db-flume-agent.sources.metric_source_<ORACLE_SID>.channels = mem_channel
@@ -42,7 +42,7 @@ db-flume-agent.sources.metric_source_<ORACLE_SID>.reader.query = select sys_cont
 db-flume-agent.sources.metric_source_<ORACLE_SID>.reader.table.columnToCommit = END_TIME 
 db-flume-agent.sources.metric_source_<ORACLE_SID>.reader.committingFile = /var/lib/db-flume-agent/committed_value_metric_<ORACLE_SID>.backup
 db-flume-agent.sources.metric_source_<ORACLE_SID>.duplicatedEventsProcessor.path = /var/lib/db-flume-agent/last_events_metric_<ORACLE_SID>.hash_list 
-db-flume-agent.sources.metric_source_<ORACLE_SID>.interceptors = addhostname adddatabasetype addoraclesid addsourcetype adddatabasetype
+db-flume-agent.sources.metric_source_<ORACLE_SID>.interceptors = addhostname adddatabasetype addoraclesid addsourcetype adddatabaseversion
 db-flume-agent.sources.metric_source_<ORACLE_SID>.interceptors.addhostname.type = host
 db-flume-agent.sources.metric_source_<ORACLE_SID>.interceptors.addhostname.hostHeader = hostname
 db-flume-agent.sources.metric_source_<ORACLE_SID>.interceptors.addhostname.useIP = false
@@ -55,9 +55,9 @@ db-flume-agent.sources.metric_source_<ORACLE_SID>.interceptors.addoraclesid.valu
 db-flume-agent.sources.metric_source_<ORACLE_SID>.interceptors.addsourcetype.type = static
 db-flume-agent.sources.metric_source_<ORACLE_SID>.interceptors.addsourcetype.key = source_type
 db-flume-agent.sources.metric_source_<ORACLE_SID>.interceptors.addsourcetype.value = metric
-db-flume-agent.sources.metric_source_<ORACLE_SID>.interceptors.adddatabasetype.type = static
-db-flume-agent.sources.metric_source_<ORACLE_SID>.interceptors.adddatabasetype.key = database_version
-db-flume-agent.sources.metric_source_<ORACLE_SID>.interceptors.adddatabasetype.value = <ORACLE_VER>
+db-flume-agent.sources.metric_source_<ORACLE_SID>.interceptors.adddatabaseversion.type = static
+db-flume-agent.sources.metric_source_<ORACLE_SID>.interceptors.adddatabaseversion.key = database_version
+db-flume-agent.sources.metric_source_<ORACLE_SID>.interceptors.adddatabaseversion.value = <ORACLE_VER>
 
 db-flume-agent.sources.alert_source_<ORACLE_SID>.type = ch.cern.db.flume.source.JDBCSource
 db-flume-agent.sources.alert_source_<ORACLE_SID>.channels = mem_channel
@@ -83,6 +83,6 @@ db-flume-agent.sources.alert_source_<ORACLE_SID>.interceptors.addoraclesid.value
 db-flume-agent.sources.alert_source_<ORACLE_SID>.interceptors.addsourcetype.type = static
 db-flume-agent.sources.alert_source_<ORACLE_SID>.interceptors.addsourcetype.key = source_type
 db-flume-agent.sources.alert_source_<ORACLE_SID>.interceptors.addsourcetype.value = alert  
-db-flume-agent.sources.alert_source_<ORACLE_SID>.interceptors.adddatabasetype.type = static
-db-flume-agent.sources.alert_source_<ORACLE_SID>.interceptors.adddatabasetype.key = database_version
-db-flume-agent.sources.alert_source_<ORACLE_SID>.interceptors.adddatabasetype.value = <ORACLE_VER>
+db-flume-agent.sources.alert_source_<ORACLE_SID>.interceptors.adddatabaseversion.type = static
+db-flume-agent.sources.alert_source_<ORACLE_SID>.interceptors.adddatabaseversion.key = database_version
+db-flume-agent.sources.alert_source_<ORACLE_SID>.interceptors.adddatabaseversion.value = <ORACLE_VER>
