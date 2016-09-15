@@ -86,6 +86,6 @@ The parameter ".expandBigFloats" changes the output of floating-point types when
 
 It compares new Events with last events. A set of last Event hashes is maintained, the size of this set can be configured with "size" parameter, default size is 1000.
 
-Event's hash is calculate by default from headers (disabled if "header" parameter is set to false) and body (disabled if "body" parameter is set to false).
+Event's hash is calculated by default from headers (disabled if "header" parameter is set to false) and body (disabled if "body" parameter is set to false).
 
 List of hashes is persisted into disk, it allows to maintain the list in case agent is restarted. File to persist hashes can be configured by "path" parameter.
