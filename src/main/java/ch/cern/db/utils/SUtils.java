@@ -24,6 +24,8 @@ public class SUtils {
 	public static final Pattern EMPTY_LINE_PATTERN = Pattern.compile("^\\s*$");
 	public static final Pattern PROPERTY_PATTERN = Pattern.compile("^([A-z,0-9]+)[ ]+=[ ]+(.+)");
 	
+	public final static String EOL = System.getProperty("line.separator");
+	
 	public static List<String> toLines(String in) {
 		return Arrays.asList(in.split("\n"));
 	}
@@ -118,6 +120,15 @@ public class SUtils {
 		}
 		
 		return returnLines;	
+	}
+
+	public static String getFirstLine(String text) {
+		int index_eol = text.indexOf(EOL);
+		
+		if(index_eol > 0)
+			return text.substring(0, index_eol);
+		else
+			return text;
 	}
 	
 }

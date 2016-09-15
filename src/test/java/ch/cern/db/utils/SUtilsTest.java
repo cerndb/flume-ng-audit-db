@@ -131,4 +131,16 @@ public class SUtilsTest extends Assert {
 		assertEquals(expectedLines, SUtils.linesBefore(inputLines, Pattern.compile(".*another.*"), 4));
 	}
 	
+	@Test
+	public void getFirstLine(){
+		String text = "First line";
+		Assert.assertEquals("First line", SUtils.getFirstLine(text));
+		
+		text = "First line\n";
+		Assert.assertEquals("First line", SUtils.getFirstLine(text));
+		
+		text = "First line\nSecond line\n";
+		Assert.assertEquals("First line", SUtils.getFirstLine(text));
+	}
+	
 }
