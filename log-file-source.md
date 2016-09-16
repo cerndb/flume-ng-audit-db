@@ -30,6 +30,7 @@ Find below all available configuration parameters:
 <agent_name>.sources.<source_name>.reader.path = 
 <agent_name>.sources.<source_name>.reader.dateFormat = yyyy-MM-dd'T'HH:mm:ssZ
 <agent_name>.sources.<source_name>.reader.severalLines = true
+<agent_name>.sources.<source_name>.reader.parser = ch.cern.db.flume.source.reader.log.DefaultLogEventParser$Builder
 <agent_name>.sources.<source_name>.reader.committingFile = committed_value.backup
 <agent_name>.sources.<source_name>.reader.committtedDate = NULL
 <agent_name>.sources.<source_name>.duplicatedEventsProcessor = true
@@ -48,6 +49,18 @@ Format of the timestamp contained in the log files can be specified with .reader
 Log files may contain events which are built from several lines. By default, all lines that no contain timestamp will be included into the log event. This can be disabled with .reader.severalLines  parameter, then events will only contain the line with the timestamp and the following lines will be skipped.
 
 When starting, last committed value is loaded from ".committingFile" if specified. File is created if it does not exist. In case ".committingFile" does not exist or is empty, last committed value will be ".committedDate" if specified. NOTE: .committedDate must be always configured following this format "yyyy-MM-dd'T'HH:mm:ssZ" (independently of configured .reader.dateFormat).
+
+## Log event parser
+
+A parser is used to convert log events to Flume events can be implemented and configured with .reader.parser. The default parser creates a Flume event with a header (log_event_timestamp) containing the log event timestamp and the body is the event text. 
+
+Another parser is included (ToJSONLogEventParser), this parser creates a Flume event with no headers and the body is a JSON object with the timestamp and text of the log event. In order to use this parser, the agent should be configured as following:
+
+```
+<agent_name>.sources.<source_name>.reader.parser = ch.cern.db.flume.source.reader.log.ToJSONLogEventParser$Builder
+```
+
+A custom parser can be implemented by implementing ch.cern.db.flume.source.reader.log.EventParser interface. The implementation needs to be included in the class path and the FQN of the class configured at .reader.parser parameter.
 
 ## duplicatedEventsProcessor
 
