@@ -28,6 +28,7 @@ import org.junit.Test;
 
 import ch.cern.db.flume.source.reader.ReliableJdbcEventReader;
 import ch.cern.db.flume.source.reader.ReliableLogFileEventReader;
+import ch.cern.db.flume.source.reader.log.DefaultLogEventParser;
 
 public class LogFileSourceTest extends Assert{
 	
@@ -66,19 +67,19 @@ public class LogFileSourceTest extends Assert{
 	    // Read a few events
 	    Event event = channel.take();
   		Assert.assertEquals("2016-07-29T15:17:34+0200", event.getHeaders().get(
-  				ReliableLogFileEventReader.TIMESTAMP_HEADER_NAME));
+  				DefaultLogEventParser.TIMESTAMP_HEADER_NAME));
   		event = channel.take();
   		Assert.assertEquals("2016-07-29T15:17:38+0200", event.getHeaders().get(
-  				ReliableLogFileEventReader.TIMESTAMP_HEADER_NAME));
+  				DefaultLogEventParser.TIMESTAMP_HEADER_NAME));
   		event = channel.take();
   		Assert.assertEquals("2016-07-29T15:18:45+0200", event.getHeaders().get(
-  				ReliableLogFileEventReader.TIMESTAMP_HEADER_NAME));
+  				DefaultLogEventParser.TIMESTAMP_HEADER_NAME));
   		event = channel.take();
   		Assert.assertEquals("2016-07-29T15:19:55+0200", event.getHeaders().get(
-  				ReliableLogFileEventReader.TIMESTAMP_HEADER_NAME));
+  				DefaultLogEventParser.TIMESTAMP_HEADER_NAME));
   		event = channel.take();
   		Assert.assertEquals("2016-07-29T15:19:56+0200", event.getHeaders().get(
-  				ReliableLogFileEventReader.TIMESTAMP_HEADER_NAME));
+  				DefaultLogEventParser.TIMESTAMP_HEADER_NAME));
 	    
 	    channel.getTransaction().commit();
 	    channel.getTransaction().close();
@@ -126,10 +127,10 @@ public class LogFileSourceTest extends Assert{
 	    
 	    Event event = channel.take();
   		Assert.assertEquals("2016-07-29T15:17:34+0200", event.getHeaders().get(
-  				ReliableLogFileEventReader.TIMESTAMP_HEADER_NAME));
+  				DefaultLogEventParser.TIMESTAMP_HEADER_NAME));
   		event = channel.take();
   		Assert.assertEquals("2016-07-29T15:17:38+0200", event.getHeaders().get(
-  				ReliableLogFileEventReader.TIMESTAMP_HEADER_NAME));
+  				DefaultLogEventParser.TIMESTAMP_HEADER_NAME));
   		
 	    channel.getTransaction().commit();
 	    channel.getTransaction().close();
@@ -142,7 +143,7 @@ public class LogFileSourceTest extends Assert{
 	    
   		event = channel.take();
   		Assert.assertEquals("2016-07-29T15:18:45+0200", event.getHeaders().get(
-  				ReliableLogFileEventReader.TIMESTAMP_HEADER_NAME));
+  				DefaultLogEventParser.TIMESTAMP_HEADER_NAME));
 	    
 	    channel.getTransaction().commit();
 	    channel.getTransaction().close();

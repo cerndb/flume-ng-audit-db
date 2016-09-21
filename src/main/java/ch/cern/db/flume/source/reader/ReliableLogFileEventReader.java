@@ -15,20 +15,19 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.flume.Context;
 import org.apache.flume.Event;
 import org.apache.flume.FlumeException;
 import org.apache.flume.conf.Configurable;
 import org.apache.flume.conf.ConfigurationException;
-import org.apache.flume.event.EventBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.cern.db.flume.source.reader.log.LogEventParser;
+import ch.cern.db.flume.source.reader.log.LogEventParser.Builder;
 import ch.cern.db.log.LogEvent;
 import ch.cern.db.log.LogFile;
 
@@ -57,7 +56,9 @@ public class ReliableLogFileEventReader implements Configurable{
 
 	private SimpleDateFormat internalDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 	
-	public static final String TIMESTAMP_HEADER_NAME = "log_event_timestamp";
+	public static final String PARSER_DEFAULT = "ch.cern.db.flume.source.reader.log.DefaultLogEventParser$Builder";
+	public static final String PARSER_PARAM = "reader.parser";
+	private LogEventParser parser;
 	
 	protected Date last_date = null;
 
@@ -89,6 +90,8 @@ public class ReliableLogFileEventReader implements Configurable{
 		logFile.setEventsCanContainSeveralLines(context.getBoolean(LOG_EVENTS_WITH_SEVERAL_LINES_PARAM, 
 																	LOG_EVENTS_WITH_SEVERAL_LINES_DEFAULT));
 		
+		parser = createParser(context);
+		
 		committing_file_path = context.getString(COMMITTING_FILE_PATH_PARAM, COMMITTING_FILE_PATH_DEFAULT);
 		committing_file = new File(committing_file_path);
 		
@@ -111,6 +114,26 @@ public class ReliableLogFileEventReader implements Configurable{
 		}
 		
 		state = State.CONFIGURED;
+	}
+
+	private LogEventParser createParser(Context context) {
+		try {
+			String parserClass = context.getString(PARSER_PARAM, PARSER_DEFAULT);
+
+			@SuppressWarnings("unchecked")
+			Class<? extends Builder> clazz = (Class<? extends Builder>) Class.forName(parserClass);
+
+			return clazz.newInstance().build(context);
+		} catch (ClassNotFoundException e) {
+			LOG.error("Builder class not found. Exception follows.", e);
+			throw new FlumeException("LogEventParser.Builder not found.", e);
+		} catch (InstantiationException e) {
+			LOG.error("Could not instantiate Builder. Exception follows.", e);
+			throw new FlumeException("LogEventParser.Builder not constructable.", e);
+		} catch (IllegalAccessException e) {
+			LOG.error("Unable to access Builder. Exception follows.", e);
+			throw new FlumeException("Unable to access LogEventParser.Builder.", e);
+		}
 	}
 
 	private void loadLastCommittedDateFromFile() {
@@ -184,12 +207,10 @@ public class ReliableLogFileEventReader implements Configurable{
 			if(last_date == null || event.getTimestamp().getTime() >= last_date.getTime()){
 				LOG.trace("New event: " + event);
 		    	
+				flumeEvent = parser.parse(event);
+				
 				last_date = event.getTimestamp();
-				
-				Map<String, String> headers = new HashMap<String, String>();
-				headers.put(TIMESTAMP_HEADER_NAME, internalDateFormat.format(last_date));
-				flumeEvent = EventBuilder.withBody(event.getText().getBytes(), headers );
-				
+
 				break;
 			}else{
 				skippedEventsBecauseNewerTimestamps++;

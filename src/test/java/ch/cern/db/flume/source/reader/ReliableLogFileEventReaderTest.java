@@ -23,6 +23,8 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 
+import ch.cern.db.flume.source.reader.log.DefaultLogEventParser;
+
 public class ReliableLogFileEventReaderTest {
 	
 	private File temp_log_file = new File("src/test/resources/sample-logs/listener-tmp.log");
@@ -215,15 +217,15 @@ public class ReliableLogFileEventReaderTest {
 				
 		//Read a few events
 		Assert.assertEquals("2016-07-29T15:17:34+0200", reader.readEvent().getHeaders().get(
-				ReliableLogFileEventReader.TIMESTAMP_HEADER_NAME));
+				DefaultLogEventParser.TIMESTAMP_HEADER_NAME));
 		Assert.assertEquals("2016-07-29T15:17:38+0200", reader.readEvent().getHeaders().get(
-				ReliableLogFileEventReader.TIMESTAMP_HEADER_NAME));
+				DefaultLogEventParser.TIMESTAMP_HEADER_NAME));
 		Assert.assertEquals("2016-07-29T15:18:45+0200", reader.readEvent().getHeaders().get(
-				ReliableLogFileEventReader.TIMESTAMP_HEADER_NAME));
+				DefaultLogEventParser.TIMESTAMP_HEADER_NAME));
 		Assert.assertEquals("2016-07-29T15:19:55+0200", reader.readEvent().getHeaders().get(
-				ReliableLogFileEventReader.TIMESTAMP_HEADER_NAME));
+				DefaultLogEventParser.TIMESTAMP_HEADER_NAME));
 		Assert.assertEquals("2016-07-29T15:19:56+0200", reader.readEvent().getHeaders().get(
-				ReliableLogFileEventReader.TIMESTAMP_HEADER_NAME));
+				DefaultLogEventParser.TIMESTAMP_HEADER_NAME));
 		
 		//Commit
 		reader.commit();
@@ -241,11 +243,11 @@ public class ReliableLogFileEventReaderTest {
 		//Read a few more events
 		//SAME AS LAST EVENT SINCE IS GREATHER OR EQUAL (THAT'S OK, DUPLICATED EVENTS INTERCEPTOR WILL DROP THE EVENT)
 		Assert.assertEquals("2016-07-29T15:19:56+0200", reader.readEvent().getHeaders().get(
-				ReliableLogFileEventReader.TIMESTAMP_HEADER_NAME));
+				DefaultLogEventParser.TIMESTAMP_HEADER_NAME));
 		Assert.assertEquals("2016-07-29T15:20:08+0200", reader.readEvent().getHeaders().get(
-				ReliableLogFileEventReader.TIMESTAMP_HEADER_NAME));
+				DefaultLogEventParser.TIMESTAMP_HEADER_NAME));
 		Assert.assertEquals("2016-07-29T15:20:10+0200", reader.readEvent().getHeaders().get(
-				ReliableLogFileEventReader.TIMESTAMP_HEADER_NAME));
+				DefaultLogEventParser.TIMESTAMP_HEADER_NAME));
 		
 		//Confirm content of committing file
 		committing_file_br = new BufferedReader(new InputStreamReader(
@@ -258,14 +260,14 @@ public class ReliableLogFileEventReaderTest {
 		reader.configure(context);
 		
 		//Read again same batch (because was not committed)
-		Assert.assertEquals("2016-07-29T15:19:56+0200", reader.readEvent().getHeaders().get(ReliableLogFileEventReader.TIMESTAMP_HEADER_NAME));
-		Assert.assertEquals("2016-07-29T15:20:08+0200", reader.readEvent().getHeaders().get(ReliableLogFileEventReader.TIMESTAMP_HEADER_NAME));
-		Assert.assertEquals("2016-07-29T15:20:10+0200", reader.readEvent().getHeaders().get(ReliableLogFileEventReader.TIMESTAMP_HEADER_NAME));
+		Assert.assertEquals("2016-07-29T15:19:56+0200", reader.readEvent().getHeaders().get(DefaultLogEventParser.TIMESTAMP_HEADER_NAME));
+		Assert.assertEquals("2016-07-29T15:20:08+0200", reader.readEvent().getHeaders().get(DefaultLogEventParser.TIMESTAMP_HEADER_NAME));
+		Assert.assertEquals("2016-07-29T15:20:10+0200", reader.readEvent().getHeaders().get(DefaultLogEventParser.TIMESTAMP_HEADER_NAME));
 		
 		//Continue reading
 		//Special case: two events with same timestamp
-		Assert.assertEquals("2016-07-29T15:20:17+0200", reader.readEvent().getHeaders().get(ReliableLogFileEventReader.TIMESTAMP_HEADER_NAME));
-		Assert.assertEquals("2016-07-29T15:20:17+0200", reader.readEvent().getHeaders().get(ReliableLogFileEventReader.TIMESTAMP_HEADER_NAME));
+		Assert.assertEquals("2016-07-29T15:20:17+0200", reader.readEvent().getHeaders().get(DefaultLogEventParser.TIMESTAMP_HEADER_NAME));
+		Assert.assertEquals("2016-07-29T15:20:17+0200", reader.readEvent().getHeaders().get(DefaultLogEventParser.TIMESTAMP_HEADER_NAME));
 		
 		//Commit and reload reader
 		reader.commit();
@@ -274,17 +276,17 @@ public class ReliableLogFileEventReaderTest {
 		
 		//Both events with the same timestamo will be reload
 		Assert.assertEquals("2016-07-29T15:20:17+0200", reader.readEvent().getHeaders().get(
-				ReliableLogFileEventReader.TIMESTAMP_HEADER_NAME));
+				DefaultLogEventParser.TIMESTAMP_HEADER_NAME));
 		Assert.assertEquals("2016-07-29T15:20:17+0200", reader.readEvent().getHeaders().get(
-				ReliableLogFileEventReader.TIMESTAMP_HEADER_NAME));
+				DefaultLogEventParser.TIMESTAMP_HEADER_NAME));
 		Assert.assertEquals("2016-07-29T15:20:57+0200", reader.readEvent().getHeaders().get(
-				ReliableLogFileEventReader.TIMESTAMP_HEADER_NAME));
+				DefaultLogEventParser.TIMESTAMP_HEADER_NAME));
 		Assert.assertEquals("2016-07-29T15:21:06+0200", reader.readEvent().getHeaders().get(
-				ReliableLogFileEventReader.TIMESTAMP_HEADER_NAME));
+				DefaultLogEventParser.TIMESTAMP_HEADER_NAME));
 		Assert.assertEquals("2016-07-29T15:22:13+0200", reader.readEvent().getHeaders().get(
-				ReliableLogFileEventReader.TIMESTAMP_HEADER_NAME));
+				DefaultLogEventParser.TIMESTAMP_HEADER_NAME));
 		Assert.assertEquals("2016-07-29T15:22:29+0200", reader.readEvent().getHeaders().get(
-				ReliableLogFileEventReader.TIMESTAMP_HEADER_NAME));
+				DefaultLogEventParser.TIMESTAMP_HEADER_NAME));
 		
 		//End of file
 		Assert.assertNull(reader.readEvent());
@@ -311,11 +313,11 @@ public class ReliableLogFileEventReaderTest {
 		bw.flush();
 		
 		Assert.assertEquals("2016-07-29T15:20:01+0200", reader.readEvent().getHeaders().get(
-				ReliableLogFileEventReader.TIMESTAMP_HEADER_NAME));
+				DefaultLogEventParser.TIMESTAMP_HEADER_NAME));
 		Assert.assertEquals("2016-07-29T15:20:02+0200", reader.readEvent().getHeaders().get(
-				ReliableLogFileEventReader.TIMESTAMP_HEADER_NAME));
+				DefaultLogEventParser.TIMESTAMP_HEADER_NAME));
 		Assert.assertEquals("2016-07-29T15:20:03+0200", reader.readEvent().getHeaders().get(
-				ReliableLogFileEventReader.TIMESTAMP_HEADER_NAME));
+				DefaultLogEventParser.TIMESTAMP_HEADER_NAME));
 		
 		bw.close();
 	}
@@ -331,26 +333,26 @@ public class ReliableLogFileEventReaderTest {
 
 		//Read a few events
 		Assert.assertEquals("2016-07-29T15:17:34+0200", reader.readEvent().getHeaders().get(
-				ReliableLogFileEventReader.TIMESTAMP_HEADER_NAME));
+				DefaultLogEventParser.TIMESTAMP_HEADER_NAME));
 		Assert.assertEquals("2016-07-29T15:17:38+0200", reader.readEvent().getHeaders().get(
-				ReliableLogFileEventReader.TIMESTAMP_HEADER_NAME));
+				DefaultLogEventParser.TIMESTAMP_HEADER_NAME));
 		
 		reader.commit();
 		
 		Assert.assertEquals("2016-07-29T15:18:45+0200", reader.readEvent().getHeaders().get(
-				ReliableLogFileEventReader.TIMESTAMP_HEADER_NAME));
+				DefaultLogEventParser.TIMESTAMP_HEADER_NAME));
 		Assert.assertEquals("2016-07-29T15:19:55+0200", reader.readEvent().getHeaders().get(
-				ReliableLogFileEventReader.TIMESTAMP_HEADER_NAME));
+				DefaultLogEventParser.TIMESTAMP_HEADER_NAME));
 		
 		reader.rollback();
 		
 		// >= timestamp condition is used, so we get 2016-07-29T15:17:38 again
 		Assert.assertEquals("2016-07-29T15:17:38+0200", reader.readEvent().getHeaders().get(
-				ReliableLogFileEventReader.TIMESTAMP_HEADER_NAME));
+				DefaultLogEventParser.TIMESTAMP_HEADER_NAME));
 		Assert.assertEquals("2016-07-29T15:18:45+0200", reader.readEvent().getHeaders().get(
-				ReliableLogFileEventReader.TIMESTAMP_HEADER_NAME));
+				DefaultLogEventParser.TIMESTAMP_HEADER_NAME));
 		Assert.assertEquals("2016-07-29T15:19:55+0200", reader.readEvent().getHeaders().get(
-				ReliableLogFileEventReader.TIMESTAMP_HEADER_NAME));
+				DefaultLogEventParser.TIMESTAMP_HEADER_NAME));
 	}
 	
 	@After
