@@ -12,8 +12,6 @@ A file which contains the last processed event timestamp is created and updated 
 
 This source is compatible with log files which are rolled out. It will check if the file has been rolled out, in such case it will start reading again from the beginning of the file.    
 
-A header with name "log_event_timestamp" is created in every Flume event with the timestamp value extracted from the log event. The value of this header is a string with the following format: "yyyy-MM-dd'T'HH:mm:ssZ".
-
 ## Configuration
 
 In order to use LogFileSource as source in your Flume agent, you need to specify the type of agent source as:
@@ -52,7 +50,7 @@ When starting, last committed value is loaded from ".committingFile" if specifie
 
 ## Log event parser
 
-A parser is used to convert log events to Flume events can be implemented and configured with .reader.parser. The default parser creates a Flume event with a header (log_event_timestamp) containing the log event timestamp and the body is the event text. 
+A parser is used to convert log events to Flume events can be implemented and configured with .reader.parser. The default parser creates a Flume event with a header (log_event_timestamp) containing the log event timestamp and the body is the event text. The value of this header is a string with the following format: "yyyy-MM-dd'T'HH:mm:ssZ".
 
 Another parser is included (ToJSONLogEventParser), this parser creates a Flume event with no headers and the body is a JSON object with the timestamp and text of the log event. In order to use this parser, the agent should be configured as following:
 
