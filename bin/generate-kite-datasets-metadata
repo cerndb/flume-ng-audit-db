@@ -48,6 +48,7 @@ generate_dataset_metadata $NAMENODE_HOST $USER_DIR/alert/ $HOME/conf/kite-datase
 generate_dataset_metadata $NAMENODE_HOST $USER_DIR/audit-11/ $HOME/conf/kite-datasets/audit-11-schema.avsc
 generate_dataset_metadata $NAMENODE_HOST $USER_DIR/audit-12/ $HOME/conf/kite-datasets/audit-12-schema.avsc
 generate_dataset_metadata $NAMENODE_HOST $USER_DIR/metric/ $HOME/conf/kite-datasets/metric-schema.avsc
+generate_dataset_metadata $NAMENODE_HOST $USER_DIR/listener/ $HOME/conf/kite-datasets/listener-schema.avsc
 
 
 
