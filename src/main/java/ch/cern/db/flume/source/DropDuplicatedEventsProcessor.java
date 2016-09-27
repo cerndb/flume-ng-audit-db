@@ -72,7 +72,7 @@ public class DropDuplicatedEventsProcessor implements Configurable{
 			throw new FlumeException("MD5 hashing not supported! ", e);
 		}
 
-		LOG.info("Initializated with defaults size="+size+", headers="+checkHeaders+", body="+checkBody);
+		LOG.info("Initializated with size="+size+", headers="+checkHeaders+", body="+checkBody);
 	}
 
 	@Override
