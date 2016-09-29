@@ -61,6 +61,12 @@ public class JSONtoElasticSearchEventSerializer implements ElasticSearchEventSer
 		
 		for (Entry<String, JsonElement> property : json.entrySet()) {
 		
+			if(property.getValue().isJsonNull()){
+				builder.nullField(property.getKey());
+				
+				continue;
+			}
+			
 			if(!property.getValue().isJsonPrimitive()){
 				builder.field(property.getKey(), property.getValue());
 				
@@ -71,15 +77,12 @@ public class JSONtoElasticSearchEventSerializer implements ElasticSearchEventSer
 			
 			if(primitiveValue.isBoolean())
 				builder.field(property.getKey(), primitiveValue.getAsBoolean());
-			
-			if(primitiveValue.isNumber()){
+			else if(primitiveValue.isNumber())
 				if (primitiveValue.getAsString().indexOf('.') != -1)
 					builder.field(property.getKey(), primitiveValue.getAsNumber().doubleValue());
 				else
 					builder.field(property.getKey(), primitiveValue.getAsNumber().longValue());
-			}
-			
-			if(primitiveValue.isString())
+			else if(primitiveValue.isString())
 				builder.field(property.getKey(), primitiveValue.getAsString());
 		}
 	}

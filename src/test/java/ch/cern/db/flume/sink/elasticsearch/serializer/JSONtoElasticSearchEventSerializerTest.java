@@ -32,6 +32,7 @@ public class JSONtoElasticSearchEventSerializerTest{
 		        "\"name\":\"text1\"," +
 		        "\"hOffset\":250.54," +
 		        "\"vOffset\":100.13," +
+		        "\"nullValue\":null," +
 		        "\"alignment\":\"center\"," +
 		        "\"onMouseUp\":\"sun1.opacity = (sun1.opacity / 100) * 90;\"" +
 		    	"}";
