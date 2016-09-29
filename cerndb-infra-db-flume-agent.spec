@@ -8,8 +8,8 @@
 
 Summary:	Flume agent for gathering audit and log data from databases
 Name:		cerndb-infra-db-flume-agent
-Version:	0.1.2
-Release:	5%{?dist}
+Version:	0.1.4
+Release:	1%{?dist}
 License:	GPL
 BuildArch:	noarch
 Group:		Development/Tools
@@ -102,6 +102,9 @@ rm -rf ${RPM_BUILD_ROOT}
 
 # Please keep a meaningful changelog
 %changelog
+* Thu Sep 29 2016 Daniel Lanza <daniel.lanza@cern.ch> - 0.1.4-1
+- Solve issue with null values in JSON documents
+
 * Tue Sep 13 2016 Daniel Lanza <daniel.lanza@cern.ch> - 0.1.2-5
 - Build connection URL with hostname instead of localhost
 
