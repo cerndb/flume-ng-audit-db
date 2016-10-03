@@ -40,6 +40,7 @@ cp -a ./lib/* $RPM_BUILD_ROOT/%{install_path}/%{install_dir_name}/lib/
 
 mkdir -p $RPM_BUILD_ROOT/etc/flume-ng/%{install_dir_name}/conf/
 cp -a ./conf/* $RPM_BUILD_ROOT/etc/flume-ng/%{install_dir_name}/conf/
+sed -i 's/rpm_version/%{version}-%{release}/g' $RPM_BUILD_ROOT/etc/flume-ng/%{install_dir_name}/conf/agent.conf.oracle-service.template
 ln -sf /etc/flume-ng/%{install_dir_name}/conf $RPM_BUILD_ROOT/%{install_path}/%{install_dir_name}/conf
 
 mkdir -p $RPM_BUILD_ROOT/var/lib/%{install_dir_name}/ 
