@@ -19,12 +19,13 @@ import org.apache.flume.Event;
 import org.apache.flume.conf.ComponentConfiguration;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 
-import com.frontier45.flume.sink.elasticsearch2.ContentBuilderUtil;
-import com.frontier45.flume.sink.elasticsearch2.ElasticSearchEventSerializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
+
+import ch.cern.db.flume.sink.elasticsearch.ContentBuilderUtil;
+import ch.cern.db.flume.sink.elasticsearch.ElasticSearchEventSerializer;
 
 public class JSONtoElasticSearchEventSerializer implements ElasticSearchEventSerializer {
 
