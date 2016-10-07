@@ -8,8 +8,8 @@
 
 Summary:	Gateway for collecting data from Flume agents that gather audit and log data from databases
 Name:		cerndb-infra-db-flume-agents-gateway
-Version:	0.0.3
-Release:	4%{?dist}
+Version:	0.0.4
+Release:	1%{?dist}
 License:	GPL
 BuildArch:	noarch
 Group:		Development/Tools
@@ -103,6 +103,9 @@ rm -rf ${RPM_BUILD_ROOT}
 
 # Please keep a meaningful changelog
 %changelog
+* Fri Oct 7 2016 Daniel Lanza <daniel.lanza@cern.ch> - 0.0.4-1
+- Use new Elasticsearch DB cluster
+
 * Fri Sep 23 2016 Daniel Lanza <daniel.lanza@cern.ch> - 0.0.3-4
 - Solve issue with configuration of listener
 
