@@ -14,17 +14,17 @@ make_rpm:
     - rpm_path=`cat make_rpm_out | grep rpmbuild/RPMS/ | cut -d' ' -f2`
     - echo $rpm_path 
     - sudo rm /var/lib/rpm/.rpm.lock || echo
-    - sudo yum remove -y cerndb-infra-db-flume-agents-gateway
+    - sudo yum remove -y cerndb-infra-db-flume-agent-kafka-to-es
     - sudo rpm -i $rpm_path
-    - /usr/lib/db-flume-agents-gateway/bin/version
-    - \[ -f /usr/lib/db-flume-agents-gateway/bin/db-flume-agents-gateway \]
-    - \[ -f /etc/init.d/db-flume-agents-gateway \]
-    - \[ -d /var/log/db-flume-agents-gateway/ \]
-    - \[ -d /var/lib/db-flume-agents-gateway/ \]
-    - \[ -d /var/run/db-flume-agents-gateway/ \]
-    - \[ -d /etc/flume-ng/db-flume-agents-gateway/ \]
+    - /usr/lib/db-flume-agent-kafka-to-es/bin/version
+    - \[ -f /usr/lib/db-flume-agent-kafka-to-es/bin/db-flume-agent-kafka-to-es \]
+    - \[ -f /etc/init.d/db-flume-agent-kafka-to-es \]
+    - \[ -d /var/log/db-flume-agent-kafka-to-es/ \]
+    - \[ -d /var/lib/db-flume-agent-kafka-to-es/ \]
+    - \[ -d /var/run/db-flume-agent-kafka-to-es/ \]
+    - \[ -d /etc/db-flume-agent-kafka-to-es/ \]
     - sleep 10
-    - sudo service db-flume-agents-gateway status
+    - sudo service db-flume-agent-kafka-to-es status
     
 cleanup_rpm_deployment:
   # it will do the clean up only on one of the runners
@@ -32,10 +32,10 @@ cleanup_rpm_deployment:
   tags:
     - custom
   script:
-    - sudo service db-flume-agents-gateway stop || echo Failed
-    - sudo yum remove -y cerndb-infra-db-flume-agents-gateway || echo Failed
-    - sudo rm -rf /etc/flume-ng/db-flume-agents-gateway/ || echo Failed
-    - sudo rm -rf /var/log/db-flume-agents-gateway/ || echo Failed
+    - sudo service db-flume-agent-kafka-to-es stop || echo Failed
+    - sudo yum remove -y cerndb-infra-db-flume-agent-kafka-to-es || echo Failed
+    - sudo rm -rf /etc/db-flume-agent-kafka-to-es/ || echo Failed
+    - sudo rm -rf /var/log/db-flume-agent-kafka-to-es/ || echo Failed
   when: always  
           
 deploy_rpm:
