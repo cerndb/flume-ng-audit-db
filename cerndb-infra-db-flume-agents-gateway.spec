@@ -8,7 +8,7 @@
 %define __os_install_post %{nil}
 
 Summary:	Flume agent to transfer log and audit data of databases from Kafka to ElasticSearch
-Name:		cerndb-infra-%{bin_name}
+Name:		cerndb-infra-db-flume-agent-kafka-to-es
 Version:	0.0.1
 Release:	1%{?dist}
 License:	GPL
