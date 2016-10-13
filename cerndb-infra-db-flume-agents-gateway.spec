@@ -106,5 +106,3 @@ rm -rf ${RPM_BUILD_ROOT}
 %changelog
 * Thu Oct 13 2016 Daniel Lanza <daniel.lanza@cern.ch> - 0.0.1-1
 - Initial creation of the RPM.
-
-
