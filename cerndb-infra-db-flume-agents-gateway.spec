@@ -39,9 +39,9 @@ sed -i 's/rpm_version/%{name}-%{version}-%{release}/g' $RPM_BUILD_ROOT/%{install
 mkdir -p $RPM_BUILD_ROOT/%{install_path}/%{install_dir_name}/lib/
 cp -a ./lib/* $RPM_BUILD_ROOT/%{install_path}/%{install_dir_name}/lib/
 
-mkdir -p $RPM_BUILD_ROOT/etc/flume-ng/%{install_dir_name}/conf/
-cp -a ./conf/* $RPM_BUILD_ROOT/etc/flume-ng/%{install_dir_name}/conf/
-ln -sf /etc/flume-ng/%{install_dir_name}/conf $RPM_BUILD_ROOT/%{install_path}/%{install_dir_name}/conf
+mkdir -p $RPM_BUILD_ROOT/etc/%{install_dir_name}/conf/
+cp -a ./conf/* $RPM_BUILD_ROOT/etc/%{install_dir_name}/conf/
+ln -sf /etc/%{install_dir_name}/conf $RPM_BUILD_ROOT/%{install_path}/%{install_dir_name}/conf
 
 mkdir -p $RPM_BUILD_ROOT/var/lib/%{install_dir_name}/ 
 
@@ -81,9 +81,9 @@ rm -rf ${RPM_BUILD_ROOT}
 
 %attr(755, flume, flume) %{install_path}/%{install_dir_name}/bin/*
 
-%dir /etc/flume-ng/%{install_dir_name}/conf/
-%attr(755, flume, flume) /etc/flume-ng/%{install_dir_name}/conf/
-%attr(644, flume, flume) /etc/flume-ng/%{install_dir_name}/conf/*
+%dir /etc/%{install_dir_name}/conf/
+%attr(755, flume, flume) /etc/%{install_dir_name}/conf/
+%attr(644, flume, flume) /etc/%{install_dir_name}/conf/*
 
 %dir /var/lib/%{install_dir_name}/
 
