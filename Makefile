@@ -33,12 +33,12 @@ rpm:    all
 	rpmbuild -ba --define '_sourcedir $(PWD)' ${SPECFILE}
 
 scratch:
-	koji build db6 --nowait --scratch  ${REPOURL}${REPOPREFIX}/${REPONAME}.git#origin/build-gateway
-	koji build db7 --nowait --scratch  ${REPOURL}${REPOPREFIX}/${REPONAME}.git#origin/build-gateway
+	koji build db6 --nowait --scratch  ${REPOURL}${REPOPREFIX}/${REPONAME}.git#origin/build-gateway-kafka-to-es
+	koji build db7 --nowait --scratch  ${REPOURL}${REPOPREFIX}/${REPONAME}.git#origin/build-gateway-kafka-to-es
 
 build:
-	koji build db6 ${REPOURL}${REPOPREFIX}/${REPONAME}.git#origin/build-gateway
-	koji build db7 ${REPOURL}${REPOPREFIX}/${REPONAME}.git#origin/build-gateway
+	koji build db6 ${REPOURL}${REPOPREFIX}/${REPONAME}.git#origin/build-gateway-kafka-to-es
+	koji build db7 ${REPOURL}${REPOPREFIX}/${REPONAME}.git#origin/build-gateway-kafka-to-es
 	
 tag-qa:
 	koji tag-build db6-qa $(PKGID)-$(PKGRELEASE).el6
