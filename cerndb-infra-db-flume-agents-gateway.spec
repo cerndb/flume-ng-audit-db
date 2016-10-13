@@ -1,15 +1,16 @@
 # Standard install path for infra 
 %define install_path /usr/lib/
-%define install_dir_name db-flume-agents-gateway
+%define install_dir_name db-flume-agent-kafka-to-es
+%define bin_name db-flume-agent-kafka-to-es
 %define debug_package %{nil}
 %define __jar_repack %{nil}
 %define __arch_install_post %{nil}
 %define __os_install_post %{nil}
 
-Summary:	Gateway for collecting data from Flume agents that gather audit and log data from databases
-Name:		cerndb-infra-db-flume-agents-gateway
-Version:	0.0.4
-Release:	2%{?dist}
+Summary:	Flume agent to transfer log and audit data of databases from Kafka to ElasticSearch
+Name:		cerndb-infra-%{bin_name}
+Version:	0.0.1
+Release:	1%{?dist}
 License:	GPL
 BuildArch:	noarch
 Group:		Development/Tools
@@ -18,7 +19,7 @@ BuildRoot:	%{_builddir}/%{name}-root
 AutoReqProv:	no
 
 %description
-Gateway for collecting data from Flume agents that gather audit and log data from databases
+Flume agent to transfer log and audit data of databases from Kafka to ElasticSearch
 
 %prep
 %setup -q
@@ -50,21 +51,21 @@ mkdir -p $RPM_BUILD_ROOT/var/log/%{install_dir_name}/
 
 # Install service
 mkdir -p $RPM_BUILD_ROOT/etc/init.d/
-ln -sf %{install_path}/%{install_dir_name}/bin/db-flume-agents-gateway $RPM_BUILD_ROOT/etc/init.d/db-flume-agents-gateway
+ln -sf %{install_path}/%{install_dir_name}/bin/%{bin_name} $RPM_BUILD_ROOT/etc/init.d/%{bin_name}
 mkdir -p $RPM_BUILD_ROOT/etc/rc0.d/
-ln -sf /etc/init.d/db-flume-agents-gateway $RPM_BUILD_ROOT/etc/rc0.d/K99db-flume-agents-gateway
+ln -sf /etc/init.d/%{bin_name} $RPM_BUILD_ROOT/etc/rc0.d/K99%{bin_name}
 mkdir -p $RPM_BUILD_ROOT/etc/rc1.d/
-ln -sf /etc/init.d/db-flume-agents-gateway $RPM_BUILD_ROOT/etc/rc1.d/K99db-flume-agents-gateway
+ln -sf /etc/init.d/%{bin_name} $RPM_BUILD_ROOT/etc/rc1.d/K99%{bin_name}
 mkdir -p $RPM_BUILD_ROOT/etc/rc2.d/
-ln -sf /etc/init.d/db-flume-agents-gateway $RPM_BUILD_ROOT/etc/rc2.d/K99db-flume-agents-gateway
+ln -sf /etc/init.d/%{bin_name} $RPM_BUILD_ROOT/etc/rc2.d/K99%{bin_name}
 mkdir -p $RPM_BUILD_ROOT/etc/rc3.d/
-ln -sf /etc/init.d/db-flume-agents-gateway $RPM_BUILD_ROOT/etc/rc3.d/S99db-flume-agents-gateway
+ln -sf /etc/init.d/%{bin_name} $RPM_BUILD_ROOT/etc/rc3.d/S99%{bin_name}
 mkdir -p $RPM_BUILD_ROOT/etc/rc4.d/
-ln -sf /etc/init.d/db-flume-agents-gateway $RPM_BUILD_ROOT/etc/rc4.d/S99db-flume-agents-gateway
+ln -sf /etc/init.d/%{bin_name} $RPM_BUILD_ROOT/etc/rc4.d/S99%{bin_name}
 mkdir -p $RPM_BUILD_ROOT/etc/rc5.d/
-ln -sf /etc/init.d/db-flume-agents-gateway $RPM_BUILD_ROOT/etc/rc5.d/S99db-flume-agents-gateway
+ln -sf /etc/init.d/%{bin_name} $RPM_BUILD_ROOT/etc/rc5.d/S99%{bin_name}
 mkdir -p $RPM_BUILD_ROOT/etc/rc6.d/
-ln -sf /etc/init.d/db-flume-agents-gateway $RPM_BUILD_ROOT/etc/rc6.d/K99db-flume-agents-gateway
+ln -sf /etc/init.d/%{bin_name} $RPM_BUILD_ROOT/etc/rc6.d/K99%{bin_name}
 
 
 %clean
@@ -97,40 +98,13 @@ rm -rf ${RPM_BUILD_ROOT}
 
 %post
 %{install_path}/%{install_dir_name}/bin/replace-old-flume-libraries
-%{install_path}/%{install_dir_name}/bin/db-flume-agents-gateway stop
-%{install_path}/%{install_dir_name}/bin/db-flume-agents-gateway start
+%{install_path}/%{install_dir_name}/bin/%{bin_name} stop
+%{install_path}/%{install_dir_name}/bin/%{bin_name} start
 
 
 # Please keep a meaningful changelog
 %changelog
-* Mon Oct 10 2016 Daniel Lanza <daniel.lanza@cern.ch> - 0.0.4-2
-- Add itdb_ prefix to ES indexes
-
-* Fri Oct 7 2016 Daniel Lanza <daniel.lanza@cern.ch> - 0.0.4-1
-- Use new Elasticsearch DB cluster
-
-* Fri Sep 23 2016 Daniel Lanza <daniel.lanza@cern.ch> - 0.0.3-4
-- Solve issue with configuration of listener
-
-* Fri Sep 23 2016 Daniel Lanza <daniel.lanza@cern.ch> - 0.0.3-3
-- Configure listener to receive listener logs
-
-* Mon Aug 5 2016 Daniel Lanza <daniel.lanza@cern.ch> - 0.0.3-2
-- Change source port to 10440
-
-* Mon Jul 26 2016 Daniel Lanza <daniel.lanza@cern.ch> - 0.0.3-1
-- Update jar package to 0.1.3, new schemas and all data sink to HDFS
-
-* Mon Jul 25 2016 Daniel Lanza <daniel.lanza@cern.ch> - 0.0.2-2
-- Point out to proper keytab in conf
-
-* Tue Jul 12 2016 Daniel Lanza <daniel.lanza@cern.ch> - 0.0.2-1
-- Update package to 0.1.2 and remove some sinks from configuration
-
-* Wed Jun 29 2016 Daniel Lanza <daniel.lanza@cern.ch> - 0.0.1-2
-- Solve issue with log directory
-
-* Tue Jun 28 2016 Daniel Lanza <daniel.lanza@cern.ch> - 0.0.1-1
+* Thu Oct 13 2016 Daniel Lanza <daniel.lanza@cern.ch> - 0.0.1-1
 - Initial creation of the RPM.
 
 
