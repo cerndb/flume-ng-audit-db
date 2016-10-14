@@ -38,3 +38,8 @@ then
 	cp $HOME/lib/jackson-core-asl-1.9.13.jar $FLUME_HOME/lib/
 fi
 
+if [ -f $FLUME_HOME/lib/kafka_2.10-0.8.1.1.jar ] 
+then
+	rm -f $FLUME_HOME/lib/kafka_2.10-0.8.1.1.jar
+fi
+
