@@ -9,8 +9,8 @@
 
 Summary:	Flume agent to transfer log and audit data of databases from Kafka to ElasticSearch
 Name:		cerndb-infra-db-flume-agent-kafka-to-es
-Version:	0.0.1
-Release:	2%{?dist}
+Version:	0.0.2
+Release:	1%{?dist}
 License:	GPL
 BuildArch:	noarch
 Group:		Development/Tools
@@ -104,6 +104,9 @@ rm -rf ${RPM_BUILD_ROOT}
 
 # Please keep a meaningful changelog
 %changelog
+* Thu Oct 14 2016 Daniel Lanza <daniel.lanza@cern.ch> - 0.0.2-1
+- Uses Kafka source with useFlumeEventFormat
+
 * Thu Oct 13 2016 Daniel Lanza <daniel.lanza@cern.ch> - 0.0.1-2
 - Solve minor issue with path for logging
 
