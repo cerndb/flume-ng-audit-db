@@ -11,7 +11,8 @@ db-flume-agent.channels.mem_channel.capacity = 2000
 db-flume-agent.channels.mem_channel.transactionCapacity = 2000
 
 # Describe the sink
-db-flume-agent.sinks.kafka_sink.type = org.apache.flume.sink.kafka.KafkaSink
+db-flume-agent.sinks.kafka_sink.type = ch.cern.db.flume.sink.kafka.KafkaSink
 db-flume-agent.sinks.kafka_sink.channel = mem_channel
 db-flume-agent.sinks.kafka_sink.brokerList = habench101.cern.ch:9092,habench102.cern.ch:9092,habench102.cern.ch:9092
 db-flume-agent.sinks.kafka_sink.topic = itdb_db-audit-log
+db-flume-agent.sinks.kafka_sink.useFlumeEventFormat = true
