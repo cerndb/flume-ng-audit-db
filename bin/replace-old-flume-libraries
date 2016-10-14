@@ -41,5 +41,6 @@ fi
 if [ -f $FLUME_HOME/lib/kafka_2.10-0.8.1.1.jar ] 
 then
 	rm -f $FLUME_HOME/lib/kafka_2.10-0.8.1.1.jar
+	cp $HOME/lib/kafka-clients-0.9.0.1.jar $FLUME_HOME/lib/
 fi
 
