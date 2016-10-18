@@ -1,0 +1,56 @@
+#!/bin/bash
+
+# Copyright (C) 2016, CERN
+# This software is distributed under the terms of the GNU General Public
+# Licence version 3 (GPL Version 3), copied verbatim in the file "LICENSE".
+# In applying this license, CERN does not waive the privileges and immunities
+# granted to it by virtue of its status as Intergovernmental Organization
+# or submit itself to any jurisdiction.
+
+# Reference: http://stackoverflow.com/questions/59895/can-a-bash-script-tell-what-directory-its-stored-in
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do
+  DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE"
+done
+SCRIPT_DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+
+HOME=$SCRIPT_DIR/..
+
+function generate_dataset_metadata {
+	namenode=$1
+	targetdir=$2
+	schemafile=$3
+
+	# Only if .metadata does not exist
+	hdfs dfs -mkdir $targetdir/.metadata
+	
+	if [ $? -eq "0" ]
+	then
+		echo Create dataset metadata at $namenode $targetdir
+		
+		cat $HOME/conf/kite-datasets/descriptor.properties.template | \
+										sed -e "s/<NAMENODE_HOST>/$namenode/g" | \
+										sed -e "s=<TARGET_DIRECTORY>=$targetdir=g" | \
+										hdfs dfs -put - $targetdir/.metadata/descriptor.properties
+										
+		cat $schemafile | hdfs dfs -put - $targetdir/.metadata/schema.avsc
+	else
+		echo Metadata already exists at $namenode $targetdir
+	fi	
+}
+
+NAMENODE_HOST=p01001532067275.cern.ch
+USER_DIR=/user/dblogs/
+
+generate_dataset_metadata $NAMENODE_HOST $USER_DIR/alert/ $HOME/conf/kite-datasets/alert-schema.avsc
+generate_dataset_metadata $NAMENODE_HOST $USER_DIR/audit-11/ $HOME/conf/kite-datasets/audit-11-schema.avsc
+generate_dataset_metadata $NAMENODE_HOST $USER_DIR/audit-12/ $HOME/conf/kite-datasets/audit-12-schema.avsc
+generate_dataset_metadata $NAMENODE_HOST $USER_DIR/metric/ $HOME/conf/kite-datasets/metric-schema.avsc
+generate_dataset_metadata $NAMENODE_HOST $USER_DIR/listener/ $HOME/conf/kite-datasets/listener-schema.avsc
+
+
+
+
+
