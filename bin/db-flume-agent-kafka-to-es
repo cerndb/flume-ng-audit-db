@@ -20,14 +20,14 @@
 # description: Flume database agent
 #
 ### BEGIN INIT INFO
-# Provides:          db-flume-agent-kafka-to-es
+# Provides:          db-flume-agent-kafka-to-hdfs
 # Required-Start:    $remote_fs
 # Should-Start:
 # Required-Stop:     $remote_fs
 # Should-Stop:
 # Default-Start:     3 4 5
 # Default-Stop:      0 1 2 6
-# Short-Description: Flume agent to transfer log and audit data of databases from Kafka to ElasticSearch
+# Short-Description: Flume agent to transfer log and audit data of databases from Kafka to HDFS
 ### END INIT INFO
 
 . /lib/lsb/init-functions
@@ -46,23 +46,23 @@ STATUS_NOT_RUNNING=3
 
 ERROR_PROGRAM_NOT_INSTALLED=5
 
-FLUME_LOG_DIR=/var/log/db-flume-agent-kafka-to-es
-FLUME_CONF_DIR=/etc/db-flume-agent-kafka-to-es/conf/
-FLUME_HOME=/usr/lib/db-flume-agent-kafka-to-es
+FLUME_LOG_DIR=/var/log/db-flume-agent-kafka-to-hdfs
+FLUME_CONF_DIR=/etc/db-flume-agent-kafka-to-hdfs/conf/
+FLUME_HOME=/usr/lib/db-flume-agent-kafka-to-hdfs
 FLUME_USER=flume
 FLUME_USER_GROUP=flume
-FLUME_AGENT_NAME="gateway_agent_kafka_to_elastic"
+FLUME_AGENT_NAME="gateway_agent_kafka_to_hdfs"
 FLUME_MONITORING=""
 
 : ${JDBC_DRIVER:=$ORACLE_HOME/jdbc/lib/*}
 
-FLUME_RUN_DIR=/var/run/db-flume-agent-kafka-to-es
+FLUME_RUN_DIR=/var/run/db-flume-agent-kafka-to-hdfs
 FLUME_LOCK_DIR="/var/lock/subsys/"
 LOCKFILE="${FLUME_LOCK_DIR}/flume-${FLUME_AGENT_NAME}"
 desc="Gateway"
 
 FLUME_SHUTDOWN_TIMEOUT=60
-FLUME_CONF_FILE=/etc/db-flume-agent-kafka-to-es/conf/agent.conf
+FLUME_CONF_FILE=/etc/db-flume-agent-kafka-to-hdfs/conf/agent.conf
 
 EXEC_PATH=/usr/bin/aimon-flume-ng
 FLUME_PID_FILE=${FLUME_RUN_DIR}/flume.pid
@@ -84,7 +84,7 @@ start() {
   fi
 
   log_success_msg "Starting $desc (${FLUME_AGENT_NAME}): "
-  /bin/su -s /bin/bash -c "/bin/bash -c 'echo \$\$ >${FLUME_PID_FILE} && exec ${EXEC_PATH} agent --classpath $FLUME_HOME/lib/*: --conf $FLUME_CONF_DIR --conf-file $FLUME_CONF_FILE --name $FLUME_AGENT_NAME $FLUME_MONITORING >>/var/log/db-flume-agent-kafka-to-es/db-flume-agent-kafka-to-es.out 2>&1' &" $FLUME_USER
+  /bin/su -s /bin/bash -c "/bin/bash -c 'echo \$\$ >${FLUME_PID_FILE} && exec ${EXEC_PATH} agent --classpath $FLUME_HOME/lib/*: --conf $FLUME_CONF_DIR --conf-file $FLUME_CONF_FILE --name $FLUME_AGENT_NAME $FLUME_MONITORING >>/var/log/db-flume-agent-kafka-to-hdfs/db-flume-agent-kafka-to-hdfs.out 2>&1' &" $FLUME_USER
   RETVAL=$?
   [ $RETVAL -eq 0 ] && touch $LOCKFILE
   return $RETVAL
