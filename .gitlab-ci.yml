@@ -14,17 +14,17 @@ make_rpm:
     - rpm_path=`cat make_rpm_out | grep rpmbuild/RPMS/ | cut -d' ' -f2`
     - echo $rpm_path 
     - sudo rm /var/lib/rpm/.rpm.lock || echo
-    - sudo yum remove -y cerndb-infra-db-flume-agent-kafka-to-es
+    - sudo yum remove -y cerndb-infra-db-flume-agent-kafka-to-hdfs
     - sudo rpm -i $rpm_path
-    - /usr/lib/db-flume-agent-kafka-to-es/bin/version
-    - \[ -f /usr/lib/db-flume-agent-kafka-to-es/bin/db-flume-agent-kafka-to-es \]
-    - \[ -f /etc/init.d/db-flume-agent-kafka-to-es \]
-    - \[ -d /var/log/db-flume-agent-kafka-to-es/ \]
-    - \[ -d /var/lib/db-flume-agent-kafka-to-es/ \]
-    - \[ -d /var/run/db-flume-agent-kafka-to-es/ \]
-    - \[ -d /etc/db-flume-agent-kafka-to-es/ \]
+    - /usr/lib/db-flume-agent-kafka-to-hdfs/bin/version
+    - \[ -f /usr/lib/db-flume-agent-kafka-to-hdfs/bin/db-flume-agent-kafka-to-hdfs \]
+    - \[ -f /etc/init.d/db-flume-agent-kafka-to-hdfs \]
+    - \[ -d /var/log/db-flume-agent-kafka-to-hdfs/ \]
+    - \[ -d /var/lib/db-flume-agent-kafka-to-hdfs/ \]
+    - \[ -d /var/run/db-flume-agent-kafka-to-hdfs/ \]
+    - \[ -d /etc/db-flume-agent-kafka-to-hdfs/ \]
     - sleep 10
-    - sudo service db-flume-agent-kafka-to-es status
+    - sudo service db-flume-agent-kafka-to-hdfs status
     
 cleanup_rpm_deployment:
   # it will do the clean up only on one of the runners
@@ -32,10 +32,10 @@ cleanup_rpm_deployment:
   tags:
     - custom
   script:
-    - sudo service db-flume-agent-kafka-to-es stop || echo Failed
-    - sudo yum remove -y cerndb-infra-db-flume-agent-kafka-to-es || echo Failed
-    - sudo rm -rf /etc/db-flume-agent-kafka-to-es/ || echo Failed
-    - sudo rm -rf /var/log/db-flume-agent-kafka-to-es/ || echo Failed
+    - sudo service db-flume-agent-kafka-to-hdfs stop || echo Failed
+    - sudo yum remove -y cerndb-infra-db-flume-agent-kafka-to-hdfs || echo Failed
+    - sudo rm -rf /etc/db-flume-agent-kafka-to-hdfs/ || echo Failed
+    - sudo rm -rf /var/log/db-flume-agent-kafka-to-hdfs/ || echo Failed
   when: always  
           
 deploy_rpm:
