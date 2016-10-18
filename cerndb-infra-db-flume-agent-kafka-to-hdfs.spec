@@ -1,15 +1,15 @@
 # Standard install path for infra 
 %define install_path /usr/lib/
-%define install_dir_name db-flume-agent-kafka-to-es
-%define bin_name db-flume-agent-kafka-to-es
+%define install_dir_name db-flume-agent-kafka-to-hdfs
+%define bin_name db-flume-agent-kafka-to-hdfs
 %define debug_package %{nil}
 %define __jar_repack %{nil}
 %define __arch_install_post %{nil}
 %define __os_install_post %{nil}
 
-Summary:	Flume agent to transfer log and audit data of databases from Kafka to ElasticSearch
-Name:		cerndb-infra-db-flume-agent-kafka-to-es
-Version:	0.0.2
+Summary:	Flume agent to transfer log and audit data of databases from Kafka to HDFS
+Name:		cerndb-infra-db-flume-agent-kafka-to-hdfs
+Version:	0.0.1
 Release:	1%{?dist}
 License:	GPL
 BuildArch:	noarch
@@ -19,7 +19,7 @@ BuildRoot:	%{_builddir}/%{name}-root
 AutoReqProv:	no
 
 %description
-Flume agent to transfer log and audit data of databases from Kafka to ElasticSearch
+Flume agent to transfer log and audit data of databases from Kafka to HDFS
 
 %prep
 %setup -q
@@ -104,11 +104,5 @@ rm -rf ${RPM_BUILD_ROOT}
 
 # Please keep a meaningful changelog
 %changelog
-* Thu Oct 14 2016 Daniel Lanza <daniel.lanza@cern.ch> - 0.0.2-1
-- Uses Kafka source with useFlumeEventFormat
-
-* Thu Oct 13 2016 Daniel Lanza <daniel.lanza@cern.ch> - 0.0.1-2
-- Solve minor issue with path for logging
-
-* Thu Oct 13 2016 Daniel Lanza <daniel.lanza@cern.ch> - 0.0.1-1
+* Thu Oct 18 2016 Daniel Lanza <daniel.lanza@cern.ch> - 0.0.1-1
 - Initial creation of the RPM.
