@@ -20,24 +20,6 @@ HOME=$SCRIPT_DIR/..
 
 FLUME_HOME=/usr/lib/aimon-flume-ng/
 
-if [ -f $FLUME_HOME/lib/guava-11.0.2.jar ] 
-then
-	rm -f $FLUME_HOME/lib/guava-11.0.2.jar
-	cp $HOME/lib/guava-19.0.jar $FLUME_HOME/lib/
-fi
-
-if [ -f $FLUME_HOME/lib/jackson-core-2.3.1.jar ] 
-then
-	rm -f $FLUME_HOME/lib/jackson-core-2.3.1.jar
-	cp $HOME/lib/jackson-core-2.8.0.rc1.jar $FLUME_HOME/lib/
-fi
-
-if [ -f $FLUME_HOME/lib/jackson-core-asl-1.8.8.jar ] 
-then
-	rm -f $FLUME_HOME/lib/jackson-core-asl-1.8.8.jar
-	cp $HOME/lib/jackson-core-asl-1.9.13.jar $FLUME_HOME/lib/
-fi
-
 if [ -f $FLUME_HOME/lib/kafka_2.10-0.8.1.1.jar ] 
 then
 	rm -f $FLUME_HOME/lib/kafka_2.10-0.8.1.1.jar
