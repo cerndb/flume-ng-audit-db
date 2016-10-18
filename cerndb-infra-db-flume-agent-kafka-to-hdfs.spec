@@ -10,7 +10,7 @@
 Summary:	Flume agent to transfer log and audit data of databases from Kafka to HDFS
 Name:		cerndb-infra-db-flume-agent-kafka-to-hdfs
 Version:	0.0.1
-Release:	1%{?dist}
+Release:	2%{?dist}
 License:	GPL
 BuildArch:	noarch
 Group:		Development/Tools
@@ -104,5 +104,8 @@ rm -rf ${RPM_BUILD_ROOT}
 
 # Please keep a meaningful changelog
 %changelog
+* Thu Oct 18 2016 Daniel Lanza <daniel.lanza@cern.ch> - 0.0.1-2
+- Use temporal HDFS path for testing
+
 * Thu Oct 18 2016 Daniel Lanza <daniel.lanza@cern.ch> - 0.0.1-1
 - Initial creation of the RPM.
