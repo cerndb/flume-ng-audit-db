@@ -24,7 +24,7 @@ function generate_dataset_metadata {
 	schemafile=$3
 
 	# Only if .metadata does not exist
-	hdfs dfs -mkdir $targetdir/.metadata
+	hdfs dfs -mkdir -p $targetdir/.metadata
 	
 	if [ $? -eq "0" ]
 	then
